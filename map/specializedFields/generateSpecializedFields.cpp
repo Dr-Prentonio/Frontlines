@@ -11,7 +11,7 @@
 auto getTreeType(int type) {
     switch (type) {
         case 1:
-            return
+            return;
     }
 }
 

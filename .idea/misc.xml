@@ -12,7 +12,7 @@
       <file path="$PROJECT_DIR$/player" />
     </sourceRoots>
     <libraryRoots>
-      <file path="$PROJECT_DIR$/cmake-build-debug/libs" />
+      <file path="$PROJECT_DIR$/libs" />
     </libraryRoots>
   </component>
 </project>

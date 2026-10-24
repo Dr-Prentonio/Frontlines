@@ -3,6 +3,8 @@ project(strategie_game)
 
 set(CMAKE_CXX_STANDARD 20)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+
 find_package(SDL2 CONFIG REQUIRED)
 find_package(SDL2_image REQUIRED CONFIG)
 find_package(SDL2_ttf REQUIRED CONFIG)
@@ -21,10 +23,15 @@ add_executable(strategie_game
         header/UIClasses.hpp
         header/buildingsClasses.hpp
         header/generalFuncs.hpp
+        header/specializedFieldClasses.hpp
+        header/devModeClasses.hpp
+        header/debugLogging.hpp
 
         # MAP RELATED
         map/territoryFuncss.cpp
         map/terrainFuncs.cpp
+        map/specializedFields/initSpecializedFields.cpp
+        map/specializedFields/generateSpecializedFields.cpp
 
         # PLAYER RELATED
         player/playerFuncs.cpp
@@ -33,14 +40,11 @@ add_executable(strategie_game
 
         # OTHER STUFF
         other/FastNoiseLite.hpp
-        dev/developmentModeFuncs.cpp
-        header/devModeClasses.hpp
-        header/debugLogging.hpp
+
+        # DEV FUNCS
         dev/uiFuncsforDev.cpp
         dev/readOutput.cpp
-        map/specializedFields/initSpecializedFields.cpp
-        header/specializedFieldClasses.hpp
-        map/specializedFields/generateSpecializedFields.cpp
+        dev/developmentModeFuncs.cpp
 )
 
 target_link_libraries(strategie_game PRIVATE
