@@ -41,7 +41,7 @@ namespace FORREST {
     // template for trees (position, type and parent group)
     struct TemplateStruct {
 
-        glm::ivec2 pos = {0,0};         // position of tree
+        SDL_Rect rect = {0,0};         // position of tree
         Types type = ERR;  // type of forest
         int groupID = 0;                    // what forest group they belong too
     };

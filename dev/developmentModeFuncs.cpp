@@ -105,6 +105,7 @@ void DEVMODE::loop() {
 
     UI::TEXT::initLabel((SDL_Rect){60,25,0,0}, "Enable Dev - Mode");
     UI::TEXT::initLabel((SDL_Rect){60,75,0,0}, "Enable Pre Generated Map");
+    UI::TEXT::initLabel((SDL_Rect){25,120,0,0}, "Space for new map and Godmode");
 
     while (run) {
         while (SDL_PollEvent(&event)) {
@@ -116,6 +117,16 @@ void DEVMODE::loop() {
             if (event.type == SDL_KEYDOWN) {
                 if (event.key.keysym.sym == SDLK_ESCAPE) {
                     run = false;
+                    break;
+                }
+
+                // if space is pressed use basic preset
+                if (event.key.keysym.sym == SDLK_SPACE) {
+                    run = false;
+
+                    UI::checkBoxes.at(0).checked = true;
+                    UI::checkBoxes.at(1).checked = false;
+
                     break;
                 }
             }

@@ -8,11 +8,30 @@
 #include "../../header/generalClasses.hpp"
 #include "../../header/specializedFieldClasses.hpp"
 
-auto getTreeType(int type) {
-    switch (type) {
-        case 1:
-            return;
+// translate number to enum
+FORREST::Types findType(int num) {
+    switch (num) {
+        case 1: return FORREST::LIGHT_OAK;
+        case 2: return FORREST::LIGHT_SPRUCE;
+        case 3: return FORREST::DENSE_OAK;
+        case 4: return FORREST::DENSE_SPRUCE;
+        default: return FORREST::ERR;
     }
+}
+
+// get texture size
+glm::ivec2 getTexSize(int num) {
+    glm::ivec2 size;
+
+    switch (num) {
+        case 1: SDL_QueryTexture(FORREST::textures.lightOak,    0, 0, &size.x, &size.y);    break;
+        case 2: SDL_QueryTexture(FORREST::textures.lightSpruce, 0, 0, &size.x, &size.y);    break;
+        case 3: SDL_QueryTexture(FORREST::textures.denseOak,    0, 0, &size.x, &size.y);    break;
+        case 4: SDL_QueryTexture(FORREST::textures.denseSpruce, 0, 0, &size.x, &size.y);    break;
+        default: return {0,0};
+    }
+
+    return size;
 }
 
 void FIELD_GENERATION::manager() {
@@ -27,11 +46,13 @@ void FIELD_GENERATION::manager() {
     std::random_device device;
     std::mt19937 gen(device());
     std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
+    std::uniform_real_distribution<float> dis2(0.0f, 2.0f);
 
     float seed = dis(gen);
 
     std::vector<float> heightMap(mapSize.x * mapSize.y);
 
+    // make new heightmap
     for (int y = 0; y < mapSize.y; y++) {
         for (int x = 0; x < mapSize.x; x++) {
 
@@ -45,19 +66,30 @@ void FIELD_GENERATION::manager() {
         }
     }
 
+    // choose tree;
     for (int y = 0; y < mapSize.y; y++) {
         for (int x = 0; x < mapSize.x; x++) {
 
             FORREST::TemplateStruct tree;
 
-            float terrainNoise = heightMap[x + y * mapSize.x];
-            int type = static_cast<int>(glm::round(dis(gen)));
+            int index = x + y * mapSize.x;
+            float terrainNoise = heightMap[index];
 
-            // > -1.15  => grass; < 0.7 => taiga
-            if (terrainNoise < 0.4f) {
-                tree.type =
+            int randomType = static_cast<int>(glm::round(dis2(gen)));
+
+            // if its any sea or shore tile it skips
+            if (TERRAIN::map[index].type > 2) {
+
+                // get type
+                if (terrainNoise < 0)       tree.type = findType(randomType);
+                else if (terrainNoise > 0)  tree.type = findType(randomType * 2);
+            } else {
+                continue;
             }
-            else if (terrainNoise < 0.7) terrainTile.type = TAIGA;
+
+            glm::ivec2 size = getTexSize(randomType);
+
+            tree.rect =  { x, y,  };
 
             FORREST::trees.push_back(tree);
         }
