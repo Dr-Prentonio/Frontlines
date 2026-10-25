@@ -8,6 +8,7 @@
 // SYSTEM
 #include <chrono>
 #include <format>
+#include <random>
 
 // HEADER
 #include "buildingsClasses.hpp"
@@ -303,6 +304,17 @@ namespace TOOLBOX {
         };
 
         newRect = temp;
+    }
+
+    // |===============================|
+    // |    Random number Generator    |
+    // |===============================|
+
+    inline float randomFloat(float min, float max) {
+        static std::random_device dev;
+        static std::mt19937 gen(dev());
+        std::uniform_real_distribution<float> dis(min, max);
+        return dis(gen);
     }
 }
 

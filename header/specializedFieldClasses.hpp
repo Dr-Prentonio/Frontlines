@@ -41,12 +41,14 @@ namespace FORREST {
     // template for trees (position, type and parent group)
     struct TemplateStruct {
 
-        SDL_Rect rect = {0,0};         // position of tree
+        SDL_Rect rect = {0,0, 0, 0};         // position of tree
+        SDL_Rect hitbox = {0, 0, 0, 0};
         Types type = ERR;  // type of forest
         int groupID = 0;                    // what forest group they belong too
     };
 
     inline std::vector<TemplateStruct> trees;
+    inline std::vector<SDL_Rect> forestTiles(TERRAIN::mapSize.x * TERRAIN::mapSize.y);
     inline Textures textures;
 
     void init();

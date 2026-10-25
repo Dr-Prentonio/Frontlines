@@ -2,6 +2,7 @@
 #include "../header/UIClasses.hpp"
 #include "../header/buildingsClasses.hpp"
 #include "../header/generalFuncs.hpp"
+#include "../header/specializedFieldClasses.hpp"
 
 void SDL::Gameloop::draw() {
     static SDL_Renderer* rend;
@@ -47,6 +48,38 @@ void SDL::Gameloop::draw() {
         SDL_RenderCopy(rend, TERRAIN::LOD.LoD2, nullptr, &drect);
     } else {
         SDL_RenderCopy(rend, TERRAIN::LOD.LoD1, nullptr, &drect);
+    }
+
+    for (auto& trees : FORREST::trees) {
+
+        SDL_Rect newRect;
+        TOOLBOX::screenSpaceMapping(trees.rect, drect, newRect);
+
+        switch (trees.type) {
+            case FORREST::LIGHT_OAK:
+                SDL_RenderCopy(rend, FORREST::textures.lightOak, nullptr, &newRect);
+                break;
+            case FORREST::DENSE_OAK:
+                SDL_RenderCopy(rend, FORREST::textures.denseOak, nullptr, &newRect);
+                break;
+            case FORREST::LIGHT_SPRUCE:
+                SDL_RenderCopy(rend, FORREST::textures.lightSpruce, nullptr, &newRect);
+                break;
+            case FORREST::DENSE_SPRUCE:
+                SDL_RenderCopy(rend, FORREST::textures.denseSpruce, nullptr, &newRect);
+                break;
+            default: break;
+        }
+
+        TOOLBOX::screenSpaceMapping(trees.hitbox, drect, newRect);
+
+        SDL_SetRenderDrawColor(rend, 225,225,225,80);
+        SDL_RenderFillRect(rend, &newRect);
+    }
+
+    for (auto& forestTiles : FORREST::forestTiles) {
+        SDL_SetRenderDrawColor(rend, 50, 50, 100, 180);
+        SDL_RenderFillRect(rend, &forestTiles);
     }
 
     //===========================0

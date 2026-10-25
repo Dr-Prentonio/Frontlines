@@ -83,6 +83,7 @@ int main() {
     else DEVMODE::useStaticMaps();
 
     FORREST::init(); // load forrest textures
+    FIELD_GENERATION::manager();
 
     TERRITORY::setupLayer(); // setup the player territory layer
 

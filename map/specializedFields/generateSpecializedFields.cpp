@@ -6,18 +6,8 @@
 
 #include "../../header/debugLogging.hpp"
 #include "../../header/generalClasses.hpp"
+#include "../../header/generalFuncs.hpp"
 #include "../../header/specializedFieldClasses.hpp"
-
-// translate number to enum
-FORREST::Types findType(int num) {
-    switch (num) {
-        case 1: return FORREST::LIGHT_OAK;
-        case 2: return FORREST::LIGHT_SPRUCE;
-        case 3: return FORREST::DENSE_OAK;
-        case 4: return FORREST::DENSE_SPRUCE;
-        default: return FORREST::ERR;
-    }
-}
 
 // get texture size
 glm::ivec2 getTexSize(int num) {
@@ -42,13 +32,8 @@ void FIELD_GENERATION::manager() {
 
     LOG::DEBUG("Mapsize x: " + std::to_string(mapSize.x) + " y: " + std::to_string(mapSize.y));
 
-    // random gen
-    std::random_device device;
-    std::mt19937 gen(device());
-    std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
-    std::uniform_real_distribution<float> dis2(0.0f, 2.0f);
-
-    float seed = dis(gen);
+    float seed = TOOLBOX::randomFloat(-1.0f, 1.0f);
+    float seed2 = TOOLBOX::randomFloat(-1.0f, 1.0f);
 
     std::vector<float> heightMap(mapSize.x * mapSize.y);
 
@@ -56,42 +41,107 @@ void FIELD_GENERATION::manager() {
     for (int y = 0; y < mapSize.y; y++) {
         for (int x = 0; x < mapSize.x; x++) {
 
-            float noiseValue;
+            float noiseValue = 0;
+            float noiseValue2 = 0;
+
             noiseValue = glm::perlin(
                 glm::vec2(
                     x * perlinNoiseScale * seed,
                     y * perlinNoiseScale * seed));
 
-            heightMap[x + y * mapSize.x] = noiseValue;
+            noiseValue2 = glm::perlin(
+                glm::vec2(
+                    x * perlinNoiseScale * seed2,
+                    y * perlinNoiseScale * seed2));
+
+            float finalNoise = noiseValue * noiseValue2;
+
+            heightMap[x + y * mapSize.x] = finalNoise;
         }
     }
 
+    /*
     // choose tree;
-    for (int y = 0; y < mapSize.y; y++) {
-        for (int x = 0; x < mapSize.x; x++) {
+    for (int y = 0; y < mapSize.y ; y++) {
+        for (int x = 0; x < mapSize.x ; x++) {
 
             FORREST::TemplateStruct tree;
 
             int index = x + y * mapSize.x;
             float terrainNoise = heightMap[index];
 
-            int randomType = static_cast<int>(glm::round(dis2(gen)));
-
-            // if its any sea or shore tile it skips
-            if (TERRAIN::map[index].type > 2) {
-
-                // get type
-                if (terrainNoise < 0)       tree.type = findType(randomType);
-                else if (terrainNoise > 0)  tree.type = findType(randomType * 2);
-            } else {
-                continue;
+            // if tree is inside water or sand -> skip
+            if (TERRAIN::map.at(index).type > 2) {
+                if (terrainNoise > -0.1) tree.type = FORREST::LIGHT_OAK;
+                else if (terrainNoise > 0.3) tree.type = FORREST::DENSE_OAK;
             }
+            else continue;
 
-            glm::ivec2 size = getTexSize(randomType);
+            float spawnChance = TOOLBOX::randomFloat(0.0f, 1.0f);
 
-            tree.rect =  { x, y,  };
+            // if spawnChance ist highr than 0.99 then -> skip
+            if (spawnChance < 0.99f) continue;
+
+            glm::ivec2 size = getTexSize(tree.type);
+
+            SDL_Rect tempRect = {
+                x * TERRAIN::tileSize,
+                y * TERRAIN::tileSize,
+                size.x / 4,
+                size.y / 4
+            };
+
+            tempRect.x += static_cast<int>(glm::round(TOOLBOX::randomFloat(-5.0f, 5.0f)));
+            tempRect.y += static_cast<int>(glm::round(TOOLBOX::randomFloat(-5.0f, 5.0f)));
+
+            SDL_Rect tempHitbox = {
+                tempRect.x - 10,
+                tempRect.y - 10,
+                tempRect.w + 20,
+                tempRect.h + 20
+            };
+
+            // AABB Ansatz
+            bool collision = false;
+            for (auto& trees : FORREST::trees) {
+                if (TOOLBOX::checkHitboxCollision(tempHitbox, trees.hitbox)) {
+                    collision = true;
+                    break;
+                }
+            }
+            if (collision) continue;
+
+            // assign temp var to vector
+            tree.rect = tempRect;
+            tree.hitbox = tempHitbox;
 
             FORREST::trees.push_back(tree);
+        }
+    }
+
+    LOG::INFO("Generated Trees: " + std::to_string(FORREST::trees.size()));
+
+*/
+
+    for (int y = 0; y < mapSize.y; y++) {
+        for (int x = 0; x < mapSize.x; x++) {
+
+            int index = y + x * mapSize.x;
+
+            if (TERRAIN::map.at(index).type <= 2) continue;
+
+            int spawnChance = static_cast<int>(glm::round(TOOLBOX::randomFloat(0.0f, 100.0f)));
+
+            if (spawnChance < 90) continue;
+
+            SDL_Rect newRect = {
+                x * TERRAIN::tileSize,
+                y * TERRAIN::tileSize,
+                TERRAIN::tileSize,
+                TERRAIN::tileSize,
+            };
+
+            FORREST::forestTiles.push_back(newRect);
         }
     }
 }
