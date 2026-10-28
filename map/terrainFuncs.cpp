@@ -4,6 +4,9 @@
 #include "../header/debugLogging.hpp"
 #include <random>
 
+#include "../header/generalFuncs.hpp"
+#include "../header/specializedFieldClasses.hpp"
+
 float interpolatedHeight(glm::vec2 pos, glm::ivec2 size, const std::vector<float>& heightMap) {
     // pos is pos
     // size.x = width; size.y = height
@@ -257,43 +260,53 @@ void TERRAIN::generateTile(SDL_Renderer* rend) {
 
 }
 
-void TERRAIN::generateLOD(SDL_Renderer* rend, SDL_Texture* ref, glm::ivec2 lodSize, SDL_Texture*& Lod) {
+void TERRAIN::generateLoDs() {
 
-    if (Lod == nullptr) {
+    SDL_Texture* staticTex;
+    SDL_Renderer* rend = window.rend;
 
-        LOG::INFO("LoD is nullptr, Generating new LoD");
+    staticTex = SDL_CreateTexture(
+        rend,
+        SDL_PIXELFORMAT_ARGB8888,
+        SDL_TEXTUREACCESS_TARGET,
+        mapSize.x * tileSize,
+        mapSize.y * tileSize);
 
-        Lod = SDL_CreateTexture(
-            rend,
-            SDL_PIXELFORMAT_RGBA8888,
-            SDL_TEXTUREACCESS_TARGET,
-            lodSize.x,
-            lodSize.y
-        );
-    }
-
-    if (Lod == nullptr) {
+    if (staticTex == nullptr) {
         std::string err = SDL_GetError();
-        LOG::ERR("Couldnt create LoD Tex" + err);
+        LOG::ERR("Critical Error " + err);
         return;
     }
 
-    LOG::INFO("LOD Created");
+    // get texture size
+    int width, height;
 
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+    SDL_QueryTexture(mapTexture, nullptr, nullptr, &width, &height);
+    SDL_Rect temp = {0,0,width, height};
 
-    SDL_SetRenderTarget(rend, Lod);
-    SDL_SetRenderDrawColor(rend, 0,0,0,0);
+    SDL_QueryTexture(FOREST::worldTex, nullptr, nullptr, &width, &height);
+    SDL_Rect temp2 = {0,0,width,height};
+
+    // draw into one texture
+    SDL_SetTextureBlendMode(staticTex, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderTarget(rend, staticTex);
+    SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
     SDL_RenderClear(rend);
 
-    SDL_RenderCopy(rend, ref, nullptr, nullptr);
+    SDL_RenderCopy(rend, mapTexture, nullptr, &temp);
+    SDL_RenderCopy(rend, FOREST::worldTex, nullptr, &temp2);
 
     SDL_SetRenderTarget(rend, nullptr);
 
-    int width, height;
-    SDL_QueryTexture(Lod, nullptr, nullptr, &width, &height);
+    // Generate LODs
+    TOOLBOX::lodMaker(2, staticTex, LOD.LoD1);
+    TOOLBOX::lodMaker(4, staticTex, LOD.LoD2);
+    TOOLBOX::lodMaker(8, staticTex, LOD.LoD3);
 
-    LOG::DEBUG("LOD: W: " + std::to_string(width) + " H: " + std::to_string(height));
+    LOG::INFO("Generated lods");
+
+    SDL_DestroyTexture(mapTexture);
+    SDL_DestroyTexture(FOREST::worldTex);
 }
 
 void TERRAIN::generateTerrain() {
@@ -374,13 +387,7 @@ void TERRAIN::generateTerrain() {
 
     SDL_QueryTexture(mapTexture, nullptr, nullptr, &width, &height);
 
-    // Generate LODs
-    generateLOD(rend, mapTexture, {width / 2, height / 2}, LOD.LoD1);
-    generateLOD(rend, mapTexture, {width / 4, height / 4}, LOD.LoD2);
-    generateLOD(rend, mapTexture, {width / 8, height / 8}, LOD.LoD3);
-
     SDL_SetRenderTarget(rend, nullptr);
-    SDL_DestroyTexture(mapTexture);
 
     // |=========================================|
     // |    Write tiles to Array for Dev mode    |
@@ -406,5 +413,6 @@ void TERRAIN::generateTerrain() {
 
     outFile.close();
 
+    LOG::INFO("Writen to staticMapArray.txt file successfully");
     LOG::INFO("Optimizing terrain < DONE >");
 }

@@ -161,7 +161,7 @@ namespace TERRAIN {
 
     void generateTerrain();
     void generateTile(SDL_Renderer* rend);
-    void generateLOD(SDL_Renderer* rend, SDL_Texture* ref, glm::ivec2 lodSize, SDL_Texture*& Lod);
+    void generateLoDs();
 }
 
 #define Red (SDL_Color){245, 0, 0, 125};

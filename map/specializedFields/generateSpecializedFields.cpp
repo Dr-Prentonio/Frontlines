@@ -14,134 +14,246 @@ glm::ivec2 getTexSize(int num) {
     glm::ivec2 size;
 
     switch (num) {
-        case 1: SDL_QueryTexture(FORREST::textures.lightOak,    0, 0, &size.x, &size.y);    break;
-        case 2: SDL_QueryTexture(FORREST::textures.lightSpruce, 0, 0, &size.x, &size.y);    break;
-        case 3: SDL_QueryTexture(FORREST::textures.denseOak,    0, 0, &size.x, &size.y);    break;
-        case 4: SDL_QueryTexture(FORREST::textures.denseSpruce, 0, 0, &size.x, &size.y);    break;
+        case 1: SDL_QueryTexture(FOREST::textures.lightOak,    0, 0, &size.x, &size.y);    break;
+        case 2: SDL_QueryTexture(FOREST::textures.lightSpruce, 0, 0, &size.x, &size.y);    break;
+        case 3: SDL_QueryTexture(FOREST::textures.denseOak,    0, 0, &size.x, &size.y);    break;
+        case 4: SDL_QueryTexture(FOREST::textures.denseSpruce, 0, 0, &size.x, &size.y);    break;
         default: return {0,0};
     }
 
     return size;
 }
 
-void FIELD_GENERATION::manager() {
-    LOG::INFO("Generating Forests");
+// spawns the trees
+void FOREST::spawnTrees(int treesAmount) {
 
-    const float perlinNoiseScale = 0.02f;
-    const glm::ivec2 mapSize = TERRAIN::mapSize;
+    // init vector for hitboxes
+    static std::vector<SDL_Rect> treesHitbox;
+    treesHitbox.clear();
 
-    LOG::DEBUG("Mapsize x: " + std::to_string(mapSize.x) + " y: " + std::to_string(mapSize.y));
+    for (int i = 0; i < treesAmount; i++) {
 
-    float seed = TOOLBOX::randomFloat(-1.0f, 1.0f);
-    float seed2 = TOOLBOX::randomFloat(-1.0f, 1.0f);
+        if (innerCircle.empty()) return;
+        int randomIndex = TOOLBOX::randomInt(0, innerCircle.size() - 1);
 
-    std::vector<float> heightMap(mapSize.x * mapSize.y);
+        // get width, height
+        int width, height;
+        SDL_QueryTexture(textures.lightOak, nullptr, nullptr, &width, &height);
 
-    // make new heightmap
-    for (int y = 0; y < mapSize.y; y++) {
-        for (int x = 0; x < mapSize.x; x++) {
+        // size, hitbox and collision detection
+        SDL_Rect temp = {
+            innerCircle.at(randomIndex).x + TOOLBOX::randomInt(-1, 1),
+            innerCircle.at(randomIndex).y + TOOLBOX::randomInt(-1, 1),
+            width / 4,
+            height / 4
+        };
 
-            float noiseValue = 0;
-            float noiseValue2 = 0;
+        SDL_Rect tempHitbox = {
+            temp.x - 5, temp.y - 5, temp.w + 10, temp.h + 10
+        };
 
-            noiseValue = glm::perlin(
-                glm::vec2(
-                    x * perlinNoiseScale * seed,
-                    y * perlinNoiseScale * seed));
-
-            noiseValue2 = glm::perlin(
-                glm::vec2(
-                    x * perlinNoiseScale * seed2,
-                    y * perlinNoiseScale * seed2));
-
-            float finalNoise = noiseValue * noiseValue2;
-
-            heightMap[x + y * mapSize.x] = finalNoise;
+        bool skip = false;
+        for (auto& kk : treesHitbox) {
+            if (TOOLBOX::checkHitboxCollision(tempHitbox, kk)) {
+                skip = true;
+            }
         }
+        if (skip) continue;
+
+        // set renderer
+        SDL_Renderer* rend = window.rend;
+        SDL_SetRenderTarget(rend, worldTex);
+
+        // debug hitbox
+        SDL_SetRenderDrawColor(rend, 125, 125, 125, 155);
+        SDL_RenderFillRect(rend, &tempHitbox);
+
+        // switch for random tree type
+        if (TOOLBOX::randomBool(0.5)) SDL_RenderCopy(rend, textures.lightOak, nullptr, &temp);
+        else SDL_RenderCopy(rend, textures.denseSpruce, nullptr, &temp);
+
+        SDL_SetRenderTarget(rend, nullptr);
+
+        // new vector entry
+        treesHitbox.push_back(tempHitbox);
     }
 
-    /*
-    // choose tree;
-    for (int y = 0; y < mapSize.y ; y++) {
-        for (int x = 0; x < mapSize.x ; x++) {
+    for (int i = 0; i < treesAmount / 2; i++) {
 
-            FORREST::TemplateStruct tree;
+        if (outerCircle.empty()) return;
 
-            int index = x + y * mapSize.x;
-            float terrainNoise = heightMap[index];
+        int randomIndex = TOOLBOX::randomInt(0, outerCircle.size() - 1);
 
-            // if tree is inside water or sand -> skip
-            if (TERRAIN::map.at(index).type > 2) {
-                if (terrainNoise > -0.1) tree.type = FORREST::LIGHT_OAK;
-                else if (terrainNoise > 0.3) tree.type = FORREST::DENSE_OAK;
+        int width, height;
+        SDL_QueryTexture(textures.lightOak, nullptr, nullptr, &width, &height);
+
+        // size, hitbox and collision detection
+        SDL_Rect temp = {
+            outerCircle.at(randomIndex).x + TOOLBOX::randomInt(-1, 1),
+            outerCircle.at(randomIndex).y + TOOLBOX::randomInt(-1, 1),
+            width / 4,
+            height / 4
+        };
+
+        SDL_Rect tempHitbox = {
+            temp.x - 5, temp.y - 5, temp.w + 10, temp.h + 10
+        };
+
+        bool skip = false;
+        for (auto& kk : treesHitbox) {
+            if (TOOLBOX::checkHitboxCollision(tempHitbox, kk)) {
+                skip = true;
             }
-            else continue;
+        }
+        if (skip) continue;
 
-            float spawnChance = TOOLBOX::randomFloat(0.0f, 1.0f);
+        // set renderer
+        SDL_Renderer* rend = window.rend;
+        SDL_SetRenderTarget(rend, worldTex);
 
-            // if spawnChance ist highr than 0.99 then -> skip
-            if (spawnChance < 0.99f) continue;
+        // debug hitbox
+        SDL_SetRenderDrawColor(rend, 125, 125, 125, 155);
+        SDL_RenderFillRect(rend, &tempHitbox);
 
-            glm::ivec2 size = getTexSize(tree.type);
+        // switch for random tree type
+        if (TOOLBOX::randomBool(0.5)) SDL_RenderCopy(rend, textures.lightOak, nullptr, &temp);
+        else SDL_RenderCopy(rend, textures.denseSpruce, nullptr, &temp);
 
-            SDL_Rect tempRect = {
-                x * TERRAIN::tileSize,
-                y * TERRAIN::tileSize,
-                size.x / 4,
-                size.y / 4
-            };
+        SDL_SetRenderTarget(rend, nullptr);
 
-            tempRect.x += static_cast<int>(glm::round(TOOLBOX::randomFloat(-5.0f, 5.0f)));
-            tempRect.y += static_cast<int>(glm::round(TOOLBOX::randomFloat(-5.0f, 5.0f)));
+        // new vector entry
+        treesHitbox.push_back(tempHitbox);
+    }
+}
 
-            SDL_Rect tempHitbox = {
-                tempRect.x - 10,
-                tempRect.y - 10,
-                tempRect.w + 20,
-                tempRect.h + 20
-            };
+// draws the forest zone
+void FOREST::drawCircle(int size, glm::ivec2 pos) {
 
-            // AABB Ansatz
-            bool collision = false;
-            for (auto& trees : FORREST::trees) {
-                if (TOOLBOX::checkHitboxCollision(tempHitbox, trees.hitbox)) {
-                    collision = true;
-                    break;
+    int outerCircleSize = size * 2;
+
+    SDL_Color floorColor = {0,115,0,155};
+
+    // outer circle
+    for (int y = -outerCircleSize; y <= outerCircleSize; y++) {
+        for (int x = -outerCircleSize; x <= outerCircleSize; x++) {
+
+            int distance2 = (x * x) + (y * y);
+
+            if (distance2 <= (outerCircleSize * outerCircleSize)) {
+                glm::ivec2 tilePos = { pos.x + x, pos.y + y };
+                int tileIndex = tilePos.x + tilePos.y * TERRAIN::mapSize.x;
+
+                if (tilePos.x < 0 || tilePos.x >= TERRAIN::mapSize.x || tilePos.y < 0 || tilePos.y >= TERRAIN::mapSize.y) {
+                    continue;
                 }
+
+                if (TERRAIN::map.at(tileIndex).type <= 2) continue;
+
+                SDL_Rect drect = {
+                    tilePos.x * TERRAIN::tileSize,
+                    tilePos.y * TERRAIN::tileSize,
+                    TERRAIN::tileSize,
+                    TERRAIN::tileSize
+                };
+
+                SDL_Renderer* rend = window.rend;
+
+                SDL_SetTextureBlendMode(worldTex, SDL_BLENDMODE_BLEND);
+
+                SDL_SetRenderTarget(rend, worldTex);
+
+                SDL_SetRenderDrawColor(rend, floorColor.r, floorColor.g, floorColor.b, floorColor.a);
+                SDL_RenderFillRect(rend, &drect);
+
+                SDL_SetRenderTarget(rend, nullptr);
+
+                outerCircle.push_back(drect);
             }
-            if (collision) continue;
-
-            // assign temp var to vector
-            tree.rect = tempRect;
-            tree.hitbox = tempHitbox;
-
-            FORREST::trees.push_back(tree);
         }
     }
 
-    LOG::INFO("Generated Trees: " + std::to_string(FORREST::trees.size()));
+    // inner circle on top of the outer
+    for (int y = -size; y <= size; y++) {
+        for (int x = -size; x <= size; x++) {
 
-*/
+            int distance2 = (x * x) + (y * y);
 
-    for (int y = 0; y < mapSize.y; y++) {
-        for (int x = 0; x < mapSize.x; x++) {
+            if (distance2 <= (size * size)) {
+                glm::ivec2 tilePos = { pos.x + x, pos.y + y };
+                int tileIndex = tilePos.x + tilePos.y * TERRAIN::mapSize.x;
 
-            int index = y + x * mapSize.x;
+                if (tilePos.x < 0 || tilePos.x >= TERRAIN::mapSize.x || tilePos.y < 0 || tilePos.y >= TERRAIN::mapSize.y) {
+                    continue;
+                }
 
-            if (TERRAIN::map.at(index).type <= 2) continue;
+                if (TERRAIN::map.at(tileIndex).type <= 2) continue;
 
-            int spawnChance = static_cast<int>(glm::round(TOOLBOX::randomFloat(0.0f, 100.0f)));
+                SDL_Rect drect = {
+                    tilePos.x * TERRAIN::tileSize,
+                    tilePos.y * TERRAIN::tileSize,
+                    TERRAIN::tileSize,
+                    TERRAIN::tileSize
+                };
 
-            if (spawnChance < 90) continue;
+                SDL_Renderer* rend = window.rend;
 
-            SDL_Rect newRect = {
-                x * TERRAIN::tileSize,
-                y * TERRAIN::tileSize,
-                TERRAIN::tileSize,
-                TERRAIN::tileSize,
-            };
+                SDL_SetTextureBlendMode(worldTex, SDL_BLENDMODE_BLEND);
 
-            FORREST::forestTiles.push_back(newRect);
+                SDL_SetRenderTarget(rend, worldTex);
+
+                SDL_SetRenderDrawColor(rend, floorColor.r, floorColor.g, floorColor.b, floorColor.a);
+                SDL_RenderFillRect(rend, &drect);
+
+                SDL_SetRenderTarget(rend, nullptr);
+
+                innerCircle.push_back(drect);
+            }
         }
+    }
+}
+
+void FOREST::generate() {
+
+    LOG::INFO("Starting Forest Generation");
+
+    const int spawnRate = 50;
+
+    worldTex = SDL_CreateTexture(
+        window.rend,
+        SDL_PIXELFORMAT_RGBA8888,
+        SDL_TEXTUREACCESS_TARGET,
+        TERRAIN::mapSize.x * TERRAIN::tileSize,
+        TERRAIN::mapSize.y * TERRAIN::tileSize);
+
+    // error detection
+    if (worldTex == nullptr) {
+        std::string err = SDL_GetError();
+        if (err.empty()) err = "Couldnt get error";
+
+        LOG::INIT_ERR("Couldnt init world Tex: " + err);
+        return;
+    }
+
+    SDL_SetTextureBlendMode(worldTex, SDL_BLENDMODE_BLEND);
+
+    SDL_SetRenderTarget(window.rend, worldTex);
+    SDL_SetRenderDrawColor(window.rend, 0, 0, 0, 0);
+    SDL_RenderClear(window.rend);
+    SDL_SetRenderTarget(window.rend, nullptr);
+
+    // amount of forests
+    for (int i = 0; i < spawnRate; i++) {
+
+        int x = static_cast<int>(TOOLBOX::randomFloat(0.0f, static_cast<float>(TERRAIN::mapSize.x)));
+        int y = static_cast<int>(TOOLBOX::randomFloat(0.0f, static_cast<float>(TERRAIN::mapSize.y)));
+
+        innerCircle.clear();
+        outerCircle.clear();
+
+        // draws floor
+        drawCircle(10, glm::ivec2(x, y));
+
+        // spawns trees
+        spawnTrees(80);
     }
 }

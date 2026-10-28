@@ -306,15 +306,97 @@ namespace TOOLBOX {
         newRect = temp;
     }
 
-    // |===============================|
-    // |    Random number Generator    |
-    // |===============================|
+    // |==============================|
+    // |    Random float Generator    |
+    // |==============================|
 
     inline float randomFloat(float min, float max) {
         static std::random_device dev;
         static std::mt19937 gen(dev());
         std::uniform_real_distribution<float> dis(min, max);
         return dis(gen);
+    }
+
+    // |============================|
+    // |    Random int Generator    |
+    // |============================|
+
+    inline int randomInt(int min, int max) {
+        static std::random_device dev;
+        static std::mt19937 gen(dev());
+        std::uniform_real_distribution<float> dis(static_cast<float>(min), static_cast<float>(max));
+
+        // give out a random int (rounded and castet from float to int)
+        return static_cast<int>(glm::round(dis(gen)));
+    }
+
+    // |================================|
+    // |    Random boolean Generator    |
+    // |================================|
+
+    inline bool randomBool(float normalizedProbability) {
+        static std::random_device dev;
+        static std::mt19937 gen(dev());
+        std::uniform_real_distribution<float> dis(0.0f, 1.0f);
+
+        return dis(gen) > normalizedProbability;
+    }
+
+    // |=====================|
+    // |    LoD Generator    |
+    // |=====================|
+
+    inline void lodMaker(
+        int downScaling,        // downscaling multiplier
+        SDL_Texture* refTex,    // original texture
+        SDL_Texture*& goalTex   // the lod texture
+        ) {
+
+        SDL_Renderer* rend = window.rend;
+
+        int originalWidth, originalHeight;
+        SDL_QueryTexture(refTex, nullptr, nullptr, &originalWidth, &originalHeight);
+
+        glm::ivec2 lodSize = {
+            originalWidth / downScaling,
+            originalHeight / downScaling
+        };
+
+        if (goalTex == nullptr) {
+
+            LOG::INFO("generating new LoD");
+
+            goalTex = SDL_CreateTexture(
+                rend,
+                SDL_PIXELFORMAT_RGBA8888,
+                SDL_TEXTUREACCESS_TARGET,
+                lodSize.x,
+                lodSize.y
+            );
+        }
+
+        if (goalTex == nullptr) {
+            std::string err = SDL_GetError();
+            LOG::ERR("Couldnt create LoD Tex " + err);
+            return;
+        }
+
+        LOG::INFO("LOD Created");
+
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+
+        SDL_SetRenderTarget(rend, goalTex);
+        SDL_SetRenderDrawColor(rend, 0,0,0,0);
+        SDL_RenderClear(rend);
+
+        SDL_RenderCopy(rend, refTex, nullptr, nullptr);
+
+        SDL_SetRenderTarget(rend, nullptr);
+
+        int width, height;
+        SDL_QueryTexture(goalTex, nullptr, nullptr, &width, &height);
+
+        LOG::INIT_SUCCESS("LoD: w " + std::to_string(width) + " h " + std::to_string(height));
     }
 }
 

@@ -6,7 +6,7 @@
 #include "../../header/generalClasses.hpp"
 #include "../../header/specializedFieldClasses.hpp"
 
-void FORREST::init() {
+void FOREST::init() {
 
     std::string denseOakAdr, denseSpruceAdr, lightOakAdr, lightSpruceAdr;
     SDL_Renderer* rend = window.rend;

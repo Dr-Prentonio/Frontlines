@@ -82,8 +82,10 @@ int main() {
     if (!SDL::useStaticMaps) TERRAIN::generateTerrain();
     else DEVMODE::useStaticMaps();
 
-    FORREST::init(); // load forrest textures
-    FIELD_GENERATION::manager();
+    FOREST::init(); // load forrest textures
+    FOREST::generate();
+
+    TERRAIN::generateLoDs();
 
     TERRITORY::setupLayer(); // setup the player territory layer
 

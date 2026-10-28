@@ -45,6 +45,7 @@ add_executable(strategie_game
         dev/uiFuncsforDev.cpp
         dev/readOutput.cpp
         dev/developmentModeFuncs.cpp
+        header/renderClass.hpp
 )
 
 target_link_libraries(strategie_game PRIVATE

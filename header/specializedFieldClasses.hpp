@@ -11,12 +11,7 @@
 
 #include "glm/glm.hpp"
 
-namespace FIELD_GENERATION {
-
-    void manager();
-}
-
-namespace FORREST {
+namespace FOREST {
 
     // textures
     struct Textures {
@@ -38,20 +33,18 @@ namespace FORREST {
         DENSE_SPRUCE
     };
 
-    // template for trees (position, type and parent group)
-    struct TemplateStruct {
-
-        SDL_Rect rect = {0,0, 0, 0};         // position of tree
-        SDL_Rect hitbox = {0, 0, 0, 0};
-        Types type = ERR;  // type of forest
-        int groupID = 0;                    // what forest group they belong too
-    };
-
-    inline std::vector<TemplateStruct> trees;
-    inline std::vector<SDL_Rect> forestTiles(TERRAIN::mapSize.x * TERRAIN::mapSize.y);
     inline Textures textures;
 
+    inline SDL_Texture* worldTex;
+
+    inline std::vector<SDL_Rect> innerCircle;
+    inline std::vector<SDL_Rect> outerCircle;
+
+    void drawCircle(int size, glm::ivec2 pos);
+    void spawnTrees(int treesAmount);
+
     void init();
+    void generate();
 }
 
 #endif //STRATEGIE_GAME_SPECIALIZEDFIELDCLASSES_HPP

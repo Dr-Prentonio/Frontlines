@@ -121,9 +121,9 @@ int DEVMODE::useStaticMaps() {
     SDL_QueryTexture(tempMap, nullptr, nullptr, &width, &height);
 
     // Generate LODs
-    TERRAIN::generateLOD(rend, tempMap, {width / 2, height / 2}, TERRAIN::LOD.LoD1);
-    TERRAIN::generateLOD(rend, tempMap, {width / 4, height / 4}, TERRAIN::LOD.LoD2);
-    TERRAIN::generateLOD(rend, tempMap, {width / 8, height / 8}, TERRAIN::LOD.LoD3);
+//    TERRAIN::generateLOD(rend, tempMap, {width / 2, height / 2}, TERRAIN::LOD.LoD1);
+//    TERRAIN::generateLOD(rend, tempMap, {width / 4, height / 4}, TERRAIN::LOD.LoD2);
+//    TERRAIN::generateLOD(rend, tempMap, {width / 8, height / 8}, TERRAIN::LOD.LoD3);
 
     LOG::INFO("Generated LODs");
 
