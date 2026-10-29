@@ -8,7 +8,7 @@ Idea: I thought the game 'Open Front' was very easy and just a fancier clicker g
 
 ### Developer Dependencies
 
-**SDL2** [SDL Github link](https://github.com/libsdl-org/SDL)
-**SDL2 Image** [SDL_Image Github link](https://github.com/libsdl-org/SDL_image)
-**SDL2 TTF** [SDL_TTF Github link](https://github.com/libsdl-org/SDL_ttf)
-**GLM** 
+**SDL2** [SDL Github link](https://github.com/libsdl-org/SDL).
+**SDL2 Image** [SDL_Image Github link](https://github.com/libsdl-org/SDL_image).
+**SDL2 TTF** [SDL_TTF Github link](https://github.com/libsdl-org/SDL_ttf).
+**GLM**
