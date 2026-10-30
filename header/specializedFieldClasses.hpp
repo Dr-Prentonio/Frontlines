@@ -16,32 +16,28 @@ namespace FOREST {
     // textures
     struct Textures {
         // not so dense forest
-        SDL_Texture* lightOak;
-        SDL_Texture* lightSpruce;
-
-        // dense forest
-        SDL_Texture* denseOak;
-        SDL_Texture* denseSpruce;
+        SDL_Texture* oak;
+        SDL_Texture* spruce;
     };
 
     // types of forests = {light = small forests, dense, big forests}
     enum Types {
         ERR,
-        LIGHT_OAK,
-        LIGHT_SPRUCE,
-        DENSE_OAK,
-        DENSE_SPRUCE
+        OAK,
+        SPRUCE,
     };
 
     inline Textures textures;
 
     inline SDL_Texture* worldTex;
 
-    inline std::vector<SDL_Rect> innerCircle;
-    inline std::vector<SDL_Rect> outerCircle;
+    inline std::vector<SDL_Rect> forestTiles;
+//    inline std::vector<SDL_Rect> tempTiles;
 
     void drawCircle(int size, glm::ivec2 pos);
     void spawnTrees(int treesAmount);
+
+    void drawForest(int radius, glm::ivec2 pos);
 
     void init();
     void generate();

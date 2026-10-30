@@ -8,14 +8,12 @@
 
 void FOREST::init() {
 
-    std::string denseOakAdr, denseSpruceAdr, lightOakAdr, lightSpruceAdr;
+    std::string OakAdr, SpruceAdr;
     SDL_Renderer* rend = window.rend;
 
-    // all the texture addresses
-    denseOakAdr = "assets/Fields/denseOak.png";
-    denseSpruceAdr = "assets/Fields/denseSpruce.png";
-    lightOakAdr = "assets/Fields/lightOak.png";
-    lightSpruceAdr = "assets/Fields/lightSpruce.png";
+    // asset address
+    OakAdr = "assets/Fields/oakTreeIcon.png";
+    SpruceAdr = "assets/Fields/spruceTreeIcon.png";
 
     auto makeTexture = [rend](std::string addr, SDL_Texture*& texture) {
 
@@ -39,11 +37,8 @@ void FOREST::init() {
     };
 
     // init the textures
-    if (makeTexture(denseOakAdr, textures.denseOak) != 0) LOG::WARN("Err in denseOakTree");
-    if (makeTexture(denseSpruceAdr, textures.denseSpruce) != 0) LOG::WARN("Err in denseSpruceTree");
-
-    if (makeTexture(lightOakAdr, textures.lightOak) != 0) LOG::WARN("Err in lightOakTree");
-    if (makeTexture(lightSpruceAdr, textures.lightSpruce) != 0) LOG::WARN("Err in lightSpruceTree");
+    if (makeTexture(OakAdr, textures.oak) != 0) LOG::WARN("Err in denseOakTree");
+    if (makeTexture(SpruceAdr, textures.spruce) != 0) LOG::WARN("Err in denseSpruceTree");
 
     LOG::INIT_SUCCESS("Created Textures successfully");
 }

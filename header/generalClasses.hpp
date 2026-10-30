@@ -164,6 +164,7 @@ namespace TERRAIN {
     void generateLoDs();
 }
 
+// definition of the firste few colors
 #define Red (SDL_Color){245, 0, 0, 125};
 #define Red_Border (SDL_Color){245, 200, 200, 125};
 #define Clear (SDL_Color){0, 0, 0, 0};
@@ -176,7 +177,6 @@ namespace TERRITORY {
         SDL_Rect rect;  // size and pos of the tile
         SDL_Color color = Clear;    // color of the field
         int ownerID;    // the owner of this field
-        bool isBeingProcessed = false; // if a player process it
 
     };
 

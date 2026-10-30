@@ -398,6 +398,36 @@ namespace TOOLBOX {
 
         LOG::INIT_SUCCESS("LoD: w " + std::to_string(width) + " h " + std::to_string(height));
     }
+
+    // |==================================|
+    // |    Generated Random Heightmap    |
+    // |==================================|
+
+    inline std::vector<float> generateHeightMap(
+        glm::ivec2 size,                // size of the generated size
+        float noiseScale                // scale of the noise scale (0.02 - 0.06 recomended)
+        ) {
+
+        float seed = randomFloat(-1, 1);
+        std::vector<float> heightMap;
+        heightMap.clear();
+        heightMap.resize(size.x * size.y);
+
+        for (int y = 0; y < size.y; y++) {
+            for (int x = 0; x < size.x; x++) {
+
+                float noiseValue;
+                noiseValue = glm::perlin(
+                    glm::vec2(
+                        x * noiseScale * seed,
+                        y * noiseScale * seed));
+
+                heightMap[x + y * size.x] = noiseValue;
+            }
+        }
+
+        return heightMap;
+    }
 }
 
 #endif //STRATEGIE_GAME_GENERALFUNCS_HPP
