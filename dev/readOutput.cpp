@@ -5,6 +5,7 @@
 #include "../header/devModeClasses.hpp"
 #include "../header/debugLogging.hpp"
 #include "../header/generalFuncs.hpp"
+#include "../header/terrainClasses.hpp"
 
 void DEVMODE::readOutput() {
 
@@ -39,13 +40,13 @@ int DEVMODE::useStaticMaps() {
     }
 
     SDL::Window win;
-    TERRAIN::TerrainTile tile;
+    TERRAIN::SURFACE::TerrainTile tile;
 
     LOG::INFO("Window size: " + std::to_string(win.scale.x) + " " + std::to_string(win.scale.y));
 
-    int totalTiles = win.scale.x / TERRAIN::tileSize * TERRAIN::scale * win.scale.y / TERRAIN::tileSize * TERRAIN::scale;
+    int totalTiles = win.scale.x / TERRAIN::SURFACE::tileSize * TERRAIN::SURFACE::scale * win.scale.y / TERRAIN::SURFACE::tileSize * TERRAIN::SURFACE::scale;
 
-    std::vector<TERRAIN::TerrainTile> map;
+    std::vector<TERRAIN::SURFACE::TerrainTile> map;
     map.reserve(totalTiles);
 
     glm::ivec2 pos;
@@ -56,25 +57,25 @@ int DEVMODE::useStaticMaps() {
         tile.rect = {
             pos.x,
             pos.y,
-            TERRAIN::tileSize,
-            TERRAIN::tileSize
+            TERRAIN::SURFACE::tileSize,
+            TERRAIN::SURFACE::tileSize
         };
 
         switch (type) {
-            case 0: tile.type = TERRAIN::DEEP_SEA;  break;
-            case 1: tile.type = TERRAIN::SEA;       break;
-            case 2: tile.type = TERRAIN::SHORE;     break;
-            case 3: tile.type = TERRAIN::GRASS;     break;
-            case 4: tile.type = TERRAIN::TAIGA;     break;
-            case 5: tile.type = TERRAIN::MOUNTAIN;  break;
-            case 6: tile.type = TERRAIN::SNOW;      break;
+            case 0: tile.type = TERRAIN::SURFACE::DEEP_SEA;  break;
+            case 1: tile.type = TERRAIN::SURFACE::SEA;       break;
+            case 2: tile.type = TERRAIN::SURFACE::SHORE;     break;
+            case 3: tile.type = TERRAIN::SURFACE::GRASS;     break;
+            case 4: tile.type = TERRAIN::SURFACE::TAIGA;     break;
+            case 5: tile.type = TERRAIN::SURFACE::MOUNTAIN;  break;
+            case 6: tile.type = TERRAIN::SURFACE::SNOW;      break;
             default: break;
         }
 
         map.push_back(tile);
     }
 
-    TERRAIN::map = map;
+    TERRAIN::SURFACE::map = map;
 
     LOG::INFO("Succesfully read " + std::to_string(map.size()) + " tiles");
 
@@ -86,19 +87,19 @@ int DEVMODE::useStaticMaps() {
     }
 
     glm::ivec2 mapSize = glm::ivec2(
-        win.scale.x / TERRAIN::tileSize * TERRAIN::scale,
-        win.scale.y / TERRAIN::tileSize * TERRAIN::scale
+        win.scale.x / TERRAIN::SURFACE::tileSize * TERRAIN::SURFACE::scale,
+        win.scale.y / TERRAIN::SURFACE::tileSize * TERRAIN::SURFACE::scale
         );
 
-    TERRAIN::mapSize = mapSize;
+    TERRAIN::SURFACE::mapSize = mapSize;
 
     SDL_Texture* tempMap;
     tempMap = SDL_CreateTexture(
         rend,
         SDL_PIXELFORMAT_RGBA8888,
         SDL_TEXTUREACCESS_TARGET,
-        mapSize.x * TERRAIN::tileSize,
-        mapSize.y * TERRAIN::tileSize
+        mapSize.x * TERRAIN::SURFACE::tileSize,
+        mapSize.y * TERRAIN::SURFACE::tileSize
     );
 
     if (tempMap == nullptr) {
@@ -112,7 +113,7 @@ int DEVMODE::useStaticMaps() {
     SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
     SDL_RenderClear(rend);
 
-    TERRAIN::generateTile(rend);
+    TERRAIN::SURFACE::generateTile(rend);
 
     SDL_SetRenderTarget(rend, nullptr);
 

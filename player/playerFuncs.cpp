@@ -4,6 +4,8 @@
 #include <random>
 #include <vector>
 
+#include "../header/terrainClasses.hpp"
+
 struct FetchNeighbours {
     int topIndex;
     int bottomIndex;
@@ -34,8 +36,8 @@ std::vector<PendingTiles> pendingTiles;
 
 FetchNeighbours fetchNeighbour(int index) {
 
-    const int width = TERRAIN::mapSize.x;
-    const int height = TERRAIN::mapSize.y;
+    const int width = TERRAIN::SURFACE::mapSize.x;
+    const int height = TERRAIN::SURFACE::mapSize.y;
 
     const int x = index % width;
     const int y = index / width;
@@ -56,7 +58,7 @@ FetchNeighbours fetchNeighbour(int index) {
 
 // fetch troop & time cost
 TileData fetchData(int index) {
-    switch (TERRAIN::map.at(index).type) {
+    switch (TERRAIN::SURFACE::map.at(index).type) {
         // the bigger the number the longer it takes (8 is already slow ash)
         case 2: return {15, 2};        // Shore
         case 3: return {10,  1};      // Grass
@@ -161,9 +163,12 @@ bool isAvailable(int index) {
 
 // requesting new tiles (once every mouse click)
 void TERRITORY::expandTerritory() {
+
+    // loop
     for (int i = 0; i < player.playerTiles.size(); i++) {
         Player::OwnedTiles& tile = player.playerTiles[i];
 
+        // check if fullboxed (if then continue)
         if (tile.fullBoxed) continue;
 
         int index = tile.worldIndex;
@@ -175,7 +180,7 @@ void TERRITORY::expandTerritory() {
 
             checkTile(player.playerTiles[i]);
 
-            if (neg.topIndex == -1 or TERRAIN::map[topIndex].type <= 1) {
+            if (neg.topIndex == -1 or TERRAIN::SURFACE::map[topIndex].type <= 1) {
                 tile.topBlocked = true;
                 continue;
             }
@@ -202,7 +207,7 @@ void TERRITORY::expandTerritory() {
 
             checkTile(player.playerTiles[i]);
 
-            if (neg.bottomIndex == -1 or TERRAIN::map[bottomIndex].type <= 1) {
+            if (neg.bottomIndex == -1 or TERRAIN::SURFACE::map[bottomIndex].type <= 1) {
                 tile.bottomBlocked = true;
                 continue;
             }
@@ -229,7 +234,7 @@ void TERRITORY::expandTerritory() {
 
             checkTile(player.playerTiles[i]);
 
-            if (neg.leftIndex == -1 or TERRAIN::map[leftIndex].type <= 1) {
+            if (neg.leftIndex == -1 or TERRAIN::SURFACE::map[leftIndex].type <= 1) {
                 tile.leftBlocked = true;
                 continue;
             }
@@ -256,7 +261,7 @@ void TERRITORY::expandTerritory() {
 
             checkTile(player.playerTiles[i]);
 
-            if (neg.rightIndex == -1 or TERRAIN::map[rightIndex].type <= 1) {
+            if (neg.rightIndex == -1 or TERRAIN::SURFACE::map[rightIndex].type <= 1) {
                 tile.rightBlocked = true;
                 continue;
             }

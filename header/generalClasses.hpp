@@ -116,54 +116,6 @@ struct Player {
     void update(float deltaTime);
 };
 
-// Terrain
-namespace TERRAIN {
-    enum TerrainType {
-        DEEP_SEA,
-        SEA,
-        SHORE,
-        GRASS,
-        TAIGA,
-        MOUNTAIN,
-        SNOW
-    };
-
-    struct TerrainTile {
-        SDL_Rect rect;
-        TerrainType type;
-    };
-
-    // corrosion simulation
-    struct Droplet {
-
-        glm::vec2 pos;
-        glm::vec2 speed = {0,0};
-        float amount = 1.0f;
-        float sediment = 0.0f;
-    };
-
-    struct LOD_Types {
-        SDL_Texture* LoD1; // smoothest
-        SDL_Texture* LoD2;
-        SDL_Texture* LoD3; // Crapiest
-    };
-
-    inline LOD_Types LOD;
-
-    const int tileSize = 32;
-    const int scale = 14; // whole game relies on THIS one number TwT
-
-    inline std::vector<TerrainTile> map; // map vector
-
-    inline SDL_Texture* mapTexture;
-
-    inline glm::ivec2 mapSize; // size of the map
-
-    void generateTerrain();
-    void generateTile(SDL_Renderer* rend);
-    void generateLoDs();
-}
-
 // definition of the firste few colors
 #define Red (SDL_Color){245, 0, 0, 125};
 #define Red_Border (SDL_Color){245, 200, 200, 125};

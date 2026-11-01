@@ -38,8 +38,8 @@ void CITY::spawnNew(glm::ivec2 mousePos, bool debug) {
 
     // find where to place the building
     glm::ivec2 tempPos = {
-        (mousePos.x * TERRAIN::tileSize) - width / 2,
-        (mousePos.y * TERRAIN::tileSize) - height / 2,
+        (mousePos.x * TERRAIN::SURFACE::tileSize) - width / 2,
+        (mousePos.y * TERRAIN::SURFACE::tileSize) - height / 2,
     };
 
     // make factory hitbox
@@ -96,7 +96,7 @@ void CITY::spawnNew(glm::ivec2 mousePos, bool debug) {
 
 void CITY::mouseClick() {
     glm::ivec2 mousePos = TOOLBOX::findMousePos();
-    glm::ivec2 mouseGridPos = mousePos * TERRAIN::tileSize;
+    glm::ivec2 mouseGridPos = mousePos * TERRAIN::SURFACE::tileSize;
 
     // if click is an buildings hitbox
     for (auto& factory : FACTORY::factorys) {
@@ -137,7 +137,7 @@ void CITY::mouseClick() {
 
     int index = TOOLBOX::findMouseIndex();
 
-    if (TERRAIN::map[index].type <= 1 or TERRITORY::layer[index].ownerID != 1) return;
+    if (TERRAIN::SURFACE::map[index].type <= 1 or TERRITORY::layer[index].ownerID != 1) return;
 
     spawnNew(mousePos, false);
 }

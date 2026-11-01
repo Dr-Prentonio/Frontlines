@@ -3,15 +3,21 @@
 #include "../header/UIClasses.hpp"
 #include <random>
 
+#include "../header/terrainClasses.hpp"
+
 void TERRITORY::setupLayer() {
     LOG::INFO("Setup for secondary layer < STARTED >");
 
     // assign new layer same pos and sizes
-    for (int y = 0; y < TERRAIN::mapSize.y; y++) {
-        for (int x = 0; x < TERRAIN::mapSize.x; x++) {
+    for (int y = 0; y < TERRAIN::SURFACE::mapSize.y; y++) {
+        for (int x = 0; x < TERRAIN::SURFACE::mapSize.x; x++) {
 
             territoryTile tile;
-            tile.rect = {x * TERRAIN::tileSize, y * TERRAIN::tileSize, TERRAIN::tileSize, TERRAIN::tileSize};
+            tile.rect = {
+                x * TERRAIN::SURFACE::tileSize,
+                y * TERRAIN::SURFACE::tileSize,
+                TERRAIN::SURFACE::tileSize,
+                TERRAIN::SURFACE::tileSize};
 
             layer.push_back(tile);
         }
@@ -23,8 +29,8 @@ void TERRITORY::setupLayer() {
         rend,
         SDL_PIXELFORMAT_RGBA8888,
         SDL_TEXTUREACCESS_TARGET,
-        TERRAIN::mapSize.x * TERRAIN::tileSize,
-        TERRAIN::mapSize.y * TERRAIN::tileSize
+        TERRAIN::SURFACE::mapSize.x * TERRAIN::SURFACE::tileSize,
+        TERRAIN::SURFACE::mapSize.y * TERRAIN::SURFACE::tileSize
     );
 
     SDL_SetTextureBlendMode(layerTexture, SDL_BLENDMODE_BLEND);
@@ -79,14 +85,16 @@ void TERRITORY::spawnTerritory(glm::vec2 pos, int size) {
 
             if (distance2 <= (size * size)) {
                 glm::ivec2 tilePos = { pos.x + x, pos.y + y };
-                int tileIndex = tilePos.x + tilePos.y * TERRAIN::mapSize.x;
+                int tileIndex = tilePos.x + tilePos.y * TERRAIN::SURFACE::mapSize.x;
 
-                if (tilePos.x < 0 || tilePos.x >= TERRAIN::mapSize.x || tilePos.y < 0 || tilePos.y >= TERRAIN::mapSize.y) {
+                if (tilePos.x < 0 || tilePos.x >= TERRAIN::SURFACE::mapSize.x || tilePos.y < 0 || tilePos.y >= TERRAIN::SURFACE::mapSize.y) {
                     continue;
                 }
 
                 // is the territory on water?
-                if (TERRAIN::map[tileIndex].type > 1) {
+                if (TERRAIN::SURFACE::map[tileIndex].type > 1) {
+
+                    // its now owned
                     layer[tileIndex].color = Red;
                     layer[tileIndex].ownerID = 1;       // owner id
 
@@ -96,8 +104,8 @@ void TERRITORY::spawnTerritory(glm::vec2 pos, int size) {
 
                     Player::OwnedTiles ownedTiles;
 
-                    int width = TERRAIN::mapSize.x;
-                    int height = TERRAIN::mapSize.y;
+                    int width = TERRAIN::SURFACE::mapSize.x;
+                    int height = TERRAIN::SURFACE::mapSize.y;
                     int type;
                     int ownerID;
 
@@ -107,7 +115,7 @@ void TERRITORY::spawnTerritory(glm::vec2 pos, int size) {
                     if (xx < width - 1) {
                         // RIGHT
                         int rightIndex      = (xx + 1) + yy * width;
-                        type = TERRAIN::map.at(rightIndex).type;
+                        type = TERRAIN::SURFACE::map.at(rightIndex).type;
                         ownerID = layer.at(rightIndex).ownerID;
 
                         if (type <= 1 or ownerID == 1) {
@@ -118,7 +126,7 @@ void TERRITORY::spawnTerritory(glm::vec2 pos, int size) {
                     if (xx > 0) {
                         // LEFT
                         int leftIndex       = (xx - 1) + yy * width;
-                        type = TERRAIN::map.at(leftIndex).type;
+                        type = TERRAIN::SURFACE::map.at(leftIndex).type;
                         ownerID = layer.at(leftIndex).ownerID;
 
                         if (type <= 1 or ownerID == 1) {
@@ -129,7 +137,7 @@ void TERRITORY::spawnTerritory(glm::vec2 pos, int size) {
                     if (yy > 0) {
                         // TOP
                         int topIndex        = xx + (yy - 1) * width;
-                        type = TERRAIN::map.at(topIndex).type;
+                        type = TERRAIN::SURFACE::map.at(topIndex).type;
                         ownerID = layer.at(topIndex).ownerID;
 
                         if (type <= 1 or ownerID == 1) {
@@ -140,7 +148,7 @@ void TERRITORY::spawnTerritory(glm::vec2 pos, int size) {
                     if (yy < height - 1) {
                         // BOTTOM
                         int bottomIndex     = xx + (yy + 1) * width;
-                        type = TERRAIN::map.at(bottomIndex).type;
+                        type = TERRAIN::SURFACE::map.at(bottomIndex).type;
                         ownerID = layer.at(bottomIndex).ownerID;
 
                         if (type <= 1 or ownerID == 1) {
@@ -188,8 +196,8 @@ void TERRITORY::spawnTerritory(glm::vec2 pos, int size) {
 int findClickIndex() {
     // default size of the tiles
     glm::vec2 defaultSize = {
-        (static_cast<float>(window.scale.x) / TERRAIN::mapSize.x),
-        (static_cast<float>(window.scale.y) / TERRAIN::mapSize.y)
+        (static_cast<float>(window.scale.x) / TERRAIN::SURFACE::mapSize.x),
+        (static_cast<float>(window.scale.y) / TERRAIN::SURFACE::mapSize.y)
     };
     //        glm::vec2 currentSize = defaultSize * player.zoom;
 
@@ -217,8 +225,8 @@ int findClickIndex() {
     };
 
     // check if tile is inside the world
-    if (tilePos.x >= 0 && tilePos.x < TERRAIN::mapSize.x && tilePos.y >= 0 && tilePos.y < TERRAIN::mapSize.y) {
-        tileIndex = tilePos.x + tilePos.y * TERRAIN::mapSize.x; // find out tile index (unused currently)
+    if (tilePos.x >= 0 && tilePos.x < TERRAIN::SURFACE::mapSize.x && tilePos.y >= 0 && tilePos.y < TERRAIN::SURFACE::mapSize.y) {
+        tileIndex = tilePos.x + tilePos.y * TERRAIN::SURFACE::mapSize.x; // find out tile index (unused currently)
 
         return tileIndex;
     } else {
@@ -244,7 +252,7 @@ void TERRITORY::toolTip() {
     int index = findClickIndex();
     if (index == -1) return;
 
-    int type = TERRAIN::map[index].type;
+    int type = TERRAIN::SURFACE::map[index].type;
 
     std::string name;
     std::string troopCost;
@@ -298,8 +306,8 @@ void TERRITORY::updateLayer() {
 
         // default size of the tiles
         glm::vec2 defaultSize = {
-            (static_cast<float>(window.scale.x) / TERRAIN::mapSize.x),
-            (static_cast<float>(window.scale.y) / TERRAIN::mapSize.y)
+            (static_cast<float>(window.scale.x) / TERRAIN::SURFACE::mapSize.x),
+            (static_cast<float>(window.scale.y) / TERRAIN::SURFACE::mapSize.y)
         };
 //        glm::vec2 currentSize = defaultSize * player.zoom;
 
@@ -333,10 +341,10 @@ void TERRITORY::updateLayer() {
 
 
         // check if tile is inside the world
-        if (tilePos.x >= 0 && tilePos.x < TERRAIN::mapSize.x && tilePos.y >= 0 && tilePos.y < TERRAIN::mapSize.y) {
-            tileIndex = tilePos.x + tilePos.y * TERRAIN::mapSize.x;
+        if (tilePos.x >= 0 && tilePos.x < TERRAIN::SURFACE::mapSize.x && tilePos.y >= 0 && tilePos.y < TERRAIN::SURFACE::mapSize.y) {
+            tileIndex = tilePos.x + tilePos.y * TERRAIN::SURFACE::mapSize.x;
 
-            if (player.playerOwnsAKingdom == false and TERRAIN::map.at(tileIndex).type > 1) {
+            if (player.playerOwnsAKingdom == false and TERRAIN::SURFACE::map.at(tileIndex).type > 1) {
                 spawnTerritory(tilePos, 6);
                 player.playerOwnsAKingdom = true;
             } else {

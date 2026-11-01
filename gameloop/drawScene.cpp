@@ -2,7 +2,7 @@
 #include "../header/UIClasses.hpp"
 #include "../header/buildingsClasses.hpp"
 #include "../header/generalFuncs.hpp"
-#include "../header/specializedFieldClasses.hpp"
+#include "../header/terrainClasses.hpp"
 
 void SDL::Gameloop::draw() {
     static SDL_Renderer* rend;
@@ -41,11 +41,11 @@ void SDL::Gameloop::draw() {
 
     // player zoom 1.0f - 7.5f (level of detail)
     if (playerZoom <= 2.5) {
-        SDL_RenderCopy(rend, TERRAIN::LOD.LoD3, nullptr, &drect);
+        SDL_RenderCopy(rend, TERRAIN::LOD::LoD3, nullptr, &drect);
     } else if (playerZoom <= 5) {
-        SDL_RenderCopy(rend, TERRAIN::LOD.LoD2, nullptr, &drect);
+        SDL_RenderCopy(rend, TERRAIN::LOD::LoD2, nullptr, &drect);
     } else {
-        SDL_RenderCopy(rend, TERRAIN::LOD.LoD1, nullptr, &drect);
+        SDL_RenderCopy(rend, TERRAIN::LOD::LoD1, nullptr, &drect);
     }
 
     //===========================0

@@ -24,6 +24,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
+#include "terrainClasses.hpp"
+
 // Funcs used all over the game
 namespace TOOLBOX {
 
@@ -44,8 +46,8 @@ namespace TOOLBOX {
     inline glm::ivec2 findMousePos() {
         // default size of the tiles
         glm::vec2 defaultSize = {
-            (static_cast<float>(window.scale.x) / TERRAIN::mapSize.x),
-            (static_cast<float>(window.scale.y) / TERRAIN::mapSize.y)
+            (static_cast<float>(window.scale.x) / TERRAIN::SURFACE::mapSize.x),
+            (static_cast<float>(window.scale.y) / TERRAIN::SURFACE::mapSize.y)
         };
         //        glm::vec2 currentSize = defaultSize * player.zoom;
 
@@ -71,7 +73,7 @@ namespace TOOLBOX {
         };
 
         // check if tile is inside the world
-        if (tilePos.x >= 0 && tilePos.x < TERRAIN::mapSize.x && tilePos.y >= 0 && tilePos.y < TERRAIN::mapSize.y) {
+        if (tilePos.x >= 0 && tilePos.x < TERRAIN::SURFACE::mapSize.x && tilePos.y >= 0 && tilePos.y < TERRAIN::SURFACE::mapSize.y) {
             return tilePos;
         }
 
@@ -85,8 +87,8 @@ namespace TOOLBOX {
     inline int findMouseIndex() {
         // default size of the tiles
         glm::vec2 defaultSize = {
-            (static_cast<float>(window.scale.x) / TERRAIN::mapSize.x),
-            (static_cast<float>(window.scale.y) / TERRAIN::mapSize.y)
+            (static_cast<float>(window.scale.x) / TERRAIN::SURFACE::mapSize.x),
+            (static_cast<float>(window.scale.y) / TERRAIN::SURFACE::mapSize.y)
         };
         //        glm::vec2 currentSize = defaultSize * player.zoom;
 
@@ -114,8 +116,8 @@ namespace TOOLBOX {
         };
 
         // check if tile is inside the world
-        if (tilePos.x >= 0 && tilePos.x < TERRAIN::mapSize.x && tilePos.y >= 0 && tilePos.y < TERRAIN::mapSize.y) {
-            tileIndex = tilePos.x + tilePos.y * TERRAIN::mapSize.x; // find out tile index (unused currently)
+        if (tilePos.x >= 0 && tilePos.x < TERRAIN::SURFACE::mapSize.x && tilePos.y >= 0 && tilePos.y < TERRAIN::SURFACE::mapSize.y) {
+            tileIndex = tilePos.x + tilePos.y * TERRAIN::SURFACE::mapSize.x; // find out tile index (unused currently)
 
             return tileIndex;
         } else {
@@ -289,10 +291,10 @@ namespace TOOLBOX {
 
         // normalize cords of building (0.0f - 1.0f)
         glm::vec4 normalized = {
-            (float)old.x    / (TERRAIN::mapSize.x * TERRAIN::tileSize),
-            (float)old.y    / (TERRAIN::mapSize.y * TERRAIN::tileSize),
-            (float)old.w    / (TERRAIN::mapSize.x * TERRAIN::tileSize),
-            (float)old.h   / (TERRAIN::mapSize.y * TERRAIN::tileSize)
+            (float)old.x    / (TERRAIN::SURFACE::mapSize.x * TERRAIN::SURFACE::tileSize),
+            (float)old.y    / (TERRAIN::SURFACE::mapSize.y * TERRAIN::SURFACE::tileSize),
+            (float)old.w    / (TERRAIN::SURFACE::mapSize.x * TERRAIN::SURFACE::tileSize),
+            (float)old.h   / (TERRAIN::SURFACE::mapSize.y * TERRAIN::SURFACE::tileSize)
         };
 
         // screen position

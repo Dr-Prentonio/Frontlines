@@ -4,16 +4,12 @@
 
 #include "../../header/debugLogging.hpp"
 #include "../../header/generalClasses.hpp"
-#include "../../header/specializedFieldClasses.hpp"
+#include "../../header/terrainClasses.hpp"
 
-void FOREST::init() {
+void TERRAIN::FOLIAGE::GENERAL::init() {
 
-    std::string OakAdr, SpruceAdr;
+    std::string oakAdr, spruceAdr, cottonAdr;
     SDL_Renderer* rend = window.rend;
-
-    // asset address
-    OakAdr = "assets/Fields/oakTreeIcon.png";
-    SpruceAdr = "assets/Fields/spruceTreeIcon.png";
 
     auto makeTexture = [rend](std::string addr, SDL_Texture*& texture) {
 
@@ -36,9 +32,23 @@ void FOREST::init() {
         return 0;
     };
 
-    // init the textures
-    if (makeTexture(OakAdr, textures.oak) != 0) LOG::WARN("Err in denseOakTree");
-    if (makeTexture(SpruceAdr, textures.spruce) != 0) LOG::WARN("Err in denseSpruceTree");
+
+
+    // trees
+    oakAdr = "assets/Fields/oakTreeIcon.png";
+    spruceAdr = "assets/Fields/spruceTreeIcon.png";
+
+    if (makeTexture(oakAdr, TERRAIN::FOLIAGE::GENERAL::textures.oak) != 0)         LOG::WARN("Err in oakTreeIcon");
+    if (makeTexture(spruceAdr, TERRAIN::FOLIAGE::GENERAL::textures.spruce) != 0)   LOG::WARN("Err in spruceTreeIcon");
+
+
+
+    // cotton
+    cottonAdr = "assets/Fields/cottonFieldIcon.png";
+
+    if (makeTexture(cottonAdr, TERRAIN::FOLIAGE::GENERAL::textures.cotton) != 0)   LOG::WARN("Err in cottonFieldIcon");
+
+
 
     LOG::INIT_SUCCESS("Created Textures successfully");
 }

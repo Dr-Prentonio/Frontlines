@@ -23,7 +23,7 @@ add_executable(strategie_game
         header/UIClasses.hpp
         header/buildingsClasses.hpp
         header/generalFuncs.hpp
-        header/specializedFieldClasses.hpp
+        header/terrainClasses.hpp
         header/devModeClasses.hpp
         header/debugLogging.hpp
 
@@ -45,7 +45,6 @@ add_executable(strategie_game
         dev/uiFuncsforDev.cpp
         dev/readOutput.cpp
         dev/developmentModeFuncs.cpp
-        header/renderClass.hpp
 )
 
 target_link_libraries(strategie_game PRIVATE

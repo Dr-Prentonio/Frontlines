@@ -2,6 +2,7 @@
 #include "../header/generalFuncs.hpp"
 #include "../header/UIClasses.hpp"
 #include "../header/buildingsClasses.hpp"
+#include "../header/terrainClasses.hpp"
 
 
 void SDL::Gameloop::input(SDL_Event &e) {
@@ -100,7 +101,7 @@ void SDL::Gameloop::input(SDL_Event &e) {
 
             // mouse click on any factory
             for (FACTORY::Building boo : FACTORY::factorys) {
-                glm::ivec2 mouseGridPos = TOOLBOX::findMousePos() * TERRAIN::tileSize;
+                glm::ivec2 mouseGridPos = TOOLBOX::findMousePos() * TERRAIN::SURFACE::tileSize;
 
                 // if click is inside an already existing building
                 if (TOOLBOX::checkMouseCollision(mouseGridPos, boo.hitbox)) {
@@ -131,7 +132,7 @@ void SDL::Gameloop::input(SDL_Event &e) {
             }
 
             for (auto& foo : CITY::citys) {
-                glm::ivec2 mouseGridPos = TOOLBOX::findMousePos() * TERRAIN::tileSize;
+                glm::ivec2 mouseGridPos = TOOLBOX::findMousePos() * TERRAIN::SURFACE::tileSize;
 
                 if (TOOLBOX::checkMouseCollision(mouseGridPos, foo.hitbox)) {
 

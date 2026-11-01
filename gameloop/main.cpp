@@ -8,7 +8,7 @@
 #include "../header/buildingsClasses.hpp"
 #include "../header/devModeClasses.hpp"
 #include "../header/debugLogging.hpp"
-#include "../header/specializedFieldClasses.hpp"
+#include "../header/terrainClasses.hpp"
 
 SDL::Gameloop gameloop;
 SDL::Window window;
@@ -25,9 +25,23 @@ void cleanup() {
 
     SDL_DestroyTexture(TERRITORY::layerTexture);
 
-    SDL_DestroyTexture(TERRAIN::LOD.LoD1);
-    SDL_DestroyTexture(TERRAIN::LOD.LoD2);
-    SDL_DestroyTexture(TERRAIN::LOD.LoD3);
+    // free map textures
+    SDL_DestroyTexture(TERRAIN::LOD::LoD1);
+    SDL_DestroyTexture(TERRAIN::LOD::LoD2);
+    SDL_DestroyTexture(TERRAIN::LOD::LoD3);
+
+    // free building icons
+    SDL_DestroyTexture(FACTORY::icons.clothingTex);
+    SDL_DestroyTexture(FACTORY::icons.oilTex);
+    SDL_DestroyTexture(FACTORY::icons.steelTex);
+    SDL_DestroyTexture(FACTORY::icons.stoneTex);
+    SDL_DestroyTexture(FACTORY::icons.woodTex);
+    SDL_DestroyTexture(CITY::cityTex);
+
+    // free terrain icons
+    SDL_DestroyTexture(TERRAIN::FOLIAGE::GENERAL::textures.cotton);
+    SDL_DestroyTexture(TERRAIN::FOLIAGE::GENERAL::textures.spruce);
+    SDL_DestroyTexture(TERRAIN::FOLIAGE::GENERAL::textures.oak);
 
     SDL_DestroyRenderer(window.rend);
     SDL_DestroyWindow(window.win);
@@ -79,13 +93,19 @@ int main() {
     // |=================|
 
     // choose between random map and static map
-    if (!SDL::useStaticMaps) TERRAIN::generateTerrain();
+    if (!SDL::useStaticMaps) TERRAIN::SURFACE::generateTerrain();
     else DEVMODE::useStaticMaps();
 
-    FOREST::init(); // load forrest textures
-    FOREST::generate();
+    // generate random forests etc
+    TERRAIN::FOLIAGE::GENERAL::init(); // load textures
 
-    TERRAIN::generateLoDs();
+    TERRAIN::FOLIAGE::FOREST::generate();
+    TERRAIN::FOLIAGE::COTTON::generate();
+
+    TERRAIN::FOLIAGE::GENERAL::drawIcons();
+
+    // generate lods (needs foliage and surface to run before)
+    TERRAIN::LOD::generateLoDs();
 
     TERRITORY::setupLayer(); // setup the player territory layer
 

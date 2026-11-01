@@ -181,8 +181,8 @@ void FACTORY::spawnNewFac(glm::ivec2 mousePos, factoryType type, bool debug) {
 
     // find where to place the building
     glm::ivec2 tempPos = {
-        (mousePos.x * TERRAIN::tileSize) - width / 2,
-        (mousePos.y * TERRAIN::tileSize) - height / 2,
+        (mousePos.x * TERRAIN::SURFACE::tileSize) - width / 2,
+        (mousePos.y * TERRAIN::SURFACE::tileSize) - height / 2,
     };
 
     // make factory hitbox
@@ -245,7 +245,7 @@ void FACTORY::spawnNewFac(glm::ivec2 mousePos, factoryType type, bool debug) {
 
 void FACTORY::mouseClick() {
     glm::ivec2 mousePos = TOOLBOX::findMousePos();
-    glm::ivec2 mouseGridPos = mousePos * TERRAIN::tileSize;
+    glm::ivec2 mouseGridPos = mousePos * TERRAIN::SURFACE::tileSize;
 
     for (auto& city : CITY::citys) {
         if (TOOLBOX::checkMouseCollision(mouseGridPos, city.hitbox)) {

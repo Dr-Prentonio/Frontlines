@@ -5,7 +5,7 @@
 #include <random>
 
 #include "../header/generalFuncs.hpp"
-#include "../header/specializedFieldClasses.hpp"
+#include "../header/terrainClasses.hpp"
 
 float interpolatedHeight(glm::vec2 pos, glm::ivec2 size, const std::vector<float>& heightMap) {
     // pos is pos
@@ -72,11 +72,11 @@ void interpolatedSediment(glm::vec2 pos, glm::ivec2 mapSize, std::vector<float>&
 }
 
 void erosion(glm::ivec2 mapSize, std::vector<float>& heightMap, int amount = 30000) {
-    std::vector<TERRAIN::TerrainTile> map = TERRAIN::map;
+    std::vector<TERRAIN::SURFACE::TerrainTile> map = TERRAIN::SURFACE::map;
 
     for (int i = 0; i < amount; i++) {
 
-        TERRAIN::Droplet drop;
+        TERRAIN::SURFACE::Droplet drop;
         drop.pos.x = rand() % mapSize.x;
         drop.pos.y = rand() % mapSize.y;
 
@@ -116,7 +116,7 @@ void erosion(glm::ivec2 mapSize, std::vector<float>& heightMap, int amount = 300
     }
 }
 
-void TERRAIN::generateTile(SDL_Renderer* rend) {
+void TERRAIN::SURFACE::generateTile(SDL_Renderer* rend) {
 
     for (int i = 0; i < map.size(); i++) {
 
@@ -260,7 +260,7 @@ void TERRAIN::generateTile(SDL_Renderer* rend) {
 
 }
 
-void TERRAIN::generateLoDs() {
+void TERRAIN::LOD::generateLoDs() {
 
     SDL_Texture* staticTex;
     SDL_Renderer* rend = window.rend;
@@ -269,8 +269,8 @@ void TERRAIN::generateLoDs() {
         rend,
         SDL_PIXELFORMAT_ARGB8888,
         SDL_TEXTUREACCESS_TARGET,
-        mapSize.x * tileSize,
-        mapSize.y * tileSize);
+        SURFACE::mapSize.x * SURFACE::tileSize,
+        SURFACE::mapSize.y * SURFACE::tileSize);
 
     if (staticTex == nullptr) {
         std::string err = SDL_GetError();
@@ -281,10 +281,10 @@ void TERRAIN::generateLoDs() {
     // get texture size
     int width, height;
 
-    SDL_QueryTexture(mapTexture, nullptr, nullptr, &width, &height);
+    SDL_QueryTexture(SURFACE::mapTexture, nullptr, nullptr, &width, &height);
     SDL_Rect temp = {0,0,width, height};
 
-    SDL_QueryTexture(FOREST::worldTex, nullptr, nullptr, &width, &height);
+    SDL_QueryTexture(FOLIAGE::GENERAL::worldTex, nullptr, nullptr, &width, &height);
     SDL_Rect temp2 = {0,0,width,height};
 
     // draw into one texture
@@ -293,23 +293,23 @@ void TERRAIN::generateLoDs() {
     SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
     SDL_RenderClear(rend);
 
-    SDL_RenderCopy(rend, mapTexture, nullptr, &temp);
-    SDL_RenderCopy(rend, FOREST::worldTex, nullptr, &temp2);
+    SDL_RenderCopy(rend, SURFACE::mapTexture, nullptr, &temp);
+    SDL_RenderCopy(rend, FOLIAGE::GENERAL::worldTex, nullptr, &temp2);
 
     SDL_SetRenderTarget(rend, nullptr);
 
     // Generate LODs
-    TOOLBOX::lodMaker(2, staticTex, LOD.LoD1);
-    TOOLBOX::lodMaker(4, staticTex, LOD.LoD2);
-    TOOLBOX::lodMaker(8, staticTex, LOD.LoD3);
+    TOOLBOX::lodMaker(2, staticTex, LoD1);
+    TOOLBOX::lodMaker(4, staticTex, LoD2);
+    TOOLBOX::lodMaker(8, staticTex, LoD3);
 
     LOG::INFO("Generated lods");
 
-    SDL_DestroyTexture(mapTexture);
-    SDL_DestroyTexture(FOREST::worldTex);
+    SDL_DestroyTexture(SURFACE::mapTexture);
+    SDL_DestroyTexture(FOLIAGE::GENERAL::worldTex);
 }
 
-void TERRAIN::generateTerrain() {
+void TERRAIN::SURFACE::generateTerrain() {
     LOG::INFO("Generating terrain < STARTED >");
 
     const float perlinNoiseScale = 0.02f;
