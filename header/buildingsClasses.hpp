@@ -13,28 +13,29 @@
 
 namespace FACTORY {
     enum factoryType {
-        clothing,
+        clothing = 1,
         wood,
         stone,
         steel,
         oil
     };
-
     struct Building {
-        factoryType facType; // Type of factory
+        factoryType facType = clothing; // Type of factory
 
-        SDL_Texture* facTex;    // fac tex
-        SDL_Rect facRect;       // pos and width of fac tex
+        SDL_Texture* facTex = nullptr; // fac tex
+        SDL_Rect facRect = {0,0,0,0}; // pos and width of fac tex
 
-        SDL_Rect hitbox;  // only stores the facs hitbox
-                            // z = width w = height
+        // only stores the facs hitbox
+        SDL_Rect hitbox = {0,0,0,0};
 
         int level = 1; // how many are stacked
 
         SDL_Texture* levelTex = nullptr;
-        SDL_Rect levelRect;
-    };
+        SDL_Rect levelRect = {0,0,0,0};
 
+        // if the factory is on for example a forest
+        bool onSpecField = false;
+    };
     struct Icons {
         SDL_Texture* clothingTex;
         SDL_Texture* woodTex;
@@ -42,20 +43,10 @@ namespace FACTORY {
         SDL_Texture* steelTex;
         SDL_Texture* oilTex;
     };
-    inline Icons icons;
 
+    inline Icons icons;
     inline std::vector<Building> factorys;
 
-
-    // Basicly i put an small texture that holds the
-    // level number of the building in a bigger texture thats
-    // as big as the map so that i can apply the zoom
-    // and offset to it easily
-//    inline SDL_Texture* facTexInMapTexture;
-
-
-
-//    inline SDL_Texture* factoryLayer;
 
     int init();
     void mouseClick();

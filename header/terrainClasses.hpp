@@ -73,6 +73,10 @@ namespace TERRAIN {
                 SDL_Texture* spruce;
                 // cotton fields
                 SDL_Texture* cotton;
+                // oil fields
+                SDL_Texture* oil;
+                // stone fields texture
+                SDL_Texture* stone;
             };
 
             inline Textures textures;
@@ -119,6 +123,39 @@ namespace TERRAIN {
             );
 
             void spawnCotton(int cottonAmount);
+            void generate();
+        }
+
+        namespace OIL {
+
+            const int spawnRate = 10;
+
+            inline std::vector<SDL_Rect> oilTiles;
+
+            void drawTiles (
+                int size,                       // size of the base
+                glm::ivec2 pos,                 // pos of the center of the base
+                SDL_Color normalColor,          // color of the tiles
+                std::vector<SDL_Rect>& tiles    // vector to safe tiles to
+            );
+            void spawnOil(int cottonAmount);
+            void generate();
+        }
+
+        namespace STONE {
+
+            const int spawnRate = 15;
+
+            inline std::vector<SDL_Rect> stoneTiles;
+
+            void spawnStone(int stoneAmount);
+            void drawTiles (
+                int size,                       // size of the base
+                glm::ivec2 pos,                 // pos of the center of the base
+                SDL_Color normalColor,          // color of the tiles
+                std::vector<SDL_Rect>& tiles    // vector to safe tiles to
+                );
+            void spawnOnMountain();
             void generate();
         }
     }

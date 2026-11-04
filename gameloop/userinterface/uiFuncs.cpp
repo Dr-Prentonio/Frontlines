@@ -2,89 +2,10 @@
 // Created by tobias on 13.10.26.
 //
 
-#include "../header/UIClasses.hpp"
-#include "../header/generalClasses.hpp"
+#include "../../header/UIClasses.hpp"
+#include "../../header/generalClasses.hpp"
+#include "../../header/generalFuncs.hpp"
 #include "glm/glm.hpp"
-
-void UI::drawToolTip(SDL_Renderer* rend) {
-
-    SDL_Rect drect = toolTip.toolTipRect;
-
-    SDL_SetRenderDrawColor(rend, 25, 25, 25, 200);
-
-    Uint32 wrapLength = 0;
-    SDL_Surface* textSurface = TTF_RenderUTF8_Blended_Wrapped(
-        fonts.terminessItalic,
-        toolTip.toolTipText.c_str(),
-        {255,255,255,255},
-        wrapLength
-        );
-    if (!textSurface) return;
-
-    SDL_Surface* boldTextSurface = TTF_RenderUTF8_Blended_Wrapped(
-        fonts.terminessBold,
-        toolTip.toolTipTitle.c_str(),
-        {255,255,255, 255},
-        wrapLength
-        );
-    if (!boldTextSurface) return;
-
-
-
-    SDL_Texture* textTexture =  SDL_CreateTextureFromSurface(rend, textSurface);
-    SDL_Texture* boldTextTexture = SDL_CreateTextureFromSurface(rend, boldTextSurface);
-
-    int boldTextWidth = boldTextSurface->w;
-    int boldTextHeight = boldTextSurface->h;
-
-    int textWidth   = textSurface->w;
-    int textHeight  = textSurface->h;
-
-    SDL_FreeSurface(textSurface);
-    SDL_FreeSurface(boldTextSurface);
-
-    //
-    // design
-    //
-
-    glm::ivec2 padding = {5, 4};
-
-    // background drect
-    SDL_Rect bgRect = {
-        drect.x,
-        drect.y,
-        textWidth + (padding.x * 2),
-        textHeight + (padding.y * 2) + 28
-    };
-
-    SDL_SetRenderDrawBlendMode(rend, SDL_BLENDMODE_BLEND);
-
-    // background rect
-    SDL_SetRenderDrawColor(rend, 25,25,25,200);
-    SDL_RenderFillRect(rend, &bgRect);
-
-    // Frame
-    SDL_SetRenderDrawColor(rend, 100, 100, 100, 255);
-    SDL_RenderDrawRect(rend, &bgRect);
-
-    SDL_Rect textDrect = {
-        drect.x + padding.x,
-        drect.y + padding.y + 28,
-        textWidth,
-        textHeight
-    };
-    SDL_Rect boldTextDrect = {
-        drect.x + padding.x,
-        drect.y + padding.y,
-        boldTextWidth,
-        boldTextHeight
-    };
-
-    SDL_RenderCopy(rend, textTexture, NULL, &textDrect);
-    SDL_RenderCopy(rend, boldTextTexture, NULL, &boldTextDrect);
-    SDL_DestroyTexture(textTexture);
-    SDL_DestroyTexture(boldTextTexture);
-}
 
 void UI::topUiBar(SDL_Renderer *rend) {
     SDL_SetRenderDrawColor(rend, 25,25,25,200);
@@ -280,14 +201,10 @@ void UI::bottomLeftUI(SDL_Renderer *rend) {
     SDL_RenderFillRect(rend, &pickyDrect);
 }
 
-//
-//
-//
-
 // part of the game loop (child of main/draw)
 void UI::UIManager(SDL_Renderer* rend) {
 
-    if (toolTip.drawToolTip) drawToolTip(rend);
+    if (TOOLTIP::enable) TOOLTIP::surfaceMode(rend);
 
     topUiBar(rend);
     rightUiBar(rend);

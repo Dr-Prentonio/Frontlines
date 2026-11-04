@@ -51,20 +51,6 @@ namespace SDL {
 
 // player
 struct Player {
-
-    SDL_Rect camOffset;
-    float zoom = 1;
-    float target = 1;
-
-    // if touches map border and cant move anymore
-    bool touchesBorderRight;
-    bool touchesBorderLeft;
-    bool touchesBorderTop;
-    bool touchesBorderBottom;
-
-    bool playerOwnsAKingdom = false;
-    int troopAmount = 1000;
-
     // Resources and factorys
     struct Resources {
         Uint32 woodAmount = 100;    // 100
@@ -73,7 +59,6 @@ struct Player {
         Uint32 steelAmount = 100;   // 100
         Uint32 oilAmount = 0;     // 0
     };
-
     // factorys take 75 citizen
     struct Factory {
         Uint32 clothesFactorys = 0;
@@ -82,17 +67,11 @@ struct Player {
         Uint32 woodFactorys = 0;
         Uint32 stoneFactorys = 0;
     };
-
     // citys give 400 citizen
     struct Citizen {
         Uint32 citysTotal = 0;
         Uint32 citizen = 1000;
     };
-    Citizen citizen;
-
-    Factory factorys;
-    Resources resources;
-
     struct OwnedTiles {
 
         glm::ivec2 pos; // pos in world cords
@@ -110,6 +89,23 @@ struct Player {
 
         bool fullBoxed = false;
     };
+
+    Citizen citizen;
+    Factory factorys;
+    Resources resources;
+
+    SDL_Rect camOffset;
+    float zoom = 1;
+    float target = 1;
+
+    // if touches map border and cant move anymore
+    bool touchesBorderRight;
+    bool touchesBorderLeft;
+    bool touchesBorderTop;
+    bool touchesBorderBottom;
+
+    bool playerOwnsAKingdom = false;
+    int troopAmount = 1000;
 
     std::vector<OwnedTiles> playerTiles;
 

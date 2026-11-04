@@ -3,6 +3,7 @@
 #include "../header/UIClasses.hpp"
 #include <random>
 
+#include "../header/generalFuncs.hpp"
 #include "../header/terrainClasses.hpp"
 
 void TERRITORY::setupLayer() {
@@ -243,60 +244,6 @@ int findClickIndex() {
 //  have to add troops to the system so that you cant expand infinitly
 //
 
-// displays toolTip when middle mouse button is clicked
-void TERRITORY::toolTip() {
-    // tooltip
-    glm::ivec2 pos;
-    SDL_GetMouseState(&pos.x, &pos.y);
-
-    int index = findClickIndex();
-    if (index == -1) return;
-
-    int type = TERRAIN::SURFACE::map[index].type;
-
-    std::string name;
-    std::string troopCost;
-
-    switch (type) {
-        case 0:
-            name = "Deep Sea Tile";
-            troopCost = "-";
-            break;
-        case 1:
-            name = "Sea Tile";
-            troopCost = "-";
-            break;
-        case 2:
-            name = "Shore Tile";
-            troopCost = "100";
-            break;
-        case 3:
-            name = "Grass Tile";
-            troopCost = "75";
-            break;
-        case 4:
-            name = "Taiga Tile";
-            troopCost = "100";
-            break;
-        case 5:
-            name = "Mountain Tile";
-            troopCost = "125";
-            break;
-        case 6:
-            name = "Snow Tile";
-            troopCost = "250";
-            break;
-        default:
-            name = "err: unknown";
-            break;
-    }
-
-    UI::toolTip.toolTipTitle = name;
-    UI::toolTip.toolTipText = "Troop cost: " + troopCost + " | Owner: " + std::to_string(layer[index].ownerID);
-    UI::toolTip.toolTipRect = {pos.x + 30, pos.y + 30, 0,0};
-
-    UI::toolTip.drawToolTip = true;
-}
 
 
 

@@ -15,55 +15,42 @@
 
 namespace UI {
 
+    // structs
     struct Fonts {
-
-        TTF_Font* terminessItalic;
-        TTF_Font* terminessNormal;
-        TTF_Font* terminessBold;
-        TTF_Font* RobotoMonoBold;
-
-    }; inline Fonts fonts;
-
-    struct ToolTip {
-
-        bool drawToolTip = false;
-        std::string toolTipText;
-        std::string toolTipTitle;
-        SDL_Rect toolTipRect;
-
-    }; inline ToolTip toolTip;
-
-    void drawToolTip(SDL_Renderer* rend);
-
-/*    struct TroopOverview {
-
-        glm::ivec2 position;
-        glm::ivec2 size;
-
-    }; inline TroopOverview troopOverview;
-*/
-//    void drawTroopOverview(SDL_Renderer* rend);
-//    void drawTileAmount(SDL_Renderer* rend);
-
-    void UIManager(SDL_Renderer* rend);
-
+        TTF_Font* terminessItalic   = nullptr;
+        TTF_Font* terminessNormal   = nullptr;
+        TTF_Font* terminessBold     = nullptr;
+        TTF_Font* RobotoMonoBold    = nullptr;
+    };
     struct TopUiBar {
-
-        glm::ivec2 pos = {
-            10, 10
-        };
+        glm::ivec2 pos = {10, 10};
         glm::ivec2 size;
-    }; inline TopUiBar topUIBar;
-
-    void topUiBar(SDL_Renderer* rend);
-    void rightUiBar(SDL_Renderer *rend);
-
+    };
     struct BottomLeftUI {
         int index = 1; // 1-5
     };
 
+    // variables
+    inline TopUiBar topUIBar;
+    inline Fonts fonts;
     inline BottomLeftUI bottomLeftUi;
+
+    // funcs
+    void topUiBar(SDL_Renderer* rend);
+    void rightUiBar(SDL_Renderer *rend);
+    void UIManager(SDL_Renderer* rend);
     void bottomLeftUI(SDL_Renderer *rend);
+
+    // namespaces
+    namespace TOOLTIP {
+
+        inline bool enable = false;
+        inline std::string text;
+        inline std::string title;
+
+        void surfaceMode(SDL_Renderer* rend);
+        void manager();
+    }
 }
 
 

@@ -74,11 +74,32 @@ void FACTORY::update() {
     timer += gameloop.deltaTime;
 
     if (timer >= 1) {
-        player.resources.clothesAmount  += player.factorys.clothesFactorys  * 5;
-        player.resources.woodAmount     += player.factorys.woodFactorys     * 6;
-        player.resources.steelAmount    += player.factorys.steelFactorys    * 4;
-        player.resources.stoneAmount    += player.factorys.stoneFactorys    * 6;
-        player.resources.oilAmount      += player.factorys.oilFactorys      * 3;
+
+        for (auto& factory : factorys) {
+            int multiplier = 1;
+
+            if (factory.onSpecField) multiplier = 2;
+
+            // apply factory production
+            switch (factory.facType) {
+                case clothing:
+                    player.resources.clothesAmount  += factory.level * 5 * multiplier;
+                    break;
+                case wood:
+                    player.resources.woodAmount     += factory.level * 6 * multiplier;
+                    break;
+                case stone:
+                    player.resources.stoneAmount    += factory.level * 6 * multiplier;
+                    break;
+                case steel:
+                    player.resources.steelAmount    += factory.level * 4 * multiplier;
+                    break;
+                case oil:
+                    player.resources.oilAmount      += factory.level * 3 * multiplier;
+                    break;
+                default: break;
+            }
+        }
 
         timer = 0;
     }
@@ -209,11 +230,57 @@ void FACTORY::spawnNewFac(glm::ivec2 mousePos, factoryType type, bool debug) {
     player.citizen.citizen -= 75;
 
     switch (type) {
-        case 1: player.factorys.clothesFactorys++;  break;
-        case 2: player.factorys.woodFactorys++;     break;
-        case 3: player.factorys.stoneFactorys++;    break;
-        case 4: player.factorys.steelFactorys++;    break;
-        case 5: player.factorys.oilFactorys++;      break;
+        case 1: {
+            player.factorys.clothesFactorys++;
+            for (auto& cotton : TERRAIN::FOLIAGE::COTTON::cottonTiles) {
+                if (TOOLBOX::checkHitboxCollision(building.hitbox, cotton)) {
+                    building.onSpecField = true;
+                    break;
+                }
+            }
+
+            break;
+        }
+        case 2: {
+            player.factorys.woodFactorys++;
+            for (auto& forest : TERRAIN::FOLIAGE::FOREST::forestTiles) {
+                if (TOOLBOX::checkHitboxCollision(building.hitbox, forest)) {
+                    building.onSpecField = true;
+                    break;
+                }
+            }
+            break;
+        }
+        case 3: {
+            player.factorys.stoneFactorys++;
+            for (auto& stone : TERRAIN::FOLIAGE::STONE::stoneTiles) {
+                if (TOOLBOX::checkHitboxCollision(building.hitbox, stone)) {
+                    building.onSpecField = true;
+                    break;
+                }
+            }
+            break;
+        }
+        case 4: {
+            player.factorys.steelFactorys++;
+            for (auto& stone : TERRAIN::FOLIAGE::STONE::stoneTiles) {
+                if (TOOLBOX::checkHitboxCollision(building.hitbox, stone)) {
+                    building.onSpecField = true;
+                    break;
+                }
+            }
+            break;
+        }
+        case 5: {
+            player.factorys.oilFactorys++;
+            for (auto& oil : TERRAIN::FOLIAGE::OIL::oilTiles) {
+                if (TOOLBOX::checkHitboxCollision(building.hitbox, oil)) {
+                    building.onSpecField = true;
+                    break;
+                }
+            }
+            break;
+        }
         default: break;
     }
 

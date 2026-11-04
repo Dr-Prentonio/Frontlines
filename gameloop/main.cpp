@@ -101,6 +101,8 @@ int main() {
 
     TERRAIN::FOLIAGE::FOREST::generate();
     TERRAIN::FOLIAGE::COTTON::generate();
+    TERRAIN::FOLIAGE::OIL::generate();
+    TERRAIN::FOLIAGE::STONE::generate();
 
     TERRAIN::FOLIAGE::GENERAL::drawIcons();
 

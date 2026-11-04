@@ -149,9 +149,9 @@ namespace TOOLBOX {
         glm::ivec2 mouse,   // mouse position
         SDL_Rect hitbox     // hitbox of a object
         ) {
-        if (mouse.x > hitbox.x &&
+        if (mouse.x >= hitbox.x &&
             mouse.x < hitbox.x + hitbox.w &&
-            mouse.y > hitbox.y &&
+            mouse.y >= hitbox.y &&
             mouse.y < hitbox.y + hitbox.h) {
             return true;
         }

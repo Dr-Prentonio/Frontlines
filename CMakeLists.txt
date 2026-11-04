@@ -16,7 +16,7 @@ add_executable(strategie_game
         gameloop/initFuncs.cpp
         gameloop/drawScene.cpp
         gameloop/inputFuncs.cpp
-        gameloop/uiFuncs.cpp
+        gameloop/userinterface/uiFuncs.cpp
 
         # MAIN HEADERS
         header/generalClasses.hpp
@@ -45,6 +45,7 @@ add_executable(strategie_game
         dev/uiFuncsforDev.cpp
         dev/readOutput.cpp
         dev/developmentModeFuncs.cpp
+        gameloop/userinterface/tooltip.cpp
 )
 
 target_link_libraries(strategie_game PRIVATE

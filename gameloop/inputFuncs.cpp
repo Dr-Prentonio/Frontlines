@@ -24,22 +24,22 @@ void SDL::Gameloop::input(SDL_Event &e) {
 
     if (state[SDL_SCANCODE_W] && !player.touchesBorderTop) {
         movement.y += baseSpeed * speed * deltaTime;
-        UI::toolTip.drawToolTip = false;
+        UI::TOOLTIP::enable = false;
     }
 
     else if (state[SDL_SCANCODE_S] && !player.touchesBorderBottom) {
         movement.y -= baseSpeed * speed * deltaTime;
-        UI::toolTip.drawToolTip = false;
+        UI::TOOLTIP::enable = false;
     }
 
     else if (state[SDL_SCANCODE_A] && !player.touchesBorderLeft) {
         movement.x += baseSpeed * speed * deltaTime;
-        UI::toolTip.drawToolTip = false;
+        UI::TOOLTIP::enable = false;
     }
 
     else if (state[SDL_SCANCODE_D] && !player.touchesBorderRight) {
         movement.x -= baseSpeed * speed * deltaTime;
-        UI::toolTip.drawToolTip = false;
+        UI::TOOLTIP::enable = false;
     }
 
 
@@ -76,10 +76,10 @@ void SDL::Gameloop::input(SDL_Event &e) {
     if (e.type == SDL_MOUSEWHEEL) {
         if (e.wheel.y > 0) {
             player.target += 0.15f;
-            UI::toolTip.drawToolTip = false;
+            UI::TOOLTIP::enable = false;
         } else if (e.wheel.y < 0) {
             player.target -= 0.15f;
-            UI::toolTip.drawToolTip = false;
+            UI::TOOLTIP::enable = false;
         }
 
         e.wheel.y = 0;
@@ -87,6 +87,8 @@ void SDL::Gameloop::input(SDL_Event &e) {
         // min / max zoom
         player.target = glm::clamp(player.target, 1.0f, 7.5f);
     }
+
+    if (e.type == SDL_MOUSEMOTION) UI::TOOLTIP::enable = false;
 
     //
     //  MOUSE
@@ -97,55 +99,7 @@ void SDL::Gameloop::input(SDL_Event &e) {
             TERRITORY::mouseClick = true;
         }
         if (e.button.button == SDL_BUTTON_MIDDLE) {
-            TERRITORY::toolTip();
-
-            // mouse click on any factory
-            for (FACTORY::Building boo : FACTORY::factorys) {
-                glm::ivec2 mouseGridPos = TOOLBOX::findMousePos() * TERRAIN::SURFACE::tileSize;
-
-                // if click is inside an already existing building
-                if (TOOLBOX::checkMouseCollision(mouseGridPos, boo.hitbox)) {
-
-                    std::string type;
-
-                    switch (boo.facType) {
-                        case 1: type = "Clothing";  break;
-                        case 2: type = "Wood";      break;
-                        case 3: type = "Stone";     break;
-                        case 4: type = "Steel";     break;
-                        case 5: type = "Oil";       break;
-
-                    }
-
-
-                    glm::ivec2 pos;
-                    SDL_GetMouseState(&pos.x, &pos.y);
-                    UI::toolTip.toolTipRect = {pos.x + 30, pos.y + 30, 0,0};
-                    UI::toolTip.toolTipTitle = "Factory";
-                    UI::toolTip.toolTipText =
-                        "Level: " + std::to_string(boo.level) +
-                        " | Type: " + type;
-                    UI::toolTip.drawToolTip = true;
-
-                    break;
-                }
-            }
-
-            for (auto& foo : CITY::citys) {
-                glm::ivec2 mouseGridPos = TOOLBOX::findMousePos() * TERRAIN::SURFACE::tileSize;
-
-                if (TOOLBOX::checkMouseCollision(mouseGridPos, foo.hitbox)) {
-
-                    glm::ivec2 pos;
-                    SDL_GetMouseState(&pos.x, &pos.y);
-                    UI::toolTip.toolTipRect = {pos.x + 30, pos.y + 30, 0,0};
-                    UI::toolTip.toolTipTitle = "City";
-                    UI::toolTip.toolTipText = "Level: " + std::to_string(foo.level);
-                    UI::toolTip.drawToolTip = true;
-
-                    break;
-                }
-            }
+            UI::TOOLTIP::manager();
         }
 
         // |===================|

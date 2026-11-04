@@ -8,7 +8,7 @@
 
 void TERRAIN::FOLIAGE::GENERAL::init() {
 
-    std::string oakAdr, spruceAdr, cottonAdr;
+    std::string oakAdr, spruceAdr, cottonAdr, oilAdr, stoneAdr;
     SDL_Renderer* rend = window.rend;
 
     auto makeTexture = [rend](std::string addr, SDL_Texture*& texture) {
@@ -32,23 +32,23 @@ void TERRAIN::FOLIAGE::GENERAL::init() {
         return 0;
     };
 
-
-
     // trees
     oakAdr = "assets/Fields/oakTreeIcon.png";
     spruceAdr = "assets/Fields/spruceTreeIcon.png";
-
-    if (makeTexture(oakAdr, TERRAIN::FOLIAGE::GENERAL::textures.oak) != 0)         LOG::WARN("Err in oakTreeIcon");
-    if (makeTexture(spruceAdr, TERRAIN::FOLIAGE::GENERAL::textures.spruce) != 0)   LOG::WARN("Err in spruceTreeIcon");
-
-
+    if (makeTexture(oakAdr, textures.oak) != 0)         LOG::WARN("Err in oakTreeIcon");
+    if (makeTexture(spruceAdr, textures.spruce) != 0)   LOG::WARN("Err in spruceTreeIcon");
 
     // cotton
     cottonAdr = "assets/Fields/cottonFieldIcon.png";
+    if (makeTexture(cottonAdr, textures.cotton) != 0)   LOG::WARN("Err in cottonFieldIcon");
 
-    if (makeTexture(cottonAdr, TERRAIN::FOLIAGE::GENERAL::textures.cotton) != 0)   LOG::WARN("Err in cottonFieldIcon");
+    // oil
+    oilAdr = "assets/Fields/oilFieldIcon.png";
+    if (makeTexture(oilAdr, textures.oil) != 0)         LOG::WARN("Err in oilFieldIcon");
 
-
+    // stone
+    stoneAdr = "assets/Fields/stoneFieldIcon.png";
+    if (makeTexture(stoneAdr, textures.stone) != 0)       LOG::WARN("Err in stoneFieldIcon");
 
     LOG::INIT_SUCCESS("Created Textures successfully");
 }
