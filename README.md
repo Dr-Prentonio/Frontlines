@@ -19,5 +19,5 @@ Idea: I thought the game 'Open Front' was very easy and just a fancier clicker g
 
 ### Contributer
 
-Dr-Prentonio: Developer, Designer
+Dr-Prentonio: Developer, Designer \
 Toastermanlmao: Designer
