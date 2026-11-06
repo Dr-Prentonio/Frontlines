@@ -16,3 +16,8 @@ Idea: I thought the game 'Open Front' was very easy and just a fancier clicker g
 ### Roadmap
 
 [Linear Roadmap](https://linear.app/closed-front/team/FL/overview)
+
+### Contributer
+
+Dr-Prentonio: Developer, Designer
+Toastermanlmao: Designer
