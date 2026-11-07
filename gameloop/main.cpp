@@ -12,7 +12,6 @@
 
 SDL::Gameloop gameloop;
 SDL::Window window;
-Player player;
 
 //
 // GRR FOR loops Very VERRY bad grr
@@ -37,6 +36,7 @@ void cleanup() {
     SDL_DestroyTexture(FACTORY::icons.stoneTex);
     SDL_DestroyTexture(FACTORY::icons.woodTex);
     SDL_DestroyTexture(CITY::cityTex);
+    SDL_DestroyTexture(MILITARYCAMP::campTex);
 
     // free terrain icons
     SDL_DestroyTexture(TERRAIN::FOLIAGE::GENERAL::textures.cotton);
@@ -125,6 +125,11 @@ int main() {
         return -1;
     }
 
+    if (MILITARYCAMP::init() != 0) {
+        LOG::INIT_ERR("Couldnt initialize military camps");
+        return -1;
+    }
+
     // |=================|
     // |    Game Loop    |
     // |=================|
@@ -152,7 +157,7 @@ int main() {
 
         gameloop.draw();
 
-        player.update(gameloop.deltaTime);
+        PLAYER::update(gameloop.deltaTime);
 
         FACTORY::update();
 

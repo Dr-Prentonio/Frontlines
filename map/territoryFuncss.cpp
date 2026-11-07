@@ -103,7 +103,7 @@ void TERRITORY::spawnTerritory(glm::vec2 pos, int size) {
                     // | Performance Calculation |
                     // |=========================|
 
-                    Player::OwnedTiles ownedTiles;
+                    PLAYER::OwnedTiles ownedTiles;
 
                     int width = TERRAIN::SURFACE::mapSize.x;
                     int height = TERRAIN::SURFACE::mapSize.y;
@@ -170,7 +170,7 @@ void TERRITORY::spawnTerritory(glm::vec2 pos, int size) {
 
                     ownedTiles.worldIndex = tileIndex;
 
-                    player.playerTiles.push_back(ownedTiles);
+                    PLAYER::playerTiles.push_back(ownedTiles);
 
                     //
                     //
@@ -193,49 +193,6 @@ void TERRITORY::spawnTerritory(glm::vec2 pos, int size) {
     }
 }
 
-// find which tile is currently under the mouse
-int findClickIndex() {
-    // default size of the tiles
-    glm::vec2 defaultSize = {
-        (static_cast<float>(window.scale.x) / TERRAIN::SURFACE::mapSize.x),
-        (static_cast<float>(window.scale.y) / TERRAIN::SURFACE::mapSize.y)
-    };
-    //        glm::vec2 currentSize = defaultSize * player.zoom;
-
-    glm::ivec2 mousePos;
-    SDL_GetMouseState(&mousePos.x, &mousePos.y);
-
-    int tileIndex;
-
-    // mouse pos in world cords
-    glm::vec2 mouseWorldPos = {
-        mousePos.x - (player.camOffset.x * player.zoom),
-        mousePos.y - (player.camOffset.y * player.zoom)
-    };
-
-    // tile size with the zoom
-    glm::vec2 tileSize = {
-        defaultSize.x * player.zoom,
-        defaultSize.y * player.zoom
-    };
-
-    // tile pos
-    glm::ivec2 tilePos = {
-        static_cast<int>(mouseWorldPos.x / tileSize.x),
-        static_cast<int>(mouseWorldPos.y / tileSize.y)
-    };
-
-    // check if tile is inside the world
-    if (tilePos.x >= 0 && tilePos.x < TERRAIN::SURFACE::mapSize.x && tilePos.y >= 0 && tilePos.y < TERRAIN::SURFACE::mapSize.y) {
-        tileIndex = tilePos.x + tilePos.y * TERRAIN::SURFACE::mapSize.x; // find out tile index (unused currently)
-
-        return tileIndex;
-    } else {
-        return -1;
-    }
-}
-
-
 //
 //  ITTS WORKINGGGGG
 //
@@ -243,9 +200,6 @@ int findClickIndex() {
 //
 //  have to add troops to the system so that you cant expand infinitly
 //
-
-
-
 
 void TERRITORY::updateLayer() {
     if (mouseClick) {
@@ -262,17 +216,18 @@ void TERRITORY::updateLayer() {
         SDL_GetMouseState(&mousePos.x, &mousePos.y);
 
         int tileIndex;
+        float zoom = PLAYER::zoom;
 
         // mouse pos in world cords
         glm::vec2 mouseWorldPos = {
-            mousePos.x - (player.camOffset.x * player.zoom),
-            mousePos.y - (player.camOffset.y * player.zoom)
+            mousePos.x - (PLAYER::camOffset.x * zoom),
+            mousePos.y - (PLAYER::camOffset.y * zoom)
         };
 
         // tile size with the zoom
         glm::vec2 tileSize = {
-            defaultSize.x * player.zoom,
-            defaultSize.y * player.zoom
+            defaultSize.x * zoom,
+            defaultSize.y * zoom
         };
 
         // tile pos
@@ -291,11 +246,11 @@ void TERRITORY::updateLayer() {
         if (tilePos.x >= 0 && tilePos.x < TERRAIN::SURFACE::mapSize.x && tilePos.y >= 0 && tilePos.y < TERRAIN::SURFACE::mapSize.y) {
             tileIndex = tilePos.x + tilePos.y * TERRAIN::SURFACE::mapSize.x;
 
-            if (player.playerOwnsAKingdom == false and TERRAIN::SURFACE::map.at(tileIndex).type > 1) {
+            if (PLAYER::playerOwnsAKingdom == false and TERRAIN::SURFACE::map.at(tileIndex).type > 1) {
                 spawnTerritory(tilePos, 6);
-                player.playerOwnsAKingdom = true;
+                PLAYER::playerOwnsAKingdom = true;
             } else {
-                if (player.troopAmount <= 0) return;
+                if (PLAYER::military.troops <= 0) return;
                 expandTerritory();
             }
         }

@@ -314,15 +314,15 @@ void TERRAIN::SURFACE::generateTerrain() {
 
     const float perlinNoiseScale = 0.02f;
     mapSize = glm::ivec2(window.scale.x / tileSize * scale, window.scale.y / tileSize * scale);
+    mapSize = glm::roundPowerOfTwo(mapSize);
 
-    LOG::DEBUG("Mapsize -> X: " + std::to_string(mapSize.x) + " Y: " + std::to_string(mapSize.y));
+    LOG::DEBUG("Map size: " + std::to_string(mapSize.x) + " x " + std::to_string(mapSize.y));
 
-    // random gen
-    std::random_device device;
-    std::mt19937 generator(device());
-    std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
 
-    float seed = distribution(generator);
+    static const int seed = TOOLBOX::randomInt(-999999, 999999);
+    glm::ivec2 axisSeed = {seed, seed * 1.5f};
+
+    LOG::INFO("Seed: " + std::to_string(seed));
 
     std::vector<float> heightMap(mapSize.x * mapSize.y);
 
@@ -332,15 +332,15 @@ void TERRAIN::SURFACE::generateTerrain() {
             float noiseValue;
             noiseValue = glm::perlin(
                 glm::vec2(
-                    x * perlinNoiseScale * seed,
-                    y * perlinNoiseScale * seed));
+                    static_cast<float>(x + axisSeed.x) * perlinNoiseScale,
+                    static_cast<float>(y + axisSeed.y) * perlinNoiseScale));
 
             heightMap[x + y * mapSize.x] = noiseValue;
         }
     }
 
     LOG::INFO("Running hydraulic erosion < STARTED >");
-    erosion(mapSize, heightMap, 100000);
+    erosion(mapSize, heightMap, 70000);
     LOG::INFO("Running hydraulic erosion < DONE >");
 
     for (int y = 0; y < mapSize.y; y++) {

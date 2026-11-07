@@ -209,7 +209,6 @@ void UI::TOOLTIP::manager() {
     for (auto& factory : CITY::citys) {
         // if click is inside an already existing building
         if (TOOLBOX::checkMouseCollision(mouseGridPos, factory.hitbox)) {
-
             glm::ivec2 pos;
             SDL_GetMouseState(&pos.x, &pos.y);
 
@@ -221,5 +220,17 @@ void UI::TOOLTIP::manager() {
         }
     }
 
+    // military camps
+    for (auto& camp : MILITARYCAMP::camps) {
+        if (TOOLBOX::checkMouseCollision(mouseGridPos, camp.hitbox)) {
+            glm::ivec2 pos;
+            SDL_GetMouseState(&pos.x, &pos.y);
 
+            title = "Military camp";
+            text = "Level: " + std::to_string(camp.level) + "        ";
+            enable = true;
+
+            break;
+        }
+    }
 }

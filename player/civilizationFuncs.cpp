@@ -24,6 +24,7 @@ int CITY::init() {
         return -1;
     }
 
+    LOG::INIT_SUCCESS("Loaded city icon");
     return 0;
 }
 
@@ -51,24 +52,24 @@ void CITY::spawnNew(glm::ivec2 mousePos, bool debug) {
     };
 
     // check player rec
-    auto rec = TOOLBOX::getPlayerResources();
-    if ( 75 > rec.steelAmount or 75 > rec.stoneAmount or 50 > rec.woodAmount) return;
+    auto& playerRes = PLAYER::resources;
+    if ( 75 > playerRes.steel or 75 > playerRes.stone or 50 > playerRes.wood) return;
 
     // check for collisions
     for (auto& boo : FACTORY::factorys) {
         if (TOOLBOX::checkHitboxCollision(building.hitbox, boo.hitbox)) return;
     }
-    for (auto& foo : citys) {
+    for (auto& foo : MILITARYCAMP::camps) {
         if (TOOLBOX::checkHitboxCollision(building.hitbox, foo.hitbox)) return;
     }
 
     // update player
-    player.citizen.citysTotal++;
-    player.citizen.citizen += 400;
+    PLAYER::citizen.citysTotal++;
+    PLAYER::citizen.citizen += 400;
 
-    player.resources.stoneAmount -= 75;
-    player.resources.steelAmount -= 75;
-    player.resources.woodAmount  -= 50;
+    playerRes.stone -= 75;
+    playerRes.steel -= 75;
+    playerRes.wood  -= 50;
 
     // |============|
     // |    Draw    |
@@ -104,25 +105,27 @@ void CITY::mouseClick() {
             return;
         }
     }
+    for (auto& camp : MILITARYCAMP::camps) {
+        if (TOOLBOX::checkMouseCollision(mousePos, camp.hitbox)) {
+            return;
+        }
+    }
 
     // if theres a city -> level up city
     for (auto& city : citys) {
         if (TOOLBOX::checkMouseCollision(mouseGridPos, city.hitbox)) {
-
-            auto rec = TOOLBOX::getPlayerResources();
+            auto& playerRes = PLAYER::resources;
 
             // checks if player has enough resources
-            if ( 75 > rec.steelAmount or 75 > rec.stoneAmount or 50 > rec.woodAmount) return;
+            if (75 > playerRes.steel or 75 > playerRes.stone or 50 > playerRes.wood) return;
 
             // update player
-            player.resources.stoneAmount -= 75;
-            player.resources.steelAmount -= 75;
-            player.resources.woodAmount  -= 50;
+            TOOLBOX::updatePlayerRes(-50, -75, -75,0,0);
 
             city.level++;
 
-            player.citizen.citysTotal++;
-            player.citizen.citizen += 400;
+            PLAYER::citizen.citysTotal++;
+            PLAYER::citizen.citizen += 400;
 
             TOOLBOX::updateBuildingLevelCounter(
                 city.level,
@@ -140,4 +143,148 @@ void CITY::mouseClick() {
     if (TERRAIN::SURFACE::map[index].type <= 1 or TERRITORY::layer[index].ownerID != 1) return;
 
     spawnNew(mousePos, false);
+}
+
+// |=====================|
+// |    Military Camp    |
+// |=====================|
+
+int MILITARYCAMP::init() {
+
+    // create surface
+    SDL_Surface* surf = IMG_Load("assets/Icon/Military.png");
+    if (surf == nullptr) {
+        std::string err = SDL_GetError();
+        if (err.empty()) err = "couldnt get error msg";
+        LOG::INIT_ERR("Couldnt create surface: " + err);
+        return -1;
+    }
+
+    // create texture from surface
+    campTex = SDL_CreateTextureFromSurface(window.rend, surf);
+    if (campTex == nullptr) {
+        std::string err = SDL_GetError();
+        if (err.empty()) err = "couldnt get error msg";
+        LOG::INIT_ERR("Couldnt create texture: " + err);
+        return -1;
+    }
+
+    SDL_FreeSurface(surf);
+    LOG::INIT_SUCCESS("Loaded military camp icon");
+    return 0;
+}
+
+void MILITARYCAMP::levelUp(auto& curCamp) {
+    // get the resources the player cur has
+    auto& playerRes = PLAYER::resources;
+    if (playerRes.stone < 100 or playerRes.steel < 100 or playerRes.wood < 125) return;
+
+    // remove resources from player
+    TOOLBOX::updatePlayerRes(-125, -100, -100, 0, 0);
+
+    // upgrade level
+    curCamp.level++;
+    PLAYER::military.militaryCamps++;
+
+    // update counter
+    TOOLBOX::updateBuildingLevelCounter(
+        curCamp.level,
+        curCamp.hitbox,
+        curCamp.levelRect,
+        curCamp.levelTex);
+}
+
+void MILITARYCAMP::spawnNew() {
+    glm::ivec2 mousePos = TOOLBOX::findMousePos();
+    Building building;
+
+    // texture size
+    int width, height;
+    SDL_QueryTexture(campTex, nullptr, nullptr, &width, &height);
+    width /= 4;
+    height /= 4;
+
+    // find where to place the building
+    glm::ivec2 tempPos = {
+        (mousePos.x * TERRAIN::SURFACE::tileSize) - width / 2,
+        (mousePos.y * TERRAIN::SURFACE::tileSize) - height / 2,
+    };
+
+    // make factory hitbox
+    building.hitbox = {
+        tempPos.x - 20,
+        tempPos.y - 20,
+        width + 40,
+        height + 40
+    };
+
+    // check player rec
+    auto& playerRes = PLAYER::resources;
+    if ( 75 > playerRes.steel or 75 > playerRes.stone or 50 > playerRes.wood) return;
+
+    // check for collisions
+    for (auto& boo : FACTORY::factorys) {
+        if (TOOLBOX::checkHitboxCollision(building.hitbox, boo.hitbox)) return;
+    }
+    for (auto& foo : CITY::citys) {
+        if (TOOLBOX::checkHitboxCollision(building.hitbox, foo.hitbox)) return;
+    }
+
+    // update player
+    PLAYER::military.militaryCamps++;
+
+    playerRes.stone -= 100;
+    playerRes.steel -= 150;
+    playerRes.wood  -= 125;
+
+    // |============|
+    // |    Draw    |
+    // |============|
+
+    // make city rect
+    building.iconRect = {
+        tempPos.x,
+        tempPos.y,
+        width,
+        height
+    };
+
+    // make counter
+    TOOLBOX::drawBuildingLevelCounter(
+        1,
+        building.hitbox,
+        building.levelRect,
+        building.levelTex
+        );
+
+    // update citys
+    camps.push_back(building);
+}
+
+void MILITARYCAMP::mouseClick() {
+    // mouse pos and mouse pos based on grid size
+    glm::ivec2 mousePos = TOOLBOX::findMousePos();
+    glm::ivec2 mouseGridPos = mousePos * TERRAIN::SURFACE::tileSize;
+
+    // check for building collision
+    for (auto& factory : FACTORY::factorys) {
+        if (TOOLBOX::checkMouseCollision(mouseGridPos, factory.hitbox)) return;
+    }
+    for (auto& cities : CITY::citys) {
+        if (TOOLBOX::checkMouseCollision(mousePos, cities.hitbox)) return;
+    }
+
+    // level up
+    for (auto& camp : camps) {
+        if (TOOLBOX::checkMouseCollision(mouseGridPos, camp.hitbox)) {
+            levelUp(camp);
+            return;
+        }
+    }
+
+    int index = TOOLBOX::findMouseIndex();
+
+    if (TERRAIN::SURFACE::map.at(index).type <= 1 or TERRITORY::layer.at(index).ownerID != 1) return;
+
+    spawnNew();
 }

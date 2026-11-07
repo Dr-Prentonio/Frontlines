@@ -65,6 +65,7 @@ int FACTORY::init() {
 
     SDL_FreeSurface(temp);
 
+    LOG::INIT_SUCCESS("Loaded factory icons successfully");
     return 0;
 }
 
@@ -80,22 +81,24 @@ void FACTORY::update() {
 
             if (factory.onSpecField) multiplier = 2;
 
+            auto& playerRes = PLAYER::resources;
+
             // apply factory production
             switch (factory.facType) {
                 case clothing:
-                    player.resources.clothesAmount  += factory.level * 5 * multiplier;
+                    playerRes.clothes  += factory.level * 5 * multiplier;
                     break;
                 case wood:
-                    player.resources.woodAmount     += factory.level * 6 * multiplier;
+                    playerRes.wood     += factory.level * 6 * multiplier;
                     break;
                 case stone:
-                    player.resources.stoneAmount    += factory.level * 6 * multiplier;
+                    playerRes.stone    += factory.level * 6 * multiplier;
                     break;
                 case steel:
-                    player.resources.steelAmount    += factory.level * 4 * multiplier;
+                    playerRes.steel    += factory.level * 4 * multiplier;
                     break;
                 case oil:
-                    player.resources.oilAmount      += factory.level * 3 * multiplier;
+                    playerRes.oil      += factory.level * 3 * multiplier;
                     break;
                 default: break;
             }
@@ -108,33 +111,23 @@ void FACTORY::update() {
 void removeResources(int type) {
     switch (type) {
         case 1: {
-            player.resources.woodAmount -= 20;
-            player.resources.steelAmount -= 50;
-            player.resources.stoneAmount -= 20;
+            TOOLBOX::updatePlayerRes(-20, -20, -50, 0, 0);
             break;
         }
         case 2: {
-            player.resources.woodAmount -= 20;
-            player.resources.steelAmount -= 25;
-            player.resources.stoneAmount -= 50;
+            TOOLBOX::updatePlayerRes(-20, -50, -25, 0, 0);
             break;
         }
         case 3: {
-            player.resources.woodAmount -= 30;
-            player.resources.steelAmount -= 50;
-            player.resources.stoneAmount -= 20;
+            TOOLBOX::updatePlayerRes(-30, -20, -50, 0, 0);
             break;
         }
         case 4: {
-            player.resources.woodAmount -= 30;
-            player.resources.steelAmount -= 50;
-            player.resources.stoneAmount -= 50;
+            TOOLBOX::updatePlayerRes(-30, -50, -50,0,0);
             break;
         }
         case 5: {
-            player.resources.woodAmount -= 30;
-            player.resources.steelAmount -= 100;
-            player.resources.stoneAmount -= 200;
+            TOOLBOX::updatePlayerRes(-30, -200, -100, 0,0);
             break;
         }
         default: break;
@@ -144,27 +137,27 @@ void removeResources(int type) {
 // returns true if not enough resources
 bool checkForResources(int type) {
 
-    auto rec = TOOLBOX::getPlayerResources();
+    auto& playerRes = PLAYER::resources;
 
     switch (type) {
         case 1: {
-            if (rec.woodAmount < 20 || rec.stoneAmount < 20 || rec.steelAmount < 50) return false;
+            if (playerRes.wood < 20 || playerRes.stone < 20 || playerRes.steel < 50) return false;
             break;
         }
         case 2: {
-            if (rec.woodAmount < 20 || rec.steelAmount < 25 || rec.stoneAmount < 50) return false;
+            if (playerRes.wood < 20 || playerRes.steel < 25 || playerRes.stone < 50) return false;
             break;
         }
         case 3: {
-            if (rec.woodAmount < 30 || rec.steelAmount < 50 || rec.stoneAmount < 20) return false;
+            if (playerRes.wood < 30 || playerRes.steel < 50 || playerRes.stone < 20) return false;
             break;
         }
         case 4: {
-            if (rec.woodAmount < 30 || rec.steelAmount < 50 || rec.stoneAmount < 50) return false;
+            if (playerRes.wood < 30 || playerRes.steel < 50 || playerRes.stone < 50) return false;
             break;
         }
         case 5: {
-            if (rec.woodAmount < 30 || rec.steelAmount < 100 || rec.stoneAmount < 200) return false;
+            if (playerRes.wood < 30 || playerRes.steel < 100 || playerRes.stone < 200) return false;
             break;
         }
         default: break;
@@ -223,15 +216,15 @@ void FACTORY::spawnNewFac(glm::ivec2 mousePos, factoryType type, bool debug) {
     }
 
     // get player resources
-    if (player.citizen.citizen < 75) return;
+    if (PLAYER::citizen.citizen < 75) return;
     if (!checkForResources(type)) return;
 
     // update player
-    player.citizen.citizen -= 75;
+    PLAYER::citizen.citizen -= 75;
 
     switch (type) {
         case 1: {
-            player.factorys.clothesFactorys++;
+            PLAYER::factorys.clothesFactorys++;
             for (auto& cotton : TERRAIN::FOLIAGE::COTTON::cottonTiles) {
                 if (TOOLBOX::checkHitboxCollision(building.hitbox, cotton)) {
                     building.onSpecField = true;
@@ -242,7 +235,7 @@ void FACTORY::spawnNewFac(glm::ivec2 mousePos, factoryType type, bool debug) {
             break;
         }
         case 2: {
-            player.factorys.woodFactorys++;
+            PLAYER::factorys.woodFactorys++;
             for (auto& forest : TERRAIN::FOLIAGE::FOREST::forestTiles) {
                 if (TOOLBOX::checkHitboxCollision(building.hitbox, forest)) {
                     building.onSpecField = true;
@@ -252,7 +245,7 @@ void FACTORY::spawnNewFac(glm::ivec2 mousePos, factoryType type, bool debug) {
             break;
         }
         case 3: {
-            player.factorys.stoneFactorys++;
+            PLAYER::factorys.stoneFactorys++;
             for (auto& stone : TERRAIN::FOLIAGE::STONE::stoneTiles) {
                 if (TOOLBOX::checkHitboxCollision(building.hitbox, stone)) {
                     building.onSpecField = true;
@@ -262,7 +255,7 @@ void FACTORY::spawnNewFac(glm::ivec2 mousePos, factoryType type, bool debug) {
             break;
         }
         case 4: {
-            player.factorys.steelFactorys++;
+            PLAYER::factorys.steelFactorys++;
             for (auto& stone : TERRAIN::FOLIAGE::STONE::stoneTiles) {
                 if (TOOLBOX::checkHitboxCollision(building.hitbox, stone)) {
                     building.onSpecField = true;
@@ -272,7 +265,7 @@ void FACTORY::spawnNewFac(glm::ivec2 mousePos, factoryType type, bool debug) {
             break;
         }
         case 5: {
-            player.factorys.oilFactorys++;
+            PLAYER::factorys.oilFactorys++;
             for (auto& oil : TERRAIN::FOLIAGE::OIL::oilTiles) {
                 if (TOOLBOX::checkHitboxCollision(building.hitbox, oil)) {
                     building.onSpecField = true;
@@ -327,21 +320,21 @@ void FACTORY::mouseClick() {
         if (TOOLBOX::checkMouseCollision(mouseGridPos, building.hitbox)) {
 
             // check for resources
-            if (player.citizen.citizen < 75) return;
+            if (PLAYER::citizen.citizen < 75) return;
             if (!checkForResources(building.facType)) return;
 
             // upgrade
             building.level += 1;
 
             // update player
-            player.citizen.citizen -= 75;
+            PLAYER::citizen.citizen -= 75;
 
             switch (building.facType) {
-                case 1: player.factorys.clothesFactorys++;  break;
-                case 2: player.factorys.woodFactorys++;     break;
-                case 3: player.factorys.stoneFactorys++;    break;
-                case 4: player.factorys.steelFactorys++;    break;
-                case 5: player.factorys.oilFactorys++;      break;
+                case 1: PLAYER::factorys.clothesFactorys++;  break;
+                case 2: PLAYER::factorys.woodFactorys++;     break;
+                case 3: PLAYER::factorys.stoneFactorys++;    break;
+                case 4: PLAYER::factorys.steelFactorys++;    break;
+                case 5: PLAYER::factorys.oilFactorys++;      break;
                 default: break;
             }
 

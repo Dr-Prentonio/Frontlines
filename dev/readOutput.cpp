@@ -12,15 +12,17 @@ void DEVMODE::readOutput() {
     if (UI::checkBoxes.at(0).checked) {
         LOG::INFO("God Mode activated");
 
-        // Rescource                      Amount
-        player.resources.clothesAmount = 1000000;
-        player.resources.oilAmount     = 1000000;
-        player.resources.steelAmount   = 1000000;
-        player.resources.stoneAmount   = 1000000;
-        player.resources.woodAmount    = 1000000;
+        auto& playerRes = PLAYER::resources;
 
-        player.citizen.citizen         = 1000000;
-        player.troopAmount             = 1000000;
+        // Rescource        Amount
+        playerRes.clothes = 1000000;
+        playerRes.oil     = 1000000;
+        playerRes.steel   = 1000000;
+        playerRes.stone   = 1000000;
+        playerRes.wood    = 1000000;
+
+        PLAYER::citizen.citizen = 1000000;
+        PLAYER::military.troops = 1000000;
     }
 
     if (UI::checkBoxes.at(1).checked) {

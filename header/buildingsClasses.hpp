@@ -55,7 +55,6 @@ namespace FACTORY {
 }
 
 namespace CITY {
-
     struct Building {
 
         SDL_Rect cityRect;
@@ -67,16 +66,43 @@ namespace CITY {
         SDL_Rect levelRect;
     };
 
+    // texture of the icon
     inline SDL_Texture* cityTex;
 
+    // vector
     inline std::vector<Building> citys;
 
+    // funcs
     int init();
-
     void update();
     void mouseClick();
-
     void spawnNew(glm::ivec2 mousePos, bool debug);
+}
+
+namespace MILITARYCAMP {
+    struct Building {
+        // icon and hitbox rect of building
+        SDL_Rect iconRect       = {0,0,0,0};
+        SDL_Rect hitbox         = {0,0,0,0};
+
+        // level
+        int level               = 1;
+
+        // level number
+        SDL_Texture* levelTex   = nullptr;
+        SDL_Rect levelRect      = {0,0,0,0};
+    };
+
+    // texture of the icon
+    inline SDL_Texture* campTex = nullptr;
+    inline std::vector<Building> camps;
+
+    // funcs
+    int init();
+    void update();
+    void mouseClick();
+    void spawnNew();
+    void levelUp(auto& curCamp);
 }
 
 #endif //STRATEGIE_GAME_BUILDINGS_HPP

@@ -6,32 +6,41 @@
 
 void SDL::Gameloop::draw() {
     static SDL_Renderer* rend;
-    static float playerZoom;
+    float playerZoom = PLAYER::zoom;
 
-    playerZoom = player.zoom;
     rend = window.rend;
 
     SDL_RenderClear(rend);
 
     SDL_Rect drect = {
-        static_cast<int>(player.camOffset.x * playerZoom),
-        static_cast<int>(player.camOffset.y * playerZoom),
+        static_cast<int>(PLAYER::camOffset.x * playerZoom),
+        static_cast<int>(PLAYER::camOffset.y * playerZoom),
         static_cast<int>(window.scale.x * playerZoom),
         static_cast<int>(window.scale.y * playerZoom)
     };
 
     // player cant escape the map
-    if (player.camOffset.x > 0) { drect.x = 0; player.touchesBorderLeft = true; }
-    else player.touchesBorderLeft = false;
+    if (PLAYER::camOffset.x > 0) {
+        drect.x = 0; PLAYER::touchesBorderLeft = true;
+    }
+    else PLAYER::touchesBorderLeft = false;
 
-    if (player.camOffset.y > 0) { drect.y = 0; player.touchesBorderTop = true; }
-    else player.touchesBorderTop = false;
+    if (PLAYER::camOffset.y > 0) {
+        drect.y = 0; PLAYER::touchesBorderTop = true;
+    }
+    else PLAYER::touchesBorderTop = false;
 
-    if (drect.x < window.scale.x - drect.w) { drect.x = window.scale.x - drect.w; player.touchesBorderRight = true; }
-    else player.touchesBorderRight = false;
+    if (drect.x < window.scale.x - drect.w) {
+        drect.x = window.scale.x - drect.w;
+        PLAYER::touchesBorderRight = true;
+    }
+    else PLAYER::touchesBorderRight = false;
 
-    if (drect.y < window.scale.y - drect.h) { drect.y = window.scale.y - drect.h; player.touchesBorderBottom = true; }
-    else player.touchesBorderBottom = false;
+    if (drect.y < window.scale.y - drect.h) {
+        drect.y = window.scale.y - drect.h;
+        PLAYER::touchesBorderBottom = true;
+    }
+    else PLAYER::touchesBorderBottom = false;
 
     // |======================|
     // |      Static Layer    |
@@ -52,16 +61,10 @@ void SDL::Gameloop::draw() {
     //          LAYER 2
     //===========================0
 
-    // |================================|
-    // |    Player Territory Texture    |
-    // |================================|
-
+    // Player Territory Texture
     SDL_RenderCopy(rend, TERRITORY::layerTexture,   nullptr, &drect);
 
-    // |==============================|
-    // |    Player Factory Texture    |
-    // |==============================|
-
+    // Player Factory Texture
     for (auto& factory : FACTORY::factorys) {
 
         // calc screen space mapping
@@ -77,10 +80,7 @@ void SDL::Gameloop::draw() {
         SDL_RenderCopy(rend, factory.levelTex, nullptr, &textCords);
     }
 
-    // |===========================|
-    // |    Player City Texture    |
-    // |===========================|
-
+    // Player City Texture
     for (auto& city : CITY::citys) {
 
         SDL_Rect buildingCords = {0,0,0,0};
@@ -94,6 +94,19 @@ void SDL::Gameloop::draw() {
         SDL_RenderCopy(rend, city.levelTex, nullptr, &textCords);
     }
 
+    // Player Military camp Texture
+    for (auto& camp : MILITARYCAMP::camps) {
+
+        SDL_Rect buildingCords = {0,0,0,0};
+        TOOLBOX::screenSpaceMapping(camp.iconRect, drect, buildingCords);
+
+        SDL_RenderCopy(rend, MILITARYCAMP::campTex, nullptr, &buildingCords);
+
+        SDL_Rect textCords = {0,0,0,0};
+        TOOLBOX::screenSpaceMapping(camp.levelRect, drect, textCords);
+
+        SDL_RenderCopy(rend, camp.levelTex, nullptr, &textCords);
+    }
 
     //
     // LAYER 3

@@ -54,16 +54,18 @@ namespace TOOLBOX {
         glm::ivec2 mousePos;
         SDL_GetMouseState(&mousePos.x, &mousePos.y);
 
+        float zoom = PLAYER::zoom;
+
         // mouse pos in world cords
         glm::vec2 mouseWorldPos = {
-            mousePos.x - (player.camOffset.x * player.zoom),
-            mousePos.y - (player.camOffset.y * player.zoom)
+            mousePos.x - (PLAYER::camOffset.x * zoom),
+            mousePos.y - (PLAYER::camOffset.y * zoom)
         };
 
         // tile size with the zoom
         glm::vec2 tileSize = {
-            defaultSize.x * player.zoom,
-            defaultSize.y * player.zoom
+            defaultSize.x * zoom,
+            defaultSize.y * zoom
         };
 
         // tile pos
@@ -96,17 +98,18 @@ namespace TOOLBOX {
         SDL_GetMouseState(&mousePos.x, &mousePos.y);
 
         int tileIndex;
+        float zoom = PLAYER::zoom;
 
         // mouse pos in world cords
         glm::vec2 mouseWorldPos = {
-            mousePos.x - (player.camOffset.x * player.zoom),
-            mousePos.y - (player.camOffset.y * player.zoom)
+            mousePos.x - (PLAYER::camOffset.x * zoom),
+            mousePos.y - (PLAYER::camOffset.y * zoom)
         };
 
         // tile size with the zoom
         glm::vec2 tileSize = {
-            defaultSize.x * player.zoom,
-            defaultSize.y * player.zoom
+            defaultSize.x * zoom,
+            defaultSize.y * zoom
         };
 
         // tile pos
@@ -125,20 +128,19 @@ namespace TOOLBOX {
         }
     }
 
-    // |==============================|
-    // |    Fetch Player Resources    |
-    // |==============================|
+    // |===================================|
+    // |    Add/Remove Player Resources    |
+    // |===================================|
 
-    inline Player::Resources getPlayerResources() {
-        Uint32 clothes, wood, stone, steel, oil;
+    // +/- player resources
+    inline void updatePlayerRes(int wood, int stone, int steel, int clothes, int oil) {
+        auto& playerRes = PLAYER::resources;
 
-        clothes = player.resources.clothesAmount;
-        wood = player.resources.woodAmount;
-        stone = player.resources.stoneAmount;
-        steel = player.resources.steelAmount;
-        oil = player.resources.oilAmount;
-
-        return {wood, stone, clothes, steel, oil};
+        playerRes.wood += wood;
+        playerRes.stone += stone;
+        playerRes.steel += steel;
+        playerRes.clothes += clothes;
+        playerRes.oil += oil;
     }
 
     // |============================================|
@@ -254,7 +256,7 @@ namespace TOOLBOX {
         temp = SDL_CreateTextureFromSurface(rend, textSurface);
 
         if (temp == nullptr or textSurface == nullptr) {
-            LOG::ERR("Couldnt create level Texture in toolbox update func");
+            LOG::ERR("Couldnt create level Texture");
 
             SDL_FreeSurface(textSurface);
             SDL_DestroyTexture(temp);

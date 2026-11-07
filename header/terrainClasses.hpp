@@ -10,6 +10,7 @@
 #include <iostream>
 
 #include "glm/glm.hpp"
+#include <glm/gtc/round.hpp>
 
 // everything terrain related
 namespace TERRAIN {
@@ -49,8 +50,8 @@ namespace TERRAIN {
             float sediment = 0.0f;
         };
 
-        const int tileSize = 32;
-        const int scale = 14; // whole game relies on THIS one number TwT
+        const int tileSize = 32; // size of tiles in full res
+        const int scale = 16; // scaling of the map
 
         inline std::vector<TerrainTile> map; // map vector
 
@@ -60,6 +61,7 @@ namespace TERRAIN {
 
         void generateTerrain();
         void generateTile(SDL_Renderer* rend);
+
     }
 
     // foliage (trees, cotton etc)

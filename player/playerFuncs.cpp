@@ -97,7 +97,7 @@ void checkTile(auto& tile) {
 }
 
 // updates the pending tiles (every frame)
-void Player::update(float deltaTime) {
+void PLAYER::update(float deltaTime) {
     if (pendingTiles.empty()) return;
 
     SDL_Renderer* rend = window.rend;
@@ -109,7 +109,7 @@ void Player::update(float deltaTime) {
             int index = pendingTiles[i].globalIndex;
             TERRITORY::territoryTile& updatedTile = TERRITORY::layer[index];
 
-            player.troopAmount -= pendingTiles[i].troopCost;
+            military.troops -= pendingTiles[i].troopCost;
 
             updatedTile.ownerID = 1;
             updatedTile.color = Red_Border;
@@ -165,8 +165,8 @@ bool isAvailable(int index) {
 void TERRITORY::expandTerritory() {
 
     // loop
-    for (int i = 0; i < player.playerTiles.size(); i++) {
-        Player::OwnedTiles& tile = player.playerTiles[i];
+    for (int i = 0; i < PLAYER::playerTiles.size(); i++) {
+        auto& tile = PLAYER::playerTiles.at(i);
 
         // check if fullboxed (if then continue)
         if (tile.fullBoxed) continue;
@@ -178,7 +178,7 @@ void TERRITORY::expandTerritory() {
         if (!tile.topBlocked) {
             int topIndex = neg.topIndex;
 
-            checkTile(player.playerTiles[i]);
+            checkTile(PLAYER::playerTiles[i]);
 
             if (neg.topIndex == -1 or TERRAIN::SURFACE::map[topIndex].type <= 1) {
                 tile.topBlocked = true;
@@ -205,7 +205,7 @@ void TERRITORY::expandTerritory() {
         if (!tile.bottomBlocked) {
             int bottomIndex = neg.bottomIndex;
 
-            checkTile(player.playerTiles[i]);
+            checkTile(PLAYER::playerTiles[i]);
 
             if (neg.bottomIndex == -1 or TERRAIN::SURFACE::map[bottomIndex].type <= 1) {
                 tile.bottomBlocked = true;
@@ -232,7 +232,7 @@ void TERRITORY::expandTerritory() {
         if (!tile.leftBlocked) {
             int leftIndex = neg.leftIndex;
 
-            checkTile(player.playerTiles[i]);
+            checkTile(PLAYER::playerTiles[i]);
 
             if (neg.leftIndex == -1 or TERRAIN::SURFACE::map[leftIndex].type <= 1) {
                 tile.leftBlocked = true;
@@ -259,7 +259,7 @@ void TERRITORY::expandTerritory() {
         if (!tile.rightBlocked) {
             int rightIndex = neg.rightIndex;
 
-            checkTile(player.playerTiles[i]);
+            checkTile(PLAYER::playerTiles[i]);
 
             if (neg.rightIndex == -1 or TERRAIN::SURFACE::map[rightIndex].type <= 1) {
                 tile.rightBlocked = true;

@@ -10,9 +10,9 @@
 void UI::topUiBar(SDL_Renderer *rend) {
     SDL_SetRenderDrawColor(rend, 25,25,25,200);
 
-    std::string troopOverview = "Troops: " + std::to_string(player.troopAmount);
-    std::string tilesOverview = "Tiles Owned: " + std::to_string(player.playerTiles.size());
-    std::string citizenOverview = "Citizens: " + std::to_string(player.citizen.citizen);
+    std::string troopOverview = "Troops: " + std::to_string(PLAYER::military.troops);
+    std::string tilesOverview = "Tiles Owned: " + std::to_string(PLAYER::playerTiles.size());
+    std::string citizenOverview = "Citizens: " + std::to_string(PLAYER::citizen.citizen);
 
     std::string text = troopOverview + " | " + tilesOverview + " | " + citizenOverview;
 
@@ -65,11 +65,13 @@ void UI::topUiBar(SDL_Renderer *rend) {
 void UI::rightUiBar(SDL_Renderer *rend) {
     SDL_SetRenderDrawColor(rend, 25,25,25,200);
 
-    std::string wood = "Wood: " + std::to_string(player.resources.woodAmount);
-    std::string stone = "Stone: " + std::to_string(player.resources.stoneAmount);
-    std::string steel = "Steel: " + std::to_string(player.resources.steelAmount);
-    std::string oil = "Oil: " + std::to_string(player.resources.oilAmount);
-    std::string clothing = "Clothing: " + std::to_string(player.resources.clothesAmount);
+    auto& playerRes = PLAYER::resources;
+
+    std::string wood        = "Wood: "      + std::to_string(playerRes.wood);
+    std::string stone       = "Stone: "     + std::to_string(playerRes.stone);
+    std::string steel       = "Steel: "     + std::to_string(playerRes.steel);
+    std::string oil         = "Oil: "       + std::to_string(playerRes.oil);
+    std::string clothing    = "Clothing: "  + std::to_string(playerRes.clothes);
 
     std::string text = wood + " | " + stone + " | " + clothing + " | " + steel + " | " + oil;
 
@@ -127,14 +129,16 @@ void UI::rightUiBar(SDL_Renderer *rend) {
 void UI::bottomLeftUI(SDL_Renderer *rend) {
     SDL_SetRenderDrawColor(rend, 25,25,25,200);
 
-    std::string text =  "––––––––––––––––––––FACTORY–––––––––––––––––––––– \n"
-                        "1 Clothing Factory | 20 Wood, 50 Steel, 20 Stone \n"
-                        "2 Wood Factory     | 20 Wood, 25 Steel, 50 Stone \n"
-                        "3 Stone Factory    | 30 Wood, 50 Steel, 20 Stone \n"
-                        "4 Steel Factory    | 30 Wood, 50 Steel, 50 Stone \n"
-                        "5 Oil Factory      | 30 Wood, 100 Steel, 200 Stone \n"
-                        "–––––––––––––––––––––CITY––––––––––––––––––––––––– \n"
-                        "6 City             | 50 Wood, 75 Steel, 75 Stone \n";
+    std::string text =  "|–––––––––––––––––––––FACTORY–––––––––––––––––––––––––|\n"
+                        "| 1. Clothing Factory | 20 Wood, 50 Steel, 20 Stone   |\n"
+                        "| 2. Wood Factory     | 20 Wood, 25 Steel, 50 Stone   |\n"
+                        "| 3. Stone Factory    | 30 Wood, 50 Steel, 20 Stone   |\n"
+                        "| 4. Steel Factory    | 30 Wood, 50 Steel, 50 Stone   |\n"
+                        "| 5. Oil Factory      | 30 Wood, 100 Steel, 200 Stone |\n"
+                        "|–––––––––––––––––––––CITY––––––––––––––––––––––––––––|\n"
+                        "| 6. City             | 50 Wood, 75 Steel, 75 Stone   |\n"
+                        "|–––––––––––––––––––––MILITARY––––––––––––––––––––––––|\n"
+                        "| 7. Military Camp    | 125 Wood, 150 Steel, 100 Stone|";
 
     int wrapLength = 0;
     SDL_Surface* textSurface = TTF_RenderUTF8_Blended_Wrapped(
@@ -189,12 +193,13 @@ void UI::bottomLeftUI(SDL_Renderer *rend) {
     int offset = 26 + (27 * (bottomLeftUi.index - 1));
 
     if (bottomLeftUi.index > 5) offset += 26;
+    if (bottomLeftUi.index > 6) offset += 26;
 
     SDL_Rect pickyDrect = {
-        barPos.x + 5,
-        barPos.y + 5 + offset,
-        textWidth - 5,
-        textHeight / 8
+        barPos.x + 17,
+        barPos.y + 6 + offset,
+        textWidth - 20,
+        textHeight / 8 - 8
     };
 
     SDL_SetRenderDrawColor(rend, 255,255,255,100);

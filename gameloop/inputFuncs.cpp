@@ -22,51 +22,42 @@ void SDL::Gameloop::input(SDL_Event &e) {
         speed = 1.5f;
     }
 
-    if (state[SDL_SCANCODE_W] && !player.touchesBorderTop) {
+    if (state[SDL_SCANCODE_W] && !PLAYER::touchesBorderTop) {
         movement.y += baseSpeed * speed * deltaTime;
         UI::TOOLTIP::enable = false;
     }
 
-    else if (state[SDL_SCANCODE_S] && !player.touchesBorderBottom) {
+    else if (state[SDL_SCANCODE_S] && !PLAYER::touchesBorderBottom) {
         movement.y -= baseSpeed * speed * deltaTime;
         UI::TOOLTIP::enable = false;
     }
 
-    else if (state[SDL_SCANCODE_A] && !player.touchesBorderLeft) {
+    else if (state[SDL_SCANCODE_A] && !PLAYER::touchesBorderLeft) {
         movement.x += baseSpeed * speed * deltaTime;
         UI::TOOLTIP::enable = false;
     }
 
-    else if (state[SDL_SCANCODE_D] && !player.touchesBorderRight) {
+    else if (state[SDL_SCANCODE_D] && !PLAYER::touchesBorderRight) {
         movement.x -= baseSpeed * speed * deltaTime;
         UI::TOOLTIP::enable = false;
     }
 
 
     // for buildings
-    if (state[SDL_SCANCODE_1]) {
-        UI::bottomLeftUi.index = 1;
-    }
-    if (state[SDL_SCANCODE_2]) {
-        UI::bottomLeftUi.index = 2;
-    }
-    if (state[SDL_SCANCODE_3]) {
-        UI::bottomLeftUi.index = 3;
-    }
-    if (state[SDL_SCANCODE_4]) {
-        UI::bottomLeftUi.index = 4;
-    }
-    if (state[SDL_SCANCODE_5]) {
-        UI::bottomLeftUi.index = 5;
-    }
-    if (state[SDL_SCANCODE_6]) {
-        UI::bottomLeftUi.index = 6;
-    }
+    if (state[SDL_SCANCODE_1])      UI::bottomLeftUi.index = 1;
+    else if (state[SDL_SCANCODE_2]) UI::bottomLeftUi.index = 2;
+    else if (state[SDL_SCANCODE_3]) UI::bottomLeftUi.index = 3;
+    else if (state[SDL_SCANCODE_4]) UI::bottomLeftUi.index = 4;
+    else if (state[SDL_SCANCODE_5]) UI::bottomLeftUi.index = 5;
+    else if (state[SDL_SCANCODE_6]) UI::bottomLeftUi.index = 6;
+    else if (state[SDL_SCANCODE_7]) UI::bottomLeftUi.index = 7;
 
-    player.camOffset = {
+    PLAYER::camOffset = {
         static_cast<int>(glm::round(movement.x)),
         static_cast<int>(glm::round(movement.y)),
-        0,0};
+        0,
+        0
+    };
 
     //
     // MOUSE WHEEL
@@ -75,17 +66,17 @@ void SDL::Gameloop::input(SDL_Event &e) {
     // zoom
     if (e.type == SDL_MOUSEWHEEL) {
         if (e.wheel.y > 0) {
-            player.target += 0.15f;
+            PLAYER::target += 0.15f;
             UI::TOOLTIP::enable = false;
         } else if (e.wheel.y < 0) {
-            player.target -= 0.15f;
+            PLAYER::target -= 0.15f;
             UI::TOOLTIP::enable = false;
         }
 
         e.wheel.y = 0;
 
         // min / max zoom
-        player.target = glm::clamp(player.target, 1.0f, 7.5f);
+        PLAYER::target = glm::clamp(PLAYER::target, 1.0f, 7.5f);
     }
 
     if (e.type == SDL_MOUSEMOTION) UI::TOOLTIP::enable = false;
@@ -115,16 +106,14 @@ void SDL::Gameloop::input(SDL_Event &e) {
             Uint32 time = SDL_GetTicks();
             if (time - diff >= cooldown) {
 
-                if (UI::bottomLeftUi.index <= 5) {
-                    FACTORY::mouseClick();
-                } else {
-                    CITY::mouseClick();
-                }
+                if (UI::bottomLeftUi.index == 7)        MILITARYCAMP::mouseClick();
+                else if (UI::bottomLeftUi.index == 6)   CITY::mouseClick();
+                else                                    FACTORY::mouseClick();
 
                 diff = time;
             }
         }
 
     }
-    player.zoom += (player.target - player.zoom) * 0.1f;
+    PLAYER::zoom += (PLAYER::target - PLAYER::zoom) * 0.1f;
 }

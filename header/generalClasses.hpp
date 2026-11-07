@@ -50,27 +50,31 @@ namespace SDL {
 }
 
 // player
-struct Player {
+namespace PLAYER {
     // Resources and factorys
-    struct Resources {
-        Uint32 woodAmount = 100;    // 100
-        Uint32 stoneAmount = 100;   // 100
-        Uint32 clothesAmount = 0; // 0
-        Uint32 steelAmount = 100;   // 100
-        Uint32 oilAmount = 0;     // 0
+    struct Resources_Def {
+        Uint32 wood       = 100; // 100
+        Uint32 stone      = 100; // 100
+        Uint32 clothes    = 0;   // 0
+        Uint32 steel      = 100; // 100
+        Uint32 oil        = 0;   // 0
     };
     // factorys take 75 citizen
-    struct Factory {
-        Uint32 clothesFactorys = 0;
-        Uint32 steelFactorys = 0;
-        Uint32 oilFactorys = 0;
-        Uint32 woodFactorys = 0;
-        Uint32 stoneFactorys = 0;
+    struct Factory_Def {
+        Uint32 clothesFactorys  = 0;
+        Uint32 steelFactorys    = 0;
+        Uint32 oilFactorys      = 0;
+        Uint32 woodFactorys     = 0;
+        Uint32 stoneFactorys    = 0;
     };
     // citys give 400 citizen
-    struct Citizen {
+    struct Citizen_Def {
         Uint32 citysTotal = 0;
         Uint32 citizen = 1000;
+    };
+    struct Military_Def {
+        int troops = 5000;
+        Uint32 militaryCamps = 0;
     };
     struct OwnedTiles {
 
@@ -90,27 +94,27 @@ struct Player {
         bool fullBoxed = false;
     };
 
-    Citizen citizen;
-    Factory factorys;
-    Resources resources;
+    inline Citizen_Def citizen;
+    inline Factory_Def factorys;
+    inline Resources_Def resources;
+    inline Military_Def military;
 
-    SDL_Rect camOffset;
-    float zoom = 1;
-    float target = 1;
+    inline SDL_Rect camOffset;
+    inline float zoom = 1;
+    inline float target = 1;
 
     // if touches map border and cant move anymore
-    bool touchesBorderRight;
-    bool touchesBorderLeft;
-    bool touchesBorderTop;
-    bool touchesBorderBottom;
+    inline bool touchesBorderRight;
+    inline bool touchesBorderLeft;
+    inline bool touchesBorderTop;
+    inline bool touchesBorderBottom;
 
-    bool playerOwnsAKingdom = false;
-    int troopAmount = 1000;
+    inline bool playerOwnsAKingdom = false;
 
-    std::vector<OwnedTiles> playerTiles;
-
+    // update player tiles in progress
+    inline std::vector<OwnedTiles> playerTiles;
     void update(float deltaTime);
-};
+}
 
 // definition of the firste few colors
 #define Red (SDL_Color){245, 0, 0, 125};
@@ -122,9 +126,9 @@ namespace TERRITORY {
 
     struct territoryTile {
 
-        SDL_Rect rect;  // size and pos of the tile
+        SDL_Rect rect = {0,0,0,0};  // size and pos of the tile
         SDL_Color color = Clear;    // color of the field
-        int ownerID;    // the owner of this field
+        int ownerID = 0;    // the owner of this field
 
     };
 
@@ -145,6 +149,5 @@ namespace TERRITORY {
 
 extern SDL::Window window;
 extern SDL::Gameloop gameloop;
-extern Player player;
 
 #endif //STRATEGIE_GAME_GENERALCLASSES_HPP
