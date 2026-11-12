@@ -177,7 +177,7 @@ int MILITARYCAMP::init() {
 void MILITARYCAMP::levelUp(auto& curCamp) {
     // get the resources the player cur has
     auto& playerRes = PLAYER::resources;
-    if (playerRes.stone < 100 or playerRes.steel < 100 or playerRes.wood < 125) return;
+    if (playerRes.stone < 100 or playerRes.steel < 150 or playerRes.wood < 125) return;
 
     // remove resources from player
     TOOLBOX::updatePlayerRes(-125, -100, -100, 0, 0);
@@ -192,6 +192,27 @@ void MILITARYCAMP::levelUp(auto& curCamp) {
         curCamp.hitbox,
         curCamp.levelRect,
         curCamp.levelTex);
+}
+
+// called 60 times a second
+void MILITARYCAMP::update() {
+    static float timer = 0;
+    timer += gameloop.deltaTime;
+
+    // every second
+    if (timer >= 1) {
+
+        for (auto& camp : camps) {
+            int offset = TOOLBOX::randomInt(-5, 5);
+
+            // update player
+            PLAYER::resources.clothes -= (5 + offset) * camp.level;
+            PLAYER::citizen.citizen   -= (5 + offset) * camp.level;
+            PLAYER::military.troops   += (5 + offset) * camp.level;
+        }
+
+        timer = 0;
+    }
 }
 
 void MILITARYCAMP::spawnNew() {
@@ -220,7 +241,7 @@ void MILITARYCAMP::spawnNew() {
 
     // check player rec
     auto& playerRes = PLAYER::resources;
-    if ( 75 > playerRes.steel or 75 > playerRes.stone or 50 > playerRes.wood) return;
+    if ( 150 > playerRes.steel or 100 > playerRes.stone or 125 > playerRes.wood) return;
 
     // check for collisions
     for (auto& boo : FACTORY::factorys) {

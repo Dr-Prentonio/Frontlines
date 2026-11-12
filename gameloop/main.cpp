@@ -130,6 +130,15 @@ int main() {
         return -1;
     }
 
+    // |===============|
+    // |    UI Init    |
+    // |===============|
+
+    if (UI::TOOLSELECT::init() != 0) {
+        LOG::INIT_ERR("Couldnt init tool select");
+        return -1;
+    }
+
     // |=================|
     // |    Game Loop    |
     // |=================|
@@ -155,11 +164,12 @@ int main() {
 
         TERRITORY::updateLayer();
 
-        gameloop.draw();
+        gameloop.draw(event);
 
         PLAYER::update(gameloop.deltaTime);
 
         FACTORY::update();
+        MILITARYCAMP::update();
 
         std::this_thread::sleep_for(std::chrono::milliseconds(8));
     }

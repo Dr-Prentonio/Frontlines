@@ -432,6 +432,16 @@ namespace TOOLBOX {
 
         return heightMap;
     }
+
+    // hitboxes of all ui elements
+    inline std::vector<SDL_Rect> UIHitbox;
+
+    inline bool checkMouseUICollision(glm::ivec2 mousePos) {
+        for (auto& hitbox : UIHitbox) {
+            if (checkMouseCollision(mousePos, hitbox)) return true;
+        }
+        return false;
+    }
 }
 
 #endif //STRATEGIE_GAME_GENERALFUNCS_HPP

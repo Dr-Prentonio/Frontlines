@@ -60,11 +60,11 @@ FetchNeighbours fetchNeighbour(int index) {
 TileData fetchData(int index) {
     switch (TERRAIN::SURFACE::map.at(index).type) {
         // the bigger the number the longer it takes (8 is already slow ash)
-        case 2: return {15, 2};        // Shore
-        case 3: return {10,  1};      // Grass
-        case 4: return {15, 2};        // Taiga
-        case 5: return {25, 4};     // Mountain
-        case 6: return {40, 8};      // Snow
+        case 2: return {15, 6};        // Shore
+        case 3: return {10,  3};      // Grass
+        case 4: return {15, 6};        // Taiga
+        case 5: return {25, 12};     // Mountain
+        case 6: return {40, 24};      // Snow
         default: return {0,0};
     }
 }

@@ -39,7 +39,7 @@ namespace SDL {
 
     struct Gameloop {
 
-        void draw();
+        void draw(SDL_Event &e);
 
         void input(SDL_Event &e);
 
@@ -58,6 +58,7 @@ namespace PLAYER {
         Uint32 clothes    = 0;   // 0
         Uint32 steel      = 100; // 100
         Uint32 oil        = 0;   // 0
+        Uint32 weapons    = 50;
     };
     // factorys take 75 citizen
     struct Factory_Def {
@@ -66,6 +67,7 @@ namespace PLAYER {
         Uint32 oilFactorys      = 0;
         Uint32 woodFactorys     = 0;
         Uint32 stoneFactorys    = 0;
+        Uint32 weaponFactorys   = 0;
     };
     // citys give 400 citizen
     struct Citizen_Def {

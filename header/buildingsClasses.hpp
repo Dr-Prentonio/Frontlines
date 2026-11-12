@@ -17,7 +17,8 @@ namespace FACTORY {
         wood,
         stone,
         steel,
-        oil
+        oil,
+        weapon
     };
     struct Building {
         factoryType facType = clothing; // Type of factory
@@ -42,11 +43,11 @@ namespace FACTORY {
         SDL_Texture* stoneTex;
         SDL_Texture* steelTex;
         SDL_Texture* oilTex;
+        SDL_Texture* weaponTex;
     };
 
     inline Icons icons;
     inline std::vector<Building> factorys;
-
 
     int init();
     void mouseClick();
@@ -57,13 +58,13 @@ namespace FACTORY {
 namespace CITY {
     struct Building {
 
-        SDL_Rect cityRect;
-        SDL_Rect hitbox;
+        SDL_Rect cityRect = {0,0,0,0};
+        SDL_Rect hitbox = {0,0,0,0};
 
         int level = 1;
 
         SDL_Texture* levelTex = nullptr;
-        SDL_Rect levelRect;
+        SDL_Rect levelRect = {0,0,0,0};
     };
 
     // texture of the icon

@@ -261,7 +261,6 @@ void TERRAIN::SURFACE::generateTile(SDL_Renderer* rend) {
 }
 
 void TERRAIN::LOD::generateLoDs() {
-
     SDL_Texture* staticTex;
     SDL_Renderer* rend = window.rend;
 
@@ -307,6 +306,30 @@ void TERRAIN::LOD::generateLoDs() {
 
     SDL_DestroyTexture(SURFACE::mapTexture);
     SDL_DestroyTexture(FOLIAGE::GENERAL::worldTex);
+}
+
+void writeToFile() {
+    std::ofstream outFile("staticMapArray.txt");
+
+    if (!outFile.is_open()) {
+        LOG::WARN("Couldnt load staticMapArray.txt file");
+        LOG::INFO("Optimizing terrain < DONE >");
+        return;
+    }
+
+    for (int i = 0; i < TERRAIN::SURFACE::map.size(); i++) {
+        auto& kniga = TERRAIN::SURFACE::map.at(i);
+
+        outFile
+        << kniga.rect.x     << " "          // position x
+        << kniga.rect.y     << " "          // position y
+        << kniga.type                       // type
+        << std::endl;
+    }
+
+    outFile.close();
+
+    LOG::INFO("Writen to staticMapArray.txt file successfully");
 }
 
 void TERRAIN::SURFACE::generateTerrain() {
@@ -393,26 +416,7 @@ void TERRAIN::SURFACE::generateTerrain() {
     // |    Write tiles to Array for Dev mode    |
     // |=========================================|
 
-    std::ofstream outFile("staticMapArray.txt");
+//    writeToFile();
 
-    if (!outFile.is_open()) {
-        LOG::WARN("Couldnt load staticMapArray.txt file");
-        LOG::INFO("Optimizing terrain < DONE >");
-        return;
-    }
-
-    for (int i = 0; i < map.size(); i++) {
-        auto& kniga = map[i];
-
-        outFile
-        << kniga.rect.x     << " "          // position x
-        << kniga.rect.y     << " "          // position y
-        << kniga.type                       // type
-        << std::endl;
-    }
-
-    outFile.close();
-
-    LOG::INFO("Writen to staticMapArray.txt file successfully");
     LOG::INFO("Optimizing terrain < DONE >");
 }

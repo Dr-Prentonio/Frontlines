@@ -4,7 +4,7 @@
 #include "../header/generalFuncs.hpp"
 #include "../header/terrainClasses.hpp"
 
-void SDL::Gameloop::draw() {
+void SDL::Gameloop::draw(SDL_Event &e) {
     static SDL_Renderer* rend;
     float playerZoom = PLAYER::zoom;
 
@@ -112,7 +112,7 @@ void SDL::Gameloop::draw() {
     // LAYER 3
     //
 
-    UI::UIManager(rend);
+    UI::UIManager(rend, e);
 
     SDL_RenderPresent(rend);
 }

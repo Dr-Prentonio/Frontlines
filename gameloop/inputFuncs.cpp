@@ -51,6 +51,7 @@ void SDL::Gameloop::input(SDL_Event &e) {
     else if (state[SDL_SCANCODE_5]) UI::bottomLeftUi.index = 5;
     else if (state[SDL_SCANCODE_6]) UI::bottomLeftUi.index = 6;
     else if (state[SDL_SCANCODE_7]) UI::bottomLeftUi.index = 7;
+    else if (state[SDL_SCANCODE_8]) UI::bottomLeftUi.index = 8;
 
     PLAYER::camOffset = {
         static_cast<int>(glm::round(movement.x)),
@@ -79,14 +80,30 @@ void SDL::Gameloop::input(SDL_Event &e) {
         PLAYER::target = glm::clamp(PLAYER::target, 1.0f, 7.5f);
     }
 
-    if (e.type == SDL_MOUSEMOTION) UI::TOOLTIP::enable = false;
+    // make it that the tooltip doesnt get disabled instantly
+    static glm::ivec2 oldMousePos;
+    glm::ivec2 newMousePos;
+
+    SDL_GetMouseState(&newMousePos.x, &newMousePos.y);
+
+    glm::ivec2 difMousePos = glm::abs(oldMousePos - newMousePos);
+
+    // delay
+    if (e.type == SDL_MOUSEMOTION and (difMousePos.x > 10  or difMousePos.y > 10 )) {
+        SDL_GetMouseState(&oldMousePos.x, &oldMousePos.y);
+        UI::TOOLTIP::enable = false;
+    }
 
     //
     //  MOUSE
     //
 
     if (e.type == SDL_MOUSEBUTTONDOWN) {
-        if (e.button.button == SDL_BUTTON_LEFT) {
+        // check if its the right event, if the tool is selected and if its NOT hitting the ui
+        if (e.button.button == SDL_BUTTON_LEFT &&
+            UI::TOOLSELECT::index == UI::TOOLSELECT::ToolIndex::war &&
+            !TOOLBOX::checkMouseUICollision(newMousePos)) {
+
             TERRITORY::mouseClick = true;
         }
         if (e.button.button == SDL_BUTTON_MIDDLE) {
@@ -106,8 +123,8 @@ void SDL::Gameloop::input(SDL_Event &e) {
             Uint32 time = SDL_GetTicks();
             if (time - diff >= cooldown) {
 
-                if (UI::bottomLeftUi.index == 7)        MILITARYCAMP::mouseClick();
-                else if (UI::bottomLeftUi.index == 6)   CITY::mouseClick();
+                if (UI::bottomLeftUi.index == 8)        MILITARYCAMP::mouseClick();
+                else if (UI::bottomLeftUi.index == 7)   CITY::mouseClick();
                 else                                    FACTORY::mouseClick();
 
                 diff = time;

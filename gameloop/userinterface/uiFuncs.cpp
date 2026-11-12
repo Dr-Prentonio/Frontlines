@@ -72,8 +72,9 @@ void UI::rightUiBar(SDL_Renderer *rend) {
     std::string steel       = "Steel: "     + std::to_string(playerRes.steel);
     std::string oil         = "Oil: "       + std::to_string(playerRes.oil);
     std::string clothing    = "Clothing: "  + std::to_string(playerRes.clothes);
+    std::string weapons     = "Weapons: "   + std::to_string(playerRes.weapons);
 
-    std::string text = wood + " | " + stone + " | " + clothing + " | " + steel + " | " + oil;
+    std::string text = wood + " " + stone + " " + clothing + " " + steel + " " + weapons + " " + oil;
 
     int wrapLength = 0;
     SDL_Surface* textSurface = TTF_RenderUTF8_Blended_Wrapped(
@@ -135,10 +136,11 @@ void UI::bottomLeftUI(SDL_Renderer *rend) {
                         "| 3. Stone Factory    | 30 Wood, 50 Steel, 20 Stone   |\n"
                         "| 4. Steel Factory    | 30 Wood, 50 Steel, 50 Stone   |\n"
                         "| 5. Oil Factory      | 30 Wood, 100 Steel, 200 Stone |\n"
+                        "| 6. Weapon Factory   | 75 Wood, 125 Steel, 125 Stone |\n"
                         "|–––––––––––––––––––––CITY––––––––––––––––––––––––––––|\n"
-                        "| 6. City             | 50 Wood, 75 Steel, 75 Stone   |\n"
+                        "| 7. City             | 50 Wood, 75 Steel, 75 Stone   |\n"
                         "|–––––––––––––––––––––MILITARY––––––––––––––––––––––––|\n"
-                        "| 7. Military Camp    | 125 Wood, 150 Steel, 100 Stone|";
+                        "| 8. Military Camp    | 125 Wood, 150 Steel, 100 Stone|";
 
     int wrapLength = 0;
     SDL_Surface* textSurface = TTF_RenderUTF8_Blended_Wrapped(
@@ -192,8 +194,8 @@ void UI::bottomLeftUI(SDL_Renderer *rend) {
 
     int offset = 26 + (27 * (bottomLeftUi.index - 1));
 
-    if (bottomLeftUi.index > 5) offset += 26;
     if (bottomLeftUi.index > 6) offset += 26;
+    if (bottomLeftUi.index > 7) offset += 26;
 
     SDL_Rect pickyDrect = {
         barPos.x + 17,
@@ -207,11 +209,17 @@ void UI::bottomLeftUI(SDL_Renderer *rend) {
 }
 
 // part of the game loop (child of main/draw)
-void UI::UIManager(SDL_Renderer* rend) {
+void UI::UIManager(SDL_Renderer* rend, SDL_Event &e) {
 
     if (TOOLTIP::enable) TOOLTIP::surfaceMode(rend);
 
     topUiBar(rend);
     rightUiBar(rend);
-    bottomLeftUI(rend);
+    // bottomLeftUI(rend);
+    TOOLSELECT::drawBar(e);
+
+
+    if (TOOLSELECT::index == TOOLSELECT::build) {
+        BUILDTOOL::draw(e);
+    }
 }

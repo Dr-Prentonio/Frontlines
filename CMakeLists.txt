@@ -39,13 +39,11 @@ add_executable(strategie_game
         player/factorysFuncs.cpp
         player/civilizationFuncs.cpp
 
-        # OTHER STUFF
-        other/FastNoiseLite.hpp
-
         # DEV FUNCS
         dev/uiFuncsforDev.cpp
         dev/readOutput.cpp
         dev/developmentModeFuncs.cpp
+        gameloop/userinterface/toolSelect.cpp
 )
 
 target_link_libraries(strategie_game PRIVATE

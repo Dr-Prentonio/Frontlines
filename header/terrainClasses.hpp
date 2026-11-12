@@ -51,7 +51,7 @@ namespace TERRAIN {
         };
 
         const int tileSize = 32; // size of tiles in full res
-        const int scale = 16; // scaling of the map
+        const int scale = 14; // scaling of the map
 
         inline std::vector<TerrainTile> map; // map vector
 

@@ -63,6 +63,17 @@ int FACTORY::init() {
     }
     icons.woodTex = SDL_CreateTextureFromSurface(rend, temp);
 
+    // |===================|
+    // |    Weapon Init    |
+    // |===================|
+
+    temp = IMG_Load("assets/Icon/Weapon.png");
+    if (temp == nullptr) {
+        LOG::INIT_ERR("Couldnt load weapon factory icon");
+        return -1;
+    }
+    icons.weaponTex = SDL_CreateTextureFromSurface(rend, temp);
+
     SDL_FreeSurface(temp);
 
     LOG::INIT_SUCCESS("Loaded factory icons successfully");
@@ -100,6 +111,9 @@ void FACTORY::update() {
                 case oil:
                     playerRes.oil      += factory.level * 3 * multiplier;
                     break;
+                case weapon:
+                    playerRes.weapons  += factory.level * 4;
+                    break;
                 default: break;
             }
         }
@@ -128,6 +142,10 @@ void removeResources(int type) {
         }
         case 5: {
             TOOLBOX::updatePlayerRes(-30, -200, -100, 0,0);
+            break;
+        }
+        case 6: {
+            TOOLBOX::updatePlayerRes(-75, -125, -125, 0, 0);
             break;
         }
         default: break;
@@ -160,6 +178,10 @@ bool checkForResources(int type) {
             if (playerRes.wood < 30 || playerRes.steel < 100 || playerRes.stone < 200) return false;
             break;
         }
+        case 6: {
+            if (playerRes.wood < 75 || playerRes.steel < 125 || playerRes.stone < 125) return false;
+            break;
+        }
         default: break;
     }
 
@@ -176,11 +198,12 @@ void FACTORY::spawnNewFac(glm::ivec2 mousePos, factoryType type, bool debug) {
 
     // select the correct tex type
     switch (type) {
-        case 1: temp = icons.clothingTex;   break;
-        case 2: temp = icons.woodTex;       break;
-        case 3: temp = icons.stoneTex;      break;
-        case 4: temp = icons.steelTex;      break;
-        case 5: temp = icons.oilTex;        break;
+        case clothing:  temp = icons.clothingTex;   break;
+        case wood:      temp = icons.woodTex;       break;
+        case stone:     temp = icons.stoneTex;      break;
+        case steel:     temp = icons.steelTex;      break;
+        case oil:       temp = icons.oilTex;        break;
+        case weapon:    temp = icons.weaponTex;     break;
         default: temp = nullptr;
     }
 
@@ -274,6 +297,9 @@ void FACTORY::spawnNewFac(glm::ivec2 mousePos, factoryType type, bool debug) {
             }
             break;
         }
+        case 6: {
+            PLAYER::factorys.weaponFactorys++;
+        }
         default: break;
     }
 
@@ -312,6 +338,11 @@ void FACTORY::mouseClick() {
             return;
         }
     }
+    for (auto& camp : MILITARYCAMP::camps) {
+        if (TOOLBOX::checkMouseCollision(mouseGridPos, camp.hitbox)) {
+            return;
+        }
+    }
 
     // checks if theres a factory
     for (Building& building : factorys) {
@@ -335,6 +366,7 @@ void FACTORY::mouseClick() {
                 case 3: PLAYER::factorys.stoneFactorys++;    break;
                 case 4: PLAYER::factorys.steelFactorys++;    break;
                 case 5: PLAYER::factorys.oilFactorys++;      break;
+                case 6: PLAYER::factorys.weaponFactorys++;   break;
                 default: break;
             }
 
@@ -354,5 +386,6 @@ void FACTORY::mouseClick() {
 
     if (TERRITORY::layer[index].ownerID != 1) return;
 
+    // if there isnt a factory then spawn a new one
     spawnNewFac(mousePos, static_cast<factoryType>(UI::bottomLeftUi.index), false);
 }
