@@ -216,10 +216,10 @@ void UI::UIManager(SDL_Renderer* rend, SDL_Event &e) {
     topUiBar(rend);
     rightUiBar(rend);
     // bottomLeftUI(rend);
-    TOOLSELECT::drawBar(e);
+    TOOL::SELECT::drawBar(e);
 
 
-    if (TOOLSELECT::index == TOOLSELECT::build) {
-        BUILDTOOL::draw(e);
+    if (TOOL::SELECT::index == TOOL::SELECT::build) {
+        TOOL::BUILDTOOL::draw(e);
     }
 }

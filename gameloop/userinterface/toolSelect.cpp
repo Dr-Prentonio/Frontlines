@@ -7,12 +7,49 @@
 #include "../../header/generalClasses.hpp"
 #include "../../header/generalFuncs.hpp"
 
+void UI::TOOL::mouseAction(SDL_Rect& collisionRect, bool& clickState, Uint32& timer, SDL_Event& e) {
+    SDL_Renderer *rend = window.rend;
+
+    // get colors
+    static const SDL_Color hover     = BUILDTOOL::hover;
+    static const SDL_Color clicked   = BUILDTOOL::clicked;
+    static const SDL_Color base      = BUILDTOOL::bgBorder;
+
+    glm::ivec2 mousePos;
+    SDL_GetMouseState(&mousePos.x, &mousePos.y);
+
+    // cooldown bs
+    const Uint32 cooldown = 200;
+    Uint32 time = SDL_GetTicks();   // btw SDL_GetTicks only works for ~49 days until the intiger gets to big
+
+    // mouse-hover or mouse click
+    if (TOOLBOX::checkMouseCollision(mousePos, collisionRect)) {
+        SDL_SetRenderDrawColor(rend, hover.r, hover.g, hover.b, hover.a);
+
+        // mouse Press
+        if (e.type == SDL_MOUSEBUTTONDOWN && time - timer >= cooldown) {
+            if (e.button.button == SDL_BUTTON_LEFT) {
+                SDL_SetRenderDrawColor(rend, clicked.r, clicked.g, clicked.b, clicked.a);
+
+                clickState = !clickState;
+            }
+
+            timer = time;
+        }
+
+        SDL_RenderFillRect(rend, &collisionRect);
+
+        // change back to normal fill color
+        SDL_SetRenderDrawColor(rend, base.r, base.g, base.b, base.a);
+    }
+}
+
 // |===================|
 // |    Tool select    |
 // |===================|
 
 // initialize textures
-int UI::TOOLSELECT::init() {
+int UI::TOOL::SELECT::init() {
 
     SDL_Renderer* rend = window.rend;
 
@@ -23,6 +60,7 @@ int UI::TOOLSELECT::init() {
         std::string err = SDL_GetError();
         if (err.empty()) err = "couldnt get sdl error";
         LOG::INIT_ERR("Couldnt load hammer.png " + err);
+        SDL_FreeSurface(tempSurf);
         return -1;
     }
 
@@ -33,14 +71,26 @@ int UI::TOOLSELECT::init() {
         std::string err = SDL_GetError();
         if (err.empty()) err = "couldnt get sdl error";
         LOG::INIT_ERR("Couldnt load swords.png " + err);
+        SDL_FreeSurface(tempSurf);
         return -1;
     }
 
+    tempSurf = IMG_Load("assets/Icon/UI/pickaxe.png");
+    textures.mine = SDL_CreateTextureFromSurface(rend, tempSurf);
+    if (textures.mine == nullptr) {
+        std::string err = SDL_GetError();
+        if (err.empty()) err = "couldnt get sdl error";
+        LOG::INIT_ERR("Couldnt load pickaxe.png " + err);
+        SDL_FreeSurface(tempSurf);
+        return -1;
+    }
+
+    SDL_FreeSurface(tempSurf);
     return 0;
 }
 
 // func for rendering the entire menu bar
-void UI::TOOLSELECT::drawBar(SDL_Event &e) {
+void UI::TOOL::SELECT::drawBar(SDL_Event &e) {
     SDL_Renderer* rend = window.rend;
 
     // colors are here defined
@@ -132,13 +182,70 @@ void UI::TOOLSELECT::drawBar(SDL_Event &e) {
 
     SDL_RenderCopy(rend, textures.war, nullptr, &icon2);
     SDL_RenderDrawRect(rend, &icon2);
+
+    // 3rd icon mining
+    SDL_Rect miningRect = {
+        bgRect.x + 5,
+        icon2.y + icon2.h + 5,
+        bgRect.w - 10,
+        bgRect.w - 10
+    };
+
+    if (TOOLBOX::checkMouseCollision(mousePos, miningRect)) {
+        // if the mouse hovers over the button
+        SDL_SetRenderDrawColor(rend, hover.r, hover.g, hover.b, hover.a);
+
+        if (e.type == SDL_MOUSEBUTTONDOWN) {
+            if (e.button.button == SDL_BUTTON_LEFT) {
+                SDL_SetRenderDrawColor(rend, clicked.r, clicked.g, clicked.b, clicked.a);
+
+                index = mine;
+            }
+        }
+
+        SDL_RenderFillRect(rend, &miningRect);
+
+        // change back to normal fill color
+        SDL_SetRenderDrawColor(rend, bgBorder.r, bgBorder.g, bgBorder.b, bgBorder.a);
+    }
+
+    SDL_RenderCopy(rend, textures.mine, nullptr, &miningRect);
+    SDL_RenderDrawRect(rend, &miningRect);
 }
 
 // |==================|
 // |    Build tool    |
 // |==================|
 
-void UI::BUILDTOOL::draw(SDL_Event &e) {
+int UI::TOOL::BUILDTOOL::init() {
+    SDL_Renderer* rend = window.rend;
+
+    // load factory icon
+    SDL_Surface* tempSurf = IMG_Load("assets/Icon/UI/factoryBuild.png");
+    textures.factory = SDL_CreateTextureFromSurface(rend, tempSurf);
+    if (textures.factory == nullptr) {
+        std::string err = SDL_GetError();
+        if (err.empty()) err = "couldnt get sdl error";
+        LOG::INIT_ERR("Couldnt load factoryBuild.png " + err);
+        return -1;
+    }
+
+    // load city icon
+    tempSurf = IMG_Load("assets/Icon/UI/cityBuild.png");
+    textures.city = SDL_CreateTextureFromSurface(rend, tempSurf);
+    if (textures.city == nullptr) {
+        std::string err = SDL_GetError();
+        if (err.empty()) err = "couldnt get sdl error";
+        LOG::INIT_ERR("Couldnt load cityBuild.png " + err);
+        return -1;
+    }
+
+    LOG::INIT_SUCCESS("Successfully inited textures");
+
+    return 0;
+}
+
+void UI::TOOL::BUILDTOOL::draw(SDL_Event &e) {
     SDL_Renderer* rend = window.rend;
 
     baseRect = {
@@ -165,35 +272,6 @@ void UI::BUILDTOOL::draw(SDL_Event &e) {
     // |=============|
 
     // handels things like hovering and clicking on icons
-    auto mouseAction = [rend, e](SDL_Rect& rect, bool& click, Uint32& oldTime) {
-        glm::ivec2 mousePos;
-        SDL_GetMouseState(&mousePos.x, &mousePos.y);
-
-        // cooldown bs
-        const Uint32 cooldown = 200;
-        Uint32 time = SDL_GetTicks();
-
-        // mouse-hover or mouse click
-        if (TOOLBOX::checkMouseCollision(mousePos, rect)) {
-            SDL_SetRenderDrawColor(rend, hover.r, hover.g, hover.b, hover.a);
-
-            // mouse Press
-            if (e.type == SDL_MOUSEBUTTONDOWN && time - oldTime >= cooldown) {
-                if (e.button.button == SDL_BUTTON_LEFT) {
-                    SDL_SetRenderDrawColor(rend, clicked.r, clicked.g, clicked.b, clicked.a);
-
-                    click = !click;
-                }
-
-                oldTime = time;
-            }
-
-            SDL_RenderFillRect(rend, &rect);
-
-            // change back to normal fill color
-            SDL_SetRenderDrawColor(rend, bgBorder.r, bgBorder.g, bgBorder.b, bgBorder.a);
-        }
-    };
 
     SDL_Rect factoryIcon = {
         baseRect.x + 5,
@@ -207,11 +285,11 @@ void UI::BUILDTOOL::draw(SDL_Event &e) {
 
     static bool facBool;
     static Uint32 facTime;
-    mouseAction(factoryIcon, facBool, facTime);
+    mouseAction(factoryIcon, facBool, facTime, e);
     SUBPANEL::enableFactory = facBool;
 
     // render icon
-    SDL_RenderCopy(rend, FACTORY::icons.clothingTex, nullptr, &factoryIcon);
+    SDL_RenderCopy(rend, textures.factory, nullptr, &factoryIcon);
 
     SDL_Rect cityIcon = {
         baseRect.x + factoryIcon.w + 10,
@@ -224,21 +302,52 @@ void UI::BUILDTOOL::draw(SDL_Event &e) {
 
     static bool cityBool;
     static Uint32 cityTime;
-    mouseAction(cityIcon, cityBool, cityTime);
+    mouseAction(cityIcon, cityBool, cityTime, e);
     SUBPANEL::enableCity = cityBool;
 
-    SDL_RenderCopy(rend, CITY::cityTex, nullptr, &cityIcon);
+    SDL_RenderCopy(rend, textures.city, nullptr, &cityIcon);
 
-    if (SUBPANEL::enableFactory) SUBPANEL::drawFactorySub(e);
+    SDL_Rect militaryIcon = {
+        cityIcon.x + cityIcon.w + 5,
+        baseRect.y + 5,
+        baseRect.h - 10,
+        baseRect.h - 10
+    };
+
+    SDL_RenderDrawRect(rend, &militaryIcon);
+
+    static bool militaryBool;
+    static Uint32 militaryTime;
+    mouseAction(militaryIcon, militaryBool, militaryTime, e);
+
+    SDL_RenderCopy(rend, MILITARYCAMP::campTex, nullptr, &militaryIcon);
+
+    // selection part
+    if (SUBPANEL::enableFactory) {
+        cityBool = false;
+        militaryBool = false;
+        SUBPANEL::drawFactorySub(e);
+    }
+    if (SUBPANEL::enableCity) {
+        facBool = false;
+        militaryBool = false;
+        SUBPANEL::drawCitySub(e);
+    }
+    if (militaryBool) {
+        cityBool = false;
+        facBool = false;
+        bottomLeftUi.index = 8;
+    }
 }
 
-void UI::BUILDTOOL::SUBPANEL::drawFactorySub(SDL_Event &e) {
+// factory build tool selection menu
+void UI::TOOL::BUILDTOOL::SUBPANEL::drawFactorySub(SDL_Event &e) {
     SDL_Renderer* rend = window.rend;
 
-    const SDL_Rect baseRect = {
+    static const SDL_Rect baseRect = {
         BUILDTOOL::baseRect.x + BUILDTOOL::baseRect.w + 50,
         BUILDTOOL::baseRect.y,
-        BUILDTOOL::baseRect.w,
+        (5 + (BUILDTOOL::baseRect.h - 10)) * 6 + 5, // calcs the exact width needed
         BUILDTOOL::baseRect.h
     };
 
@@ -249,15 +358,111 @@ void UI::BUILDTOOL::SUBPANEL::drawFactorySub(SDL_Event &e) {
 
     // ICONS
 
-    // have to make a lambda here that makes it easier to draw many icons
+    static Uint32 time = 0;
 
-    SDL_Rect clothIcon = {
+    // clothing icon
+    static SDL_Rect clothIcon = {
         baseRect.x + 5,
         baseRect.y + 5,
         baseRect.h - 10,
         baseRect.h - 10
     };
-
+    bool clothBool = false;
+    mouseAction(clothIcon, clothBool, time, e);
+    if (clothBool) bottomLeftUi.index = 1;
     SDL_RenderCopy(rend, FACTORY::icons.clothingTex, nullptr, &clothIcon);
 
+    // wood icon
+    static SDL_Rect woodIcon = {
+        clothIcon.x + clothIcon.w + 5,
+        baseRect.y + 5,
+        baseRect.h - 10,
+        baseRect.h - 10
+    };
+    bool woodBool = false;
+    mouseAction(woodIcon, woodBool, time, e);
+    if (woodBool) bottomLeftUi.index = 2;
+    SDL_RenderCopy(rend, FACTORY::icons.woodTex, nullptr, &woodIcon);
+
+    // stone icon
+    static SDL_Rect stoneIcon = {
+        woodIcon.x + woodIcon.w + 5,
+        baseRect.y + 5,
+        baseRect.h - 10,
+        baseRect.h - 10
+    };
+    bool stoneBool = false;
+    mouseAction(stoneIcon, stoneBool, time, e);
+    if (stoneBool) bottomLeftUi.index = 3;
+    SDL_RenderCopy(rend, FACTORY::icons.stoneTex, nullptr, &stoneIcon);
+
+    // steal icon
+    static SDL_Rect steelIcon = {
+        stoneIcon.x + stoneIcon.w + 5,
+        baseRect.y + 5,
+        baseRect.h - 10,
+        baseRect.h - 10
+    };
+    bool steelBool = false;
+    mouseAction(steelIcon, steelBool, time, e);
+    if (steelBool) bottomLeftUi.index = 4;
+    SDL_RenderCopy(rend, FACTORY::icons.steelTex, nullptr, &steelIcon);
+
+    // oil icon
+    static SDL_Rect oilIcon = {
+        steelIcon.x + steelIcon.w + 5,
+        baseRect.y + 5,
+        baseRect.h - 10,
+        baseRect.h - 10
+    };
+    bool oilBool = false;
+    mouseAction(oilIcon, oilBool, time, e);
+    if (oilBool) bottomLeftUi.index = 5;
+    SDL_RenderCopy(rend, FACTORY::icons.oilTex, nullptr, &oilIcon);
+
+    // weapon icon
+    static SDL_Rect weaponIcon = {
+        oilIcon.x + oilIcon.w + 5,
+        baseRect.y + 5,
+        baseRect.h - 10,
+        baseRect.h - 10
+    };
+    bool weaponBool = false;
+    mouseAction(weaponIcon, weaponBool, time, e);
+    if (weaponBool) bottomLeftUi.index = 6;
+    SDL_RenderCopy(rend, FACTORY::icons.weaponTex, nullptr, &weaponIcon);
+}
+
+// city build tool selection menu
+void UI::TOOL::BUILDTOOL::SUBPANEL::drawCitySub(SDL_Event &e) {
+    SDL_Renderer* rend = window.rend;
+
+    static const SDL_Rect baseRect = {
+        BUILDTOOL::baseRect.x + BUILDTOOL::baseRect.w + 50,
+        BUILDTOOL::baseRect.y,
+        (5 + (BUILDTOOL::baseRect.h - 10)) * 2 + 5, // calcs the exact width needed
+        BUILDTOOL::baseRect.h
+    };
+
+    SDL_SetRenderDrawColor(rend, bgColor.r, bgColor.g, bgColor.b, bgColor.a);
+    SDL_RenderFillRect(rend, &baseRect);
+    SDL_SetRenderDrawColor(rend, bgBorder.r, bgBorder.g, bgBorder.b, bgBorder.a);
+    SDL_RenderDrawRect(rend, &baseRect);
+
+    // ICONS
+    // have to make a lambda here that makes it easier to draw many icons
+
+    static Uint32 time = 0;
+
+    // clothing icon
+    static SDL_Rect cityIcon = {
+        baseRect.x + 5,
+        baseRect.y + 5,
+        baseRect.h - 10,
+        baseRect.h - 10
+    };
+    bool cityBool = false;
+    mouseAction(cityIcon, cityBool, time, e);
+    if (cityBool) bottomLeftUi.index = 7;
+    SDL_RenderCopy(rend, CITY::cityTex, nullptr, &cityIcon);
 }

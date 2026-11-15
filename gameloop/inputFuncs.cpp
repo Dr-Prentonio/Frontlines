@@ -101,7 +101,7 @@ void SDL::Gameloop::input(SDL_Event &e) {
     if (e.type == SDL_MOUSEBUTTONDOWN) {
         // check if its the right event, if the tool is selected and if its NOT hitting the ui
         if (e.button.button == SDL_BUTTON_LEFT &&
-            UI::TOOLSELECT::index == UI::TOOLSELECT::ToolIndex::war &&
+            UI::TOOL::SELECT::index == UI::TOOL::SELECT::ToolIndex::war &&
             !TOOLBOX::checkMouseUICollision(newMousePos)) {
 
             TERRITORY::mouseClick = true;

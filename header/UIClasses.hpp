@@ -14,7 +14,6 @@
 #include "glm/glm.hpp"
 
 namespace UI {
-
     // structs
     struct Fonts {
         TTF_Font* terminessItalic   = nullptr;
@@ -27,7 +26,7 @@ namespace UI {
         glm::ivec2 size;
     };
     struct BottomLeftUI {
-        int index = 1; // 1-5
+        int index = 1;
     };
 
     // variables
@@ -52,49 +51,71 @@ namespace UI {
         void manager();
     }
 
-    namespace TOOLSELECT {
-        enum ToolIndex {
-            war,
-            build
-        };
-        struct Textures_Def {
-            SDL_Texture* build  = nullptr;
-            SDL_Texture* war    = nullptr;
-        };
+    // for tools
+    namespace TOOL {
 
-        // rect of the ui element
-        inline SDL_Rect bgRect = {0,0,0,0};
+        void mouseAction(SDL_Rect& collisionRect,   // rect of the ui element
+            bool& clickState,                       // state of the boolean
+            Uint32& timer,                          // timeout for design
+            SDL_Event& e);                          // event for mouseclick
 
-        inline Textures_Def textures;
+        // selection of which tool to use
+        namespace SELECT {
+            enum ToolIndex {
+                war,
+                build,
+                mine
+            };
+            struct Textures_Def {
+                SDL_Texture* build  = nullptr;
+                SDL_Texture* war    = nullptr;
+                SDL_Texture* mine   = nullptr;
+            };
 
-        // default should be war but for debuging it might be build
-        inline ToolIndex index = build;
+            // rect of the ui element
+            inline SDL_Rect bgRect = {0,0,0,0};
 
-        int init();
-        void drawBar(SDL_Event &e);
-    }
+            inline Textures_Def textures;
 
-    namespace BUILDTOOL {
-        inline SDL_Rect baseRect = {0,0,0,0};
+            // default should be war but for debuging it might be build
+            inline ToolIndex index = build;
 
-        // colors
-        static const SDL_Color bgColor  = {55, 55, 55, 220};
-        static const SDL_Color bgBorder = {100, 100, 100, 220};
-        static const SDL_Color hover    = {255, 120, 120, 220};
-        static const SDL_Color clicked  = {120, 120, 255, 220};
+            int init();
+            void drawBar(SDL_Event &e);
+        }
 
-        namespace SUBPANEL {
+        // building menu
+        namespace BUILDTOOL {
+            struct Textures_Def {
+                SDL_Texture* factory = nullptr;
+                SDL_Texture* city = nullptr;
+            };
 
-            // for factory placement
-            inline bool enableFactory  = false;
-            void drawFactorySub(SDL_Event &e);
+            inline Textures_Def textures;
 
-            // for city placement
-            inline bool enableCity     = false;
+            inline SDL_Rect baseRect = {0,0,0,0};
 
-        };
+            // colors
+            static const SDL_Color bgColor  = {55, 55, 55, 220};
+            static const SDL_Color bgBorder = {100, 100, 100, 220};
+            static const SDL_Color hover    = {255, 120, 120, 220};
+            static const SDL_Color clicked  = {120, 120, 255, 220};
 
-        void draw(SDL_Event &e);
+            // subpanels of each category
+            namespace SUBPANEL {
+
+                // for factory placement
+                inline bool enableFactory  = false;
+                void drawFactorySub(SDL_Event &e);
+
+                // for city placement
+                inline bool enableCity     = false;
+                void drawCitySub(SDL_Event &e);
+            }
+
+            int init();
+            void draw(SDL_Event &e);
+        }
     }
 }
 

@@ -19,7 +19,6 @@ SDL::Window window;
 
 // cleanup func
 void cleanup() {
-
     LOG::INFO("Cleaning Up");
 
     SDL_DestroyTexture(TERRITORY::layerTexture);
@@ -43,11 +42,39 @@ void cleanup() {
     SDL_DestroyTexture(TERRAIN::FOLIAGE::GENERAL::textures.spruce);
     SDL_DestroyTexture(TERRAIN::FOLIAGE::GENERAL::textures.oak);
 
+    // free ui icons
+    SDL_DestroyTexture(UI::TOOL::SELECT::textures.build);
+    SDL_DestroyTexture(UI::TOOL::SELECT::textures.war);
+    SDL_DestroyTexture(UI::TOOL::BUILDTOOL::textures.city);
+    SDL_DestroyTexture(UI::TOOL::BUILDTOOL::textures.factory);
+
     SDL_DestroyRenderer(window.rend);
     SDL_DestroyWindow(window.win);
 
     LOG::INFO("Cleaning up done");
+}
 
+int devmodeManager() {
+
+    // init
+    if (DEVMODE::init() != 0) {
+        LOG::INIT_ERR("Devmode couldnt be initialized");
+        return -1;
+    }
+    LOG::INIT_SUCCESS("Devmode initialized and starting");
+
+    DEVMODE::loop();
+
+    LOG::INFO("Devmode stoped, starting Game");
+
+    DEVMODE::readOutput();
+
+    // set the window back to its original size
+    SDL_SetWindowSize(window.win, window.scale.x, window.scale.y);
+    SDL_SetWindowPosition(window.win, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+    SDL_SetWindowTitle(window.win, window.title);
+
+    return 0;
 }
 
 int main() {
@@ -72,20 +99,8 @@ int main() {
 
     // developer mode (has its own rend and window)
     if (devMode) {
-        // init
-        if (DEVMODE::init() != 0) LOG::INIT_ERR("Devmode couldnt be initialized, starting game init");
-        else LOG::INIT_SUCCESS("Devmode initialized and starting");
-
-        DEVMODE::loop();
-
-        LOG::INFO("Devmode stoped, starting Game");
-
-        DEVMODE::readOutput();
-
-        // set the window back to its original size
-        SDL_SetWindowSize(window.win, window.scale.x, window.scale.y);
-        SDL_SetWindowPosition(window.win, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-        SDL_SetWindowTitle(window.win, window.title);
+        if (devmodeManager() != 0)
+            LOG::ERR("Devmode error, starting game init");
     }
 
     // |=================|
@@ -134,8 +149,13 @@ int main() {
     // |    UI Init    |
     // |===============|
 
-    if (UI::TOOLSELECT::init() != 0) {
+    if (UI::TOOL::SELECT::init() != 0) {
         LOG::INIT_ERR("Couldnt init tool select");
+        return -1;
+    }
+
+    if (UI::TOOL::BUILDTOOL::init() != 0) {
+        LOG::INIT_ERR("Couldnt init build tool");
         return -1;
     }
 
