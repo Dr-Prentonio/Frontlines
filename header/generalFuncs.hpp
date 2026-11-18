@@ -132,8 +132,8 @@ namespace TOOLBOX {
     // |    Add/Remove Player Resources    |
     // |===================================|
 
-    // +/- player resources
-    inline void updatePlayerRes(int wood, int stone, int steel, int clothes, int oil) {
+    // +/- player resources (outdated)
+    inline void updatePlayerRes(int wood, int stone, int steel, int clothes, int oil, int weapons) {
         auto& playerRes = PLAYER::resources;
 
         playerRes.wood += wood;
@@ -141,6 +141,7 @@ namespace TOOLBOX {
         playerRes.steel += steel;
         playerRes.clothes += clothes;
         playerRes.oil += oil;
+        playerRes.weapons += weapons;
     }
 
     // |============================================|

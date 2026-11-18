@@ -120,7 +120,7 @@ void CITY::mouseClick() {
             if (75 > playerRes.steel or 75 > playerRes.stone or 50 > playerRes.wood) return;
 
             // update player
-            TOOLBOX::updatePlayerRes(-50, -75, -75,0,0);
+            TOOLBOX::updatePlayerRes(-50, -75, -75, 0, 0, 0);
 
             city.level++;
 
@@ -180,7 +180,7 @@ void MILITARYCAMP::levelUp(auto& curCamp) {
     if (playerRes.stone < 100 or playerRes.steel < 150 or playerRes.wood < 125) return;
 
     // remove resources from player
-    TOOLBOX::updatePlayerRes(-125, -100, -100, 0, 0);
+    TOOLBOX::updatePlayerRes(-125, -100, -100, 0, 0, 0);
 
     // upgrade level
     curCamp.level++;

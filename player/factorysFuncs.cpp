@@ -125,27 +125,27 @@ void FACTORY::update() {
 void removeResources(int type) {
     switch (type) {
         case 1: {
-            TOOLBOX::updatePlayerRes(-20, -20, -50, 0, 0);
+            TOOLBOX::updatePlayerRes(-20, -20, -50, 0, 0, 0);
             break;
         }
         case 2: {
-            TOOLBOX::updatePlayerRes(-20, -50, -25, 0, 0);
+            TOOLBOX::updatePlayerRes(-20, -50, -25, 0, 0, 0);
             break;
         }
         case 3: {
-            TOOLBOX::updatePlayerRes(-30, -20, -50, 0, 0);
+            TOOLBOX::updatePlayerRes(-30, -20, -50, 0, 0, 0);
             break;
         }
         case 4: {
-            TOOLBOX::updatePlayerRes(-30, -50, -50,0,0);
+            TOOLBOX::updatePlayerRes(-30, -50, -50,0,0, 0);
             break;
         }
         case 5: {
-            TOOLBOX::updatePlayerRes(-30, -200, -100, 0,0);
+            TOOLBOX::updatePlayerRes(-30, -200, -100, 0,0, 0);
             break;
         }
         case 6: {
-            TOOLBOX::updatePlayerRes(-75, -125, -125, 0, 0);
+            TOOLBOX::updatePlayerRes(-75, -125, -125, 0, 0, 0);
             break;
         }
         default: break;
@@ -330,7 +330,7 @@ void FACTORY::spawnNewFac(glm::ivec2 mousePos, factoryType type, bool debug) {
 }
 
 void FACTORY::mouseClick() {
-    glm::ivec2 mousePos = TOOLBOX::findMousePos();
+    glm::ivec2 mousePos     = TOOLBOX::findMousePos();
     glm::ivec2 mouseGridPos = mousePos * TERRAIN::SURFACE::tileSize;
 
     for (auto& city : CITY::citys) {
@@ -345,7 +345,7 @@ void FACTORY::mouseClick() {
     }
 
     // checks if theres a factory
-    for (Building& building : factorys) {
+    for (auto& building : factorys) {
 
         // if click is inside an already existing building
         if (TOOLBOX::checkMouseCollision(mouseGridPos, building.hitbox)) {

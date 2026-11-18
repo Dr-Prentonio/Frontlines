@@ -104,6 +104,7 @@ void TERRAIN::FOLIAGE::FOREST::drawTiles(
 
                 // push back vectors
                 GENERAL::isUsed.at(index) = true;
+                GENERAL::worldTileUsage.at(index) = true;
                 tiles.push_back(drect);
 
                 //
@@ -281,6 +282,7 @@ void TERRAIN::FOLIAGE::COTTON::drawTiles(
 
                 // push back vectors
                 GENERAL::isUsed.at(index) = true;
+                GENERAL::worldTileUsage.at(index) = true;
                 tiles.push_back(drect);
 
                 //
@@ -450,6 +452,7 @@ void TERRAIN::FOLIAGE::OIL::drawTiles(
 
                 // push back vectors
                 GENERAL::isUsed.at(index) = true;
+                GENERAL::worldTileUsage.at(index) = true;
                 tiles.push_back(drect);
 
                 //
@@ -619,6 +622,7 @@ void TERRAIN::FOLIAGE::STONE::drawTiles(
 
                 // push back vectors
                 GENERAL::isUsed.at(index) = true;
+                GENERAL::worldTileUsage.at(index) = true;
                 tiles.push_back(drect);
 
                 //

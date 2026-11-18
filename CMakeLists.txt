@@ -44,6 +44,7 @@ add_executable(strategie_game
         dev/readOutput.cpp
         dev/developmentModeFuncs.cpp
         gameloop/userinterface/toolSelect.cpp
+        player/mining.cpp
 )
 
 target_link_libraries(strategie_game PRIVATE

@@ -20,7 +20,6 @@ namespace ch = std::chrono;
 
 // SDL2
 namespace SDL {
-
     // if in dev settings is selected a static
     // texture will be loaded
     inline bool useStaticMaps = false;
@@ -46,7 +45,6 @@ namespace SDL {
         // delta time in seconds
         float deltaTime;
     };
-
 }
 
 // player
@@ -71,27 +69,27 @@ namespace PLAYER {
     };
     // citys give 400 citizen
     struct Citizen_Def {
-        Uint32 citysTotal = 0;
-        Uint32 citizen = 1000;
+        Uint32 citysTotal   = 0;
+        Uint32 citizen      = 1000;
     };
     struct Military_Def {
-        int troops = 5000;
-        Uint32 militaryCamps = 0;
+        int troops              = 5000;
+        Uint32 militaryCamps    = 0;
     };
     struct OwnedTiles {
 
-        glm::ivec2 pos; // pos in world cords
+        glm::ivec2 pos = {0, 0}; // pos in world cords
 
         // very important if a wrong number is passed
         // the whole game might crash
-        int worldIndex; // index of the same tiles (map, layer)
+        int worldIndex = 0; // index of the same tiles (map, layer)
 
         // if its either an country tile or
         // an water tile
-        bool topBlocked = false;
-        bool bottomBlocked = false;
-        bool leftBlocked = false;
-        bool rightBlocked = false;
+        bool topBlocked     = false;
+        bool bottomBlocked  = false;
+        bool leftBlocked    = false;
+        bool rightBlocked   = false;
 
         bool fullBoxed = false;
     };
@@ -116,12 +114,16 @@ namespace PLAYER {
     // update player tiles in progress
     inline std::vector<OwnedTiles> playerTiles;
     void update(float deltaTime);
+
+    namespace MINING {
+        void mouseClick();
+    }
 }
 
 // definition of the firste few colors
-#define Red (SDL_Color){245, 0, 0, 125};
-#define Red_Border (SDL_Color){245, 200, 200, 125};
-#define Clear (SDL_Color){0, 0, 0, 0};
+#define Red         (SDL_Color){245, 0, 0, 125};
+#define Red_Border  (SDL_Color){245, 200, 200, 125};
+#define Clear       (SDL_Color){0, 0, 0, 0};
 
 // territory asignment
 namespace TERRITORY {

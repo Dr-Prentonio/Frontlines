@@ -77,7 +77,8 @@ void SDL::Gameloop::input(SDL_Event &e) {
         e.wheel.y = 0;
 
         // min / max zoom
-        PLAYER::target = glm::clamp(PLAYER::target, 1.0f, 7.5f);
+        static const float maxZoom = 10.0f;
+        PLAYER::target = glm::clamp(PLAYER::target, 1.0f, maxZoom);
     }
 
     // make it that the tooltip doesnt get disabled instantly
@@ -99,13 +100,36 @@ void SDL::Gameloop::input(SDL_Event &e) {
     //
 
     if (e.type == SDL_MOUSEBUTTONDOWN) {
-        // check if its the right event, if the tool is selected and if its NOT hitting the ui
-        if (e.button.button == SDL_BUTTON_LEFT &&
-            UI::TOOL::SELECT::index == UI::TOOL::SELECT::ToolIndex::war &&
-            !TOOLBOX::checkMouseUICollision(newMousePos)) {
 
-            TERRITORY::mouseClick = true;
+        {
+            // check if its the right event, if the tool is selected and if its NOT hitting the ui
+            if (e.button.button == SDL_BUTTON_LEFT) {
+                // war tool
+                if (UI::TOOL::SELECT::index == UI::TOOL::SELECT::ToolIndex::war &&
+                    !TOOLBOX::checkMouseUICollision(newMousePos)) {
+
+                    TERRITORY::mouseClick = true;
+                    }
+
+                // mining tool
+
+                static Uint32 delta = 0;
+                static const Uint32 cooldown = 333;
+
+                Uint32 time = SDL_GetTicks();
+                if (time - delta >= cooldown) {
+                    if (UI::TOOL::SELECT::index == UI::TOOL::SELECT::ToolIndex::mine and
+                        !TOOLBOX::checkMouseUICollision(newMousePos)) {
+
+                        PLAYER::MINING::mouseClick();
+                        }
+
+                    delta = time;
+                }
+            }
         }
+
+        // tooltip
         if (e.button.button == SDL_BUTTON_MIDDLE) {
             UI::TOOLTIP::manager();
         }
@@ -115,7 +139,7 @@ void SDL::Gameloop::input(SDL_Event &e) {
         // |===================|
 
         static Uint32 diff = 0;
-        const Uint32 cooldown = 200;
+        static const Uint32 cooldown = 200;
 
         if (e.button.button == SDL_BUTTON_RIGHT) {
 

@@ -50,5 +50,8 @@ void TERRAIN::FOLIAGE::GENERAL::init() {
     stoneAdr = "assets/Fields/stoneFieldIcon.png";
     if (makeTexture(stoneAdr, textures.stone) != 0)       LOG::WARN("Err in stoneFieldIcon");
 
+    // init the whole vector (it now uses world cords)
+    worldTileUsage.assign(SURFACE::mapSize.x * SURFACE::mapSize.y, false);
+
     LOG::INIT_SUCCESS("Created Textures successfully");
 }

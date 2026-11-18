@@ -106,4 +106,5 @@ namespace MILITARYCAMP {
     void levelUp(auto& curCamp);
 }
 
+
 #endif //STRATEGIE_GAME_BUILDINGS_HPP

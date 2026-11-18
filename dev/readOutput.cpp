@@ -20,6 +20,7 @@ void DEVMODE::readOutput() {
         playerRes.steel   = 1000000;
         playerRes.stone   = 1000000;
         playerRes.wood    = 1000000;
+        playerRes.weapons = 1000000;
 
         PLAYER::citizen.citizen = 1000000;
         PLAYER::military.troops = 1000000;
@@ -31,6 +32,10 @@ void DEVMODE::readOutput() {
         SDL::useStaticMaps = true;
     }
 }
+
+//
+//  WARNING: OUTDATED ASF, dont use ts (too lazy to fix this bs)
+//
 
 int DEVMODE::useStaticMaps() {
 

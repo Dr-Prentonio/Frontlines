@@ -86,6 +86,7 @@ namespace TERRAIN {
             inline SDL_Texture* worldTex;
 
             inline std::vector<bool> isUsed;
+            inline std::vector<bool> worldTileUsage; // uses world index
 
             void init();
             void drawIcons();

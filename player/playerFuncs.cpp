@@ -4,6 +4,7 @@
 #include <random>
 #include <vector>
 
+#include "../header/generalFuncs.hpp"
 #include "../header/terrainClasses.hpp"
 
 struct FetchNeighbours {
@@ -58,15 +59,34 @@ FetchNeighbours fetchNeighbour(int index) {
 
 // fetch troop & time cost
 TileData fetchData(int index) {
+    TileData data;
+
     switch (TERRAIN::SURFACE::map.at(index).type) {
-        // the bigger the number the longer it takes (8 is already slow ash)
-        case 2: return {15, 6};        // Shore
-        case 3: return {10,  3};      // Grass
-        case 4: return {15, 6};        // Taiga
-        case 5: return {25, 12};     // Mountain
-        case 6: return {40, 24};      // Snow
+        // the bigger the number the longer it takes
+        case 2:
+            data = {15, 6};         // Shore
+            break;
+        case 3:
+            data = {10,  3};        // Grass
+            break;
+        case 4:
+            data = {15, 6};         // Taiga
+            break;
+        case 5:
+            data = {25, 12};        // Mountain
+            break;
+        case 6:
+            data = {40, 24};        // Snow
+            break;
         default: return {0,0};
     }
+
+    if (TERRAIN::FOLIAGE::GENERAL::worldTileUsage.at(index)) {
+        data.troopCost += 5;
+        data.timeCost *= 2;
+    }
+
+    return data;
 }
 
 //
@@ -109,7 +129,10 @@ void PLAYER::update(float deltaTime) {
             int index = pendingTiles[i].globalIndex;
             TERRITORY::territoryTile& updatedTile = TERRITORY::layer[index];
 
-            military.troops -= pendingTiles[i].troopCost;
+            int multiplier = 1;
+            if (!(TOOLBOX::randomInt(0, 4) >= 4)) multiplier = 4;
+
+            military.troops -= pendingTiles[i].troopCost / multiplier;
 
             updatedTile.ownerID = 1;
             updatedTile.color = Red_Border;
