@@ -10,10 +10,10 @@ void TERRITORY::setupLayer() {
     LOG::INFO("Setup for secondary layer < STARTED >");
 
     // assign new layer same pos and sizes
-    for (int y = 0; y < TERRAIN::SURFACE::mapSize.y; y++) {
-        for (int x = 0; x < TERRAIN::SURFACE::mapSize.x; x++) {
+    for (int y = {}; y < TERRAIN::SURFACE::mapSize.y; y++) {
+        for (int x = {}; x < TERRAIN::SURFACE::mapSize.x; x++) {
 
-            territoryTile tile;
+            territoryTile tile {};
             tile.rect = {
                 x * TERRAIN::SURFACE::tileSize,
                 y * TERRAIN::SURFACE::tileSize,
@@ -24,7 +24,7 @@ void TERRITORY::setupLayer() {
         }
     }
 
-    SDL_Renderer* rend = window.rend;
+    SDL_Renderer* rend {window.rend};
 
     layerTexture = SDL_CreateTexture(
         rend,
@@ -40,12 +40,12 @@ void TERRITORY::setupLayer() {
     SDL_SetRenderDrawColor(rend, 0, 0, 0, 0);
     SDL_RenderClear(rend);
 
-    for (int i = 0; i < layer.size(); i++) {
+    for (int i = {}; i < layer.size(); i++) {
 
         SDL_SetRenderDrawColor(rend, 0, 0, 0, 0);
         SDL_RenderFillRect(rend, &layer[i].rect);
     }
-    SDL_SetRenderTarget(rend, NULL);
+    SDL_SetRenderTarget(rend, nullptr);
 
     LOG::INFO("Setup for secondary layer < DONE >");
 }
@@ -77,18 +77,22 @@ void TERRITORY::setupLayer() {
 // |================|
 
 // spawns a circle (start territory)
-void TERRITORY::spawnTerritory(glm::vec2 pos, int size) {
+void TERRITORY::spawnTerritory(const glm::vec2 pos, const int size) {
 
     for (int y = -size; y <= size; y++) {
         for (int x = -size; x <= size; x++) {
 
-            int distance2 = (x * x) + (y * y);
+            int distance2 {(x * x) + (y * y)};
 
             if (distance2 <= (size * size)) {
-                glm::ivec2 tilePos = { pos.x + x, pos.y + y };
-                int tileIndex = tilePos.x + tilePos.y * TERRAIN::SURFACE::mapSize.x;
+                glm::ivec2 tilePos { pos.x + x, pos.y + y };
+                int tileIndex {tilePos.x + tilePos.y * TERRAIN::SURFACE::mapSize.x};
 
-                if (tilePos.x < 0 || tilePos.x >= TERRAIN::SURFACE::mapSize.x || tilePos.y < 0 || tilePos.y >= TERRAIN::SURFACE::mapSize.y) {
+                if (tilePos.x < 0 ||
+                    tilePos.x >= TERRAIN::SURFACE::mapSize.x ||
+                    tilePos.y < 0 ||
+                    tilePos.y >= TERRAIN::SURFACE::mapSize.y) {
+
                     continue;
                 }
 
@@ -103,19 +107,19 @@ void TERRITORY::spawnTerritory(glm::vec2 pos, int size) {
                     // | Performance Calculation |
                     // |=========================|
 
-                    PLAYER::OwnedTiles ownedTiles;
+                    PLAYER::OwnedTiles ownedTiles {};
 
-                    int width = TERRAIN::SURFACE::mapSize.x;
-                    int height = TERRAIN::SURFACE::mapSize.y;
-                    int type;
-                    int ownerID;
+                    int width  {TERRAIN::SURFACE::mapSize.x};
+                    int height {TERRAIN::SURFACE::mapSize.y};
+                    int type {};
+                    int ownerID {};
 
-                    int xx = tilePos.x;
-                    int yy = tilePos.y;
+                    int xx {tilePos.x};
+                    int yy {tilePos.y};
 
                     if (xx < width - 1) {
                         // RIGHT
-                        int rightIndex      = (xx + 1) + yy * width;
+                        int rightIndex {(xx + 1) + yy * width};
                         type = TERRAIN::SURFACE::map.at(rightIndex).type;
                         ownerID = layer.at(rightIndex).ownerID;
 
@@ -126,7 +130,7 @@ void TERRITORY::spawnTerritory(glm::vec2 pos, int size) {
 
                     if (xx > 0) {
                         // LEFT
-                        int leftIndex       = (xx - 1) + yy * width;
+                        int leftIndex {(xx - 1) + yy * width};
                         type = TERRAIN::SURFACE::map.at(leftIndex).type;
                         ownerID = layer.at(leftIndex).ownerID;
 
@@ -137,7 +141,7 @@ void TERRITORY::spawnTerritory(glm::vec2 pos, int size) {
 
                     if (yy > 0) {
                         // TOP
-                        int topIndex        = xx + (yy - 1) * width;
+                        int topIndex {xx + (yy - 1) * width};
                         type = TERRAIN::SURFACE::map.at(topIndex).type;
                         ownerID = layer.at(topIndex).ownerID;
 
@@ -148,7 +152,7 @@ void TERRITORY::spawnTerritory(glm::vec2 pos, int size) {
 
                     if (yy < height - 1) {
                         // BOTTOM
-                        int bottomIndex     = xx + (yy + 1) * width;
+                        int bottomIndex {xx + (yy + 1) * width};
                         type = TERRAIN::SURFACE::map.at(bottomIndex).type;
                         ownerID = layer.at(bottomIndex).ownerID;
 
@@ -176,7 +180,7 @@ void TERRITORY::spawnTerritory(glm::vec2 pos, int size) {
                     //
                     //
 
-                    SDL_Renderer* rend = window.rend;
+                    SDL_Renderer* rend {window.rend};
 
                     SDL_SetRenderDrawBlendMode(rend, SDL_BLENDMODE_BLEND);
 
@@ -186,7 +190,7 @@ void TERRITORY::spawnTerritory(glm::vec2 pos, int size) {
                         layer[tileIndex].color.b, layer[tileIndex].color.a);
                     SDL_RenderFillRect(rend, &layer[tileIndex].rect);
 
-                    SDL_SetRenderTarget(rend, NULL);
+                    SDL_SetRenderTarget(rend, nullptr);
                 }
             }
         }
@@ -196,54 +200,53 @@ void TERRITORY::spawnTerritory(glm::vec2 pos, int size) {
 //
 //  ITTS WORKINGGGGG
 //
-//  nga
-//
 //  have to add troops to the system so that you cant expand infinitly
 //
 
 void TERRITORY::updateLayer() {
     if (mouseClick) {
 
-
         // default size of the tiles
-        glm::vec2 defaultSize = {
+        glm::vec2 defaultSize {
             (static_cast<float>(window.scale.x) / TERRAIN::SURFACE::mapSize.x),
             (static_cast<float>(window.scale.y) / TERRAIN::SURFACE::mapSize.y)
         };
 //        glm::vec2 currentSize = defaultSize * player.zoom;
 
-        glm::ivec2 mousePos;
+        glm::ivec2 mousePos {};
         SDL_GetMouseState(&mousePos.x, &mousePos.y);
 
-        int tileIndex;
-        float zoom = PLAYER::zoom;
+        int tileIndex {};
+        float zoom {PLAYER::zoom};
 
         // mouse pos in world cords
-        glm::vec2 mouseWorldPos = {
+        glm::vec2 mouseWorldPos {
             mousePos.x - (PLAYER::camOffset.x * zoom),
             mousePos.y - (PLAYER::camOffset.y * zoom)
         };
 
         // tile size with the zoom
-        glm::vec2 tileSize = {
+        glm::vec2 tileSize {
             defaultSize.x * zoom,
             defaultSize.y * zoom
         };
 
         // tile pos
-        glm::ivec2 tilePos = {
+        glm::ivec2 tilePos {
             static_cast<int>(mouseWorldPos.x / tileSize.x),
             static_cast<int>(mouseWorldPos.y / tileSize.y)
         };
-
 
         // |=====================================|
         // | MANAGER FOR TERRITORY RELATED FUNCS |
         // |=====================================|
 
-
         // check if tile is inside the world
-        if (tilePos.x >= 0 && tilePos.x < TERRAIN::SURFACE::mapSize.x && tilePos.y >= 0 && tilePos.y < TERRAIN::SURFACE::mapSize.y) {
+        if (tilePos.x >= 0 &&
+            tilePos.x < TERRAIN::SURFACE::mapSize.x &&
+            tilePos.y >= 0 &&
+            tilePos.y < TERRAIN::SURFACE::mapSize.y) {
+
             tileIndex = tilePos.x + tilePos.y * TERRAIN::SURFACE::mapSize.x;
 
             if (PLAYER::playerOwnsAKingdom == false and TERRAIN::SURFACE::map.at(tileIndex).type > 1) {
@@ -254,7 +257,6 @@ void TERRITORY::updateLayer() {
                 expandTerritory();
             }
         }
-
         mouseClick = false;
     }
 }

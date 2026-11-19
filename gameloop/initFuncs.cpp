@@ -63,10 +63,10 @@ int SDL::Window::init() {
     UI::fonts.terminessBold     = TTF_OpenFont("assets/Font/TerminessNerdFont-Bold.ttf",    24);
     UI::fonts.RobotoMonoBold    = TTF_OpenFont("assets/Font/RobotoMono-Bold.ttf",           22);
 
-    if (UI::fonts.terminessItalic == nullptr    ||
-        UI::fonts.terminessBold == nullptr      ||
-        UI::fonts.terminessNormal == nullptr    ||
-        UI::fonts.terminessNormal == nullptr    ) {
+    if (UI::fonts.terminessItalic   == nullptr    ||
+        UI::fonts.terminessBold     == nullptr      ||
+        UI::fonts.terminessNormal   == nullptr    ||
+        UI::fonts.terminessNormal   == nullptr    ) {
 
         LOG::INIT_ERR(TTF_GetError());
     }

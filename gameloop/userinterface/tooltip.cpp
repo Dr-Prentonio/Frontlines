@@ -13,13 +13,13 @@
 
 void UI::TOOLTIP::surfaceMode(SDL_Renderer* rend) {
 
-    glm::ivec2 pos;
+    glm::ivec2 pos {};
     SDL_GetMouseState(&pos.x, &pos.y);
-    SDL_Rect drect = {pos.x + 30, pos.y + 30, 0,0};
+    SDL_Rect drect {pos.x + 30, pos.y + 30, 0,0};
 
     SDL_SetRenderDrawColor(rend, 25, 25, 25, 200);
 
-    Uint32 wrapLength = 0;
+    Uint32 wrapLength {};
 
     // title surface
     SDL_Surface* boldTextSurface = TTF_RenderUTF8_Blended_Wrapped(
@@ -43,11 +43,11 @@ void UI::TOOLTIP::surfaceMode(SDL_Renderer* rend) {
     SDL_Texture* textTexture =  SDL_CreateTextureFromSurface(rend, textSurface);
     SDL_Texture* boldTextTexture = SDL_CreateTextureFromSurface(rend, boldTextSurface);
 
-    int boldTextWidth = boldTextSurface->w;
-    int boldTextHeight = boldTextSurface->h;
+    int boldTextWidth {boldTextSurface->w};
+    int boldTextHeight {boldTextSurface->h};
 
-    int textWidth   = textSurface->w;
-    int textHeight  = textSurface->h;
+    int textWidth   {textSurface->w};
+    int textHeight  {textSurface->h};
 
     SDL_FreeSurface(textSurface);
     SDL_FreeSurface(boldTextSurface);
@@ -56,10 +56,10 @@ void UI::TOOLTIP::surfaceMode(SDL_Renderer* rend) {
     // design
     //
 
-    glm::ivec2 padding = {5, 4};
+    glm::ivec2 padding {5, 4};
 
     // background drect
-    SDL_Rect bgRect = {
+    SDL_Rect bgRect {
         drect.x,
         drect.y,
         textWidth + (padding.x * 2),
@@ -76,13 +76,14 @@ void UI::TOOLTIP::surfaceMode(SDL_Renderer* rend) {
     SDL_SetRenderDrawColor(rend, 100, 100, 100, 255);
     SDL_RenderDrawRect(rend, &bgRect);
 
-    SDL_Rect textDrect = {
+    SDL_Rect textDrect {
         drect.x + padding.x,
         drect.y + padding.y + 28,
         textWidth,
         textHeight
     };
-    SDL_Rect boldTextDrect = {
+
+    SDL_Rect boldTextDrect {
         drect.x + padding.x,
         drect.y + padding.y,
         boldTextWidth,
@@ -101,14 +102,14 @@ void UI::TOOLTIP::manager() {
     glm::ivec2 mouseGridPos = TOOLBOX::findMousePos() * TERRAIN::SURFACE::tileSize;
 
     // global vars
-    std::string name;
-    std::string troopCost;
-    std::string ownerID;
+    std::string name {};
+    std::string troopCost {};
+    std::string ownerID {};
 
     // surface terrain layer (its on top cuz its always going to be true)
-    {
+    [&]{
         // tooltip
-        glm::ivec2 pos;
+        glm::ivec2 pos {};
         SDL_GetMouseState(&pos.x, &pos.y);
 
         // get index & type
@@ -157,10 +158,10 @@ void UI::TOOLTIP::manager() {
         title = name;
         text = "Troop cost: " + troopCost + " | Owner: " + ownerID;
         enable = true;
-    }
+    }();
 
     // foliage
-    {
+    [&]{
         // lambda to check what tile is uses
         auto kniga = [mouseGridPos, name, troopCost, ownerID](const std::vector<SDL_Rect>& tiles, const std::string& title) {
             for (auto& check : tiles) {
@@ -176,14 +177,14 @@ void UI::TOOLTIP::manager() {
         kniga(TERRAIN::FOLIAGE::COTTON::cottonTiles, "Cotton Field");
         kniga(TERRAIN::FOLIAGE::OIL::oilTiles,       "Oil Field"   );
         kniga(TERRAIN::FOLIAGE::STONE::stoneTiles,   "Rocky Hill"  );
-    }
+    }();
 
     // factorys
-    for (auto& factory : FACTORY::factorys) {
+    for (const auto factory : FACTORY::factorys) {
         // if click is inside an already existing building
         if (TOOLBOX::checkMouseCollision(mouseGridPos, factory.hitbox)) {
 
-            std::string type;
+            std::string type {};
 
             switch (factory.facType) {
                 case 1: type = "Clothing";  break;
@@ -194,7 +195,7 @@ void UI::TOOLTIP::manager() {
                 default: type = "Unknown"; break;
             }
 
-            glm::ivec2 pos;
+            glm::ivec2 pos {};
             SDL_GetMouseState(&pos.x, &pos.y);
 
             title = "Factory";
@@ -206,10 +207,10 @@ void UI::TOOLTIP::manager() {
     }
 
     // citys
-    for (auto& factory : CITY::citys) {
+    for (const auto factory : CITY::citys) {
         // if click is inside an already existing building
         if (TOOLBOX::checkMouseCollision(mouseGridPos, factory.hitbox)) {
-            glm::ivec2 pos;
+            glm::ivec2 pos {};
             SDL_GetMouseState(&pos.x, &pos.y);
 
             title = "City";
@@ -221,9 +222,9 @@ void UI::TOOLTIP::manager() {
     }
 
     // military camps
-    for (auto& camp : MILITARYCAMP::camps) {
+    for (const auto camp : MILITARYCAMP::camps) {
         if (TOOLBOX::checkMouseCollision(mouseGridPos, camp.hitbox)) {
-            glm::ivec2 pos;
+            glm::ivec2 pos {};
             SDL_GetMouseState(&pos.x, &pos.y);
 
             title = "Military camp";

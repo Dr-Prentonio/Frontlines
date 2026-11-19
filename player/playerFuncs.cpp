@@ -8,43 +8,43 @@
 #include "../header/terrainClasses.hpp"
 
 struct FetchNeighbours {
-    int topIndex;
-    int bottomIndex;
-    int leftIndex;
-    int rightIndex;
+    int topIndex    {};
+    int bottomIndex {};
+    int leftIndex   {};
+    int rightIndex  {};
 };
 
 struct PendingTiles {
-    bool leftBlocked = false;
-    bool rightBlocked = false;
-    bool topBlocked = false;
-    bool bottomBlocked = false;
+    bool leftBlocked    {};
+    bool rightBlocked   {};
+    bool topBlocked     {};
+    bool bottomBlocked  {};
 
-    int troopCost;
-    float timeCost;
+    int troopCost   {};
+    float timeCost  {};
 
-    float currentTimer;
+    float currentTimer {};
 
-    int globalIndex;
+    int globalIndex {};
 };
 
 struct TileData {
-    int troopCost;
-    float timeCost;
+    int troopCost   {};
+    float timeCost  {};
 };
 
-std::vector<PendingTiles> pendingTiles;
+std::vector<PendingTiles> pendingTiles {};
 
 FetchNeighbours fetchNeighbour(int index) {
 
-    const int width = TERRAIN::SURFACE::mapSize.x;
-    const int height = TERRAIN::SURFACE::mapSize.y;
+    const int width {TERRAIN::SURFACE::mapSize.x};
+    const int height {TERRAIN::SURFACE::mapSize.y};
 
-    const int x = index % width;
-    const int y = index / width;
+    const int x {index % width};
+    const int y {index / width};
 
     // Init
-    FetchNeighbours neg = {-1,-1,-1,-1};
+    FetchNeighbours neg = {-1, -1, -1, -1};
 
     // Top & Bottom
     if (y > 0) neg.topIndex =  x + (y - 1) * width;
@@ -59,7 +59,7 @@ FetchNeighbours fetchNeighbour(int index) {
 
 // fetch troop & time cost
 TileData fetchData(int index) {
-    TileData data;
+    TileData data {};
 
     switch (TERRAIN::SURFACE::map.at(index).type) {
         // the bigger the number the longer it takes
@@ -78,7 +78,7 @@ TileData fetchData(int index) {
         case 6:
             data = {40, 24};        // Snow
             break;
-        default: return {0,0};
+        default: return {};
     }
 
     if (TERRAIN::FOLIAGE::GENERAL::worldTileUsage.at(index)) {
@@ -96,13 +96,16 @@ TileData fetchData(int index) {
 void checkTile(auto& tile) {
     if (tile.fullBoxed) return;
 
-    if (tile.topBlocked && tile.bottomBlocked && tile.leftBlocked && tile.rightBlocked) {
+    if (tile.topBlocked &&
+        tile.bottomBlocked &&
+        tile.leftBlocked &&
+        tile.rightBlocked) {
 
         tile.fullBoxed = true;
-        int index = tile.worldIndex;
+        int index {tile.worldIndex};
         TERRITORY::layer[index].color = Red;
 
-        SDL_Renderer* rend = window.rend;
+        SDL_Renderer* rend {window.rend};
         SDL_SetRenderDrawBlendMode(rend, SDL_BLENDMODE_BLEND);
         SDL_SetRenderTarget(rend, TERRITORY::layerTexture);
         SDL_SetRenderDrawColor(rend,
@@ -120,16 +123,16 @@ void checkTile(auto& tile) {
 void PLAYER::update(float deltaTime) {
     if (pendingTiles.empty()) return;
 
-    SDL_Renderer* rend = window.rend;
+    SDL_Renderer* rend {window.rend};
 
-    for (int i = 0; i < pendingTiles.size(); i++) {
+    for (int i = {}; i < pendingTiles.size(); i++) {
 
         if (pendingTiles[i].currentTimer >= pendingTiles[i].timeCost) {
 
-            int index = pendingTiles[i].globalIndex;
+            int index {pendingTiles[i].globalIndex};
             TERRITORY::territoryTile& updatedTile = TERRITORY::layer[index];
 
-            int multiplier = 1;
+            int multiplier {1};
             if (!(TOOLBOX::randomInt(0, 4) >= 4)) multiplier = 4;
 
             military.troops -= pendingTiles[i].troopCost / multiplier;
@@ -137,7 +140,7 @@ void PLAYER::update(float deltaTime) {
             updatedTile.ownerID = 1;
             updatedTile.color = Red_Border;
 
-            OwnedTiles newTile;
+            OwnedTiles newTile {};
 
             newTile.worldIndex = index;
             newTile.bottomBlocked = pendingTiles[i].bottomBlocked;
@@ -161,7 +164,7 @@ void PLAYER::update(float deltaTime) {
             SDL_RenderFillRect(rend, &updatedTile.rect);
             SDL_SetRenderTarget(rend, nullptr);
         } else {
-            static std::random_device device;
+            static std::random_device device {};
             static std::mt19937 generator(device());
 
             std::uniform_real_distribution dis1(0.1f, 25.0f);
@@ -177,7 +180,7 @@ bool isAvailable(int index) {
     if (TERRITORY::layer[index].ownerID == 1) return false;
 
     // if is being already processed
-    for (const auto& pending : pendingTiles) {
+    for (const auto pending : pendingTiles) {
         if (pending.globalIndex == index) return false;
     }
 
@@ -188,18 +191,18 @@ bool isAvailable(int index) {
 void TERRITORY::expandTerritory() {
 
     // loop
-    for (int i = 0; i < PLAYER::playerTiles.size(); i++) {
+    for (int i = {}; i < PLAYER::playerTiles.size(); i++) {
         auto& tile = PLAYER::playerTiles.at(i);
 
         // check if fullboxed (if then continue)
         if (tile.fullBoxed) continue;
 
-        int index = tile.worldIndex;
+        int index {tile.worldIndex};
         FetchNeighbours neg = fetchNeighbour(index);
 
         // top check
         if (!tile.topBlocked) {
-            int topIndex = neg.topIndex;
+            int topIndex {neg.topIndex};
 
             checkTile(PLAYER::playerTiles[i]);
 
@@ -209,7 +212,7 @@ void TERRITORY::expandTerritory() {
             }
 
             if (isAvailable(topIndex)) {
-                PendingTiles newTile;
+                PendingTiles newTile {};
 
                 newTile.bottomBlocked   = true;
                 tile.topBlocked        = true;
@@ -226,7 +229,7 @@ void TERRITORY::expandTerritory() {
 
         // bottom check
         if (!tile.bottomBlocked) {
-            int bottomIndex = neg.bottomIndex;
+            int bottomIndex {neg.bottomIndex};
 
             checkTile(PLAYER::playerTiles[i]);
 
@@ -236,7 +239,7 @@ void TERRITORY::expandTerritory() {
             }
 
             if (isAvailable(bottomIndex)) {
-                PendingTiles newTile;
+                PendingTiles newTile {};
 
                 tile.bottomBlocked    = true;
                 newTile.topBlocked     = true;
@@ -253,7 +256,7 @@ void TERRITORY::expandTerritory() {
 
         // left check
         if (!tile.leftBlocked) {
-            int leftIndex = neg.leftIndex;
+            int leftIndex = {neg.leftIndex};
 
             checkTile(PLAYER::playerTiles[i]);
 
@@ -263,7 +266,7 @@ void TERRITORY::expandTerritory() {
             }
 
             if (isAvailable(leftIndex)) {
-                PendingTiles newTile;
+                PendingTiles newTile {};
 
                 tile.leftBlocked        = true;
                 newTile.rightBlocked   = true;
@@ -280,7 +283,7 @@ void TERRITORY::expandTerritory() {
 
         // right check
         if (!tile.rightBlocked) {
-            int rightIndex = neg.rightIndex;
+            int rightIndex {neg.rightIndex};
 
             checkTile(PLAYER::playerTiles[i]);
 
@@ -290,7 +293,7 @@ void TERRITORY::expandTerritory() {
             }
 
             if (isAvailable(rightIndex)) {
-                PendingTiles newTile;
+                PendingTiles newTile {};
 
                 tile.rightBlocked    = true;
                 newTile.leftBlocked     = true;
@@ -309,7 +312,7 @@ void TERRITORY::expandTerritory() {
             if (tile.fullBoxed) continue;
 
             tile.fullBoxed = true;
-            int index = tile.worldIndex;
+            int index {tile.worldIndex};
 
             SDL_Renderer* rend = window.rend;
 

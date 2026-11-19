@@ -22,30 +22,28 @@ glm::ivec4 checkNeighbour(int index) {
     // bottom  x + (y + 1) * mapSize.x
 
     // top, bottom, left, right index
-    glm::ivec4 neg;
+    glm::ivec4 neg {};
 
-    const int width = TERRAIN::SURFACE::mapSize.x;
-    const int height = TERRAIN::SURFACE::mapSize.y;
+    static const int width  = {TERRAIN::SURFACE::mapSize.x};
+    static const int height = {TERRAIN::SURFACE::mapSize.y};
 
     // what the flying fuck
     const int x = index % width;
     const int y = index / width;
 
-    neg = {-1, -1, -1, -1};
-
     // Top & Bottom
     if (y > 0)
-        neg.x =  x + (y - 1) * width;
+        neg.x = x + (y - 1) * width;
 
     if (y + 1 < height)
-        neg.y =  x + (y + 1) * width;
+        neg.y = x + (y + 1) * width;
 
     // Left & Right
     if (x > 0)
         neg.z = (x - 1) + y * width;
 
     if (x + 1 < width)
-        neg.w =  (x + 1) + y * width;
+        neg.w = (x + 1) + y * width;
 
     return neg;
 }
@@ -55,13 +53,13 @@ glm::ivec4 checkNeighbour(int index) {
 // |===============|
 
 void TERRAIN::FOLIAGE::FOREST::drawTiles(
-    int size,                       // size of the base
-    glm::ivec2 pos,                 // pos of the center of the base
-    SDL_Color normalColor,          // color of the tiles
-    std::vector<SDL_Rect>& tiles    // vector to safe tiles to
+    const int size,                     // size of the base
+    const glm::ivec2 pos,               // pos of the center of the base
+    const SDL_Color normalColor,        // color of the tiles
+    std::vector<SDL_Rect>& tiles        // vector to safe tiles to
     ) {
 
-    SDL_Renderer* rend = window.rend;
+    SDL_Renderer* rend {window.rend};
 
     for (int y = -size; y < size; y++) {
         for (int x = -size; x < size; x++) {
@@ -70,18 +68,18 @@ void TERRAIN::FOLIAGE::FOREST::drawTiles(
             if (sqrt > size) continue;
 
             // cords + loop for perlin
-            glm::vec2 noiseCords = {
+            glm::vec2 noiseCords {
                 pos.x + x,
                 pos.y + y
             };
 
             // aplay perlin to radius
-            float noise = glm::perlin(noiseCords * 0.06f);
-            float radius = size + noise * 8.0f;
+            float noise {glm::perlin(noiseCords * 0.06f)};
+            float radius {size + noise * 8.0f};
 
             if (sqrt <= radius) {
 
-                glm::ivec2 kniga = noiseCords;
+                glm::ivec2 kniga {noiseCords};
 
                 // safety check
                 if (kniga.x < 0 || kniga.x >= SURFACE::mapSize.x ||
@@ -92,7 +90,7 @@ void TERRAIN::FOLIAGE::FOREST::drawTiles(
                 int index = kniga.x + kniga.y * SURFACE::mapSize.x;
                 if (SURFACE::map.at(index).type <= 2 || SURFACE::map.at(index).type >= 5) continue;
 
-                SDL_Rect drect = {
+                SDL_Rect drect {
                     kniga.x * SURFACE::tileSize,
                     kniga.y * SURFACE::tileSize,
                     SURFACE::tileSize,
@@ -127,7 +125,7 @@ void TERRAIN::FOLIAGE::FOREST::drawTiles(
 void TERRAIN::FOLIAGE::FOREST::spawnTrees(int treesAmount) {
 
     // init vector for hitboxes
-    static std::vector<SDL_Rect> treesHitbox;
+    static std::vector<SDL_Rect> treesHitbox {};
     treesHitbox.clear();
 
     for (int i = 0; i < treesAmount; i++) {
@@ -136,23 +134,23 @@ void TERRAIN::FOLIAGE::FOREST::spawnTrees(int treesAmount) {
         int randomIndex = TOOLBOX::randomInt(0, forestTiles.size() - 1);
 
         // get width, height
-        int width, height;
+        int width {}, height {};
         SDL_QueryTexture(GENERAL::textures.oak, nullptr, nullptr, &width, &height);
 
         // size, hitbox and collision detection
-        SDL_Rect temp = {
+        SDL_Rect temp {
             forestTiles.at(randomIndex).x + TOOLBOX::randomInt(-1, 1),
             forestTiles.at(randomIndex).y + TOOLBOX::randomInt(-1, 1),
             width / 4,
             height / 4
         };
 
-        SDL_Rect tempHitbox = {
+        SDL_Rect tempHitbox {
             temp.x - 5, temp.y - 5, temp.w + 10, temp.h + 10
         };
 
-        bool skip = false;
-        for (auto& kk : treesHitbox) {
+        bool skip {};
+        for (const auto kk : treesHitbox) {
             if (TOOLBOX::checkHitboxCollision(tempHitbox, kk)) {
                 skip = true;
             }
@@ -160,7 +158,7 @@ void TERRAIN::FOLIAGE::FOREST::spawnTrees(int treesAmount) {
         if (skip) continue;
 
         // set renderer
-        SDL_Renderer* rend = window.rend;
+        SDL_Renderer* rend {window.rend};
         SDL_SetRenderTarget(rend, GENERAL::worldTex);
 
         // switch for random tree type
@@ -177,8 +175,6 @@ void TERRAIN::FOLIAGE::FOREST::spawnTrees(int treesAmount) {
 void TERRAIN::FOLIAGE::FOREST::generate() {
 
     LOG::INFO("Starting Forest Generation");
-
-    const int spawnRate = 50;   // FOREST spawn rate
 
     // initializing world tex if not already happen
     if (GENERAL::worldTex == nullptr) {
@@ -215,7 +211,7 @@ void TERRAIN::FOLIAGE::FOREST::generate() {
     GENERAL::isUsed.assign(SURFACE::mapSize.x * SURFACE::mapSize.y, false);
 
     // amount of forests
-    for (int i = 0; i < spawnRate; i++) {
+    for (int i = {}; i < spawnRate; i++) {
 
         // random position
         int x = static_cast<int>(TOOLBOX::randomFloat(0.0f, static_cast<float>(SURFACE::mapSize.x)));
@@ -233,13 +229,13 @@ void TERRAIN::FOLIAGE::FOREST::generate() {
 // |=====================|
 
 void TERRAIN::FOLIAGE::COTTON::drawTiles(
-    int size,                       // size of the base
-    glm::ivec2 pos,                 // pos of the center of the base
-    SDL_Color normalColor,          // color of the tiles
-    std::vector<SDL_Rect>& tiles    // vector to safe tiles to
+    const int size,                     // size of the base
+    const glm::ivec2 pos,               // pos of the center of the base
+    const SDL_Color normalColor,        // color of the tiles
+    std::vector<SDL_Rect>& tiles        // vector to safe tiles to
     ) {
 
-    SDL_Renderer* rend = window.rend;
+    SDL_Renderer* rend {window.rend};
 
     for (int y = -size; y < size; y++) {
         for (int x = -size; x < size; x++) {
@@ -248,18 +244,18 @@ void TERRAIN::FOLIAGE::COTTON::drawTiles(
             if (sqrt > size) continue;
 
             // cords + loop for perlin
-            glm::vec2 noiseCords = {
+            glm::vec2 noiseCords {
                 pos.x + x,
                 pos.y + y
             };
 
             // aplay perlin to radius
-            float noise = glm::perlin(noiseCords * 0.06f);
-            float radius = size + noise * 8.0f;
+            float noise {glm::perlin(noiseCords * 0.06f)};
+            float radius {size + noise * 8.0f};
 
             if (sqrt <= radius) {
 
-                glm::ivec2 kniga = noiseCords;
+                glm::ivec2 kniga {noiseCords};
 
                 // safety check
                 if (kniga.x < 0 || kniga.x >= SURFACE::mapSize.x ||
@@ -267,10 +263,10 @@ void TERRAIN::FOLIAGE::COTTON::drawTiles(
                     continue;
 
                 // check terrain type underneath
-                int index = kniga.x + kniga.y * SURFACE::mapSize.x;
+                int index {kniga.x + kniga.y * SURFACE::mapSize.x};
                 if (SURFACE::map.at(index).type <= 2 || SURFACE::map.at(index).type >= 5) continue;
 
-                SDL_Rect drect = {
+                SDL_Rect drect {
                     kniga.x * SURFACE::tileSize,
                     kniga.y * SURFACE::tileSize,
                     SURFACE::tileSize,
@@ -303,7 +299,7 @@ void TERRAIN::FOLIAGE::COTTON::drawTiles(
 void TERRAIN::FOLIAGE::COTTON::spawnCotton(int treesAmount) {
 
     // init vector for hitboxes
-    static std::vector<SDL_Rect> treesHitbox;
+    static std::vector<SDL_Rect> treesHitbox {};
     treesHitbox.clear();
 
     for (int i = 0; i < treesAmount; i++) {
@@ -312,23 +308,26 @@ void TERRAIN::FOLIAGE::COTTON::spawnCotton(int treesAmount) {
         int randomIndex = TOOLBOX::randomInt(0, cottonTiles.size() - 1);
 
         // get width, height
-        int width, height;
+        int width {}, height {};
         SDL_QueryTexture(GENERAL::textures.oak, nullptr, nullptr, &width, &height);
 
         // size, hitbox and collision detection
-        SDL_Rect temp = {
+        SDL_Rect temp {
             cottonTiles.at(randomIndex).x + TOOLBOX::randomInt(-1, 1),
             cottonTiles.at(randomIndex).y + TOOLBOX::randomInt(-1, 1),
             width / 4,
             height / 4
         };
 
-        SDL_Rect tempHitbox = {
-            temp.x - 5, temp.y - 5, temp.w + 10, temp.h + 10
+        SDL_Rect tempHitbox {
+            temp.x - 5,
+            temp.y - 5,
+            temp.w + 10,
+            temp.h + 10
         };
 
-        bool skip = false;
-        for (auto& kk : treesHitbox) {
+        bool skip {};
+        for (const auto kk : treesHitbox) {
             if (TOOLBOX::checkHitboxCollision(tempHitbox, kk)) {
                 skip = true;
             }
@@ -336,7 +335,7 @@ void TERRAIN::FOLIAGE::COTTON::spawnCotton(int treesAmount) {
         if (skip) continue;
 
         // set renderer
-        SDL_Renderer* rend = window.rend;
+        SDL_Renderer* rend {window.rend};
         SDL_SetRenderTarget(rend, GENERAL::worldTex);
 
         // switch for random tree type
@@ -353,7 +352,7 @@ void TERRAIN::FOLIAGE::COTTON::generate() {
 
     LOG::INFO("Starting cotton Generation");
 
-    SDL_Renderer* rend = window.rend;
+    SDL_Renderer* rend {window.rend};
 
     // initializing world tex if not already happen
     if (GENERAL::worldTex == nullptr) {
@@ -403,13 +402,13 @@ void TERRAIN::FOLIAGE::COTTON::generate() {
 // |==================|
 
 void TERRAIN::FOLIAGE::OIL::drawTiles(
-    int size,                       // size of the base
-    glm::ivec2 pos,                 // pos of the center of the base
-    SDL_Color normalColor,          // color of the tiles
-    std::vector<SDL_Rect>& tiles    // vector to safe tiles to
+    const int size,                     // size of the base
+    const glm::ivec2 pos,               // pos of the center of the base
+    const SDL_Color normalColor,        // color of the tiles
+    std::vector<SDL_Rect>& tiles        // vector to safe tiles to
     ) {
 
-    SDL_Renderer* rend = window.rend;
+    SDL_Renderer* rend {window.rend};
 
     for (int y = -size; y < size; y++) {
         for (int x = -size; x < size; x++) {
@@ -418,18 +417,18 @@ void TERRAIN::FOLIAGE::OIL::drawTiles(
             if (sqrt > size) continue;
 
             // cords + loop for perlin
-            glm::vec2 noiseCords = {
+            glm::vec2 noiseCords {
                 pos.x + x,
                 pos.y + y
             };
 
             // aplay perlin to radius
-            float noise = glm::perlin(noiseCords * 0.06f);
-            float radius = size + noise * 8.0f;
+            float noise {glm::perlin(noiseCords * 0.06f)};
+            float radius {size + noise * 8.0f};
 
             if (sqrt <= radius) {
 
-                glm::ivec2 kniga = noiseCords;
+                glm::ivec2 kniga {noiseCords};
 
                 // safety check
                 if (kniga.x < 0 || kniga.x >= SURFACE::mapSize.x ||
@@ -437,10 +436,10 @@ void TERRAIN::FOLIAGE::OIL::drawTiles(
                     continue;
 
                 // check terrain type underneath
-                int index = kniga.x + kniga.y * SURFACE::mapSize.x;
+                int index {kniga.x + kniga.y * SURFACE::mapSize.x};
                 if (SURFACE::map.at(index).type <= 2 || SURFACE::map.at(index).type >= 5) continue;
 
-                SDL_Rect drect = {
+                SDL_Rect drect {
                     kniga.x * SURFACE::tileSize,
                     kniga.y * SURFACE::tileSize,
                     SURFACE::tileSize,
@@ -473,7 +472,7 @@ void TERRAIN::FOLIAGE::OIL::drawTiles(
 void TERRAIN::FOLIAGE::OIL::spawnOil(int treesAmount) {
 
     // init vector for hitboxes
-    static std::vector<SDL_Rect> treesHitbox;
+    static std::vector<SDL_Rect> treesHitbox {};
     treesHitbox.clear();
 
     for (int i = 0; i < treesAmount; i++) {
@@ -482,23 +481,23 @@ void TERRAIN::FOLIAGE::OIL::spawnOil(int treesAmount) {
         int randomIndex = TOOLBOX::randomInt(0, oilTiles.size() - 1);
 
         // get width, height
-        int width, height;
+        int width {}, height {};
         SDL_QueryTexture(GENERAL::textures.oak, nullptr, nullptr, &width, &height);
 
         // size, hitbox and collision detection
-        SDL_Rect temp = {
+        SDL_Rect temp {
             oilTiles.at(randomIndex).x + TOOLBOX::randomInt(-1, 1),
             oilTiles.at(randomIndex).y + TOOLBOX::randomInt(-1, 1),
             width / 6,
             height / 6
         };
 
-        SDL_Rect tempHitbox = {
+        SDL_Rect tempHitbox {
             temp.x - 5, temp.y - 5, temp.w + 10, temp.h + 10
         };
 
-        bool skip = false;
-        for (auto& kk : treesHitbox) {
+        bool skip {};
+        for (const auto kk : treesHitbox) {
             if (TOOLBOX::checkHitboxCollision(tempHitbox, kk)) {
                 skip = true;
             }
@@ -506,7 +505,7 @@ void TERRAIN::FOLIAGE::OIL::spawnOil(int treesAmount) {
         if (skip) continue;
 
         // set renderer
-        SDL_Renderer* rend = window.rend;
+        SDL_Renderer* rend {window.rend};
         SDL_SetRenderTarget(rend, GENERAL::worldTex);
 
         // switch for random tree type
@@ -523,7 +522,7 @@ void TERRAIN::FOLIAGE::OIL::generate() {
 
     LOG::INFO("Starting oil Generation");
 
-    SDL_Renderer* rend = window.rend;
+    SDL_Renderer* rend {window.rend};
 
     // initializing world tex if not already happen
     if (GENERAL::worldTex == nullptr) {
@@ -573,13 +572,13 @@ void TERRAIN::FOLIAGE::OIL::generate() {
 // |===================|
 
 void TERRAIN::FOLIAGE::STONE::drawTiles(
-    int size,                       // size of the base
-    glm::ivec2 pos,                 // pos of the center of the base
-    SDL_Color normalColor,          // color of the tiles
-    std::vector<SDL_Rect>& tiles    // vector to safe tiles to
+    const int size,                     // size of the base
+    const glm::ivec2 pos,               // pos of the center of the base
+    const SDL_Color normalColor,        // color of the tiles
+    std::vector<SDL_Rect>& tiles        // vector to safe tiles to
     ) {
 
-    SDL_Renderer* rend = window.rend;
+    SDL_Renderer* rend {window.rend};
 
     for (int y = -size; y < size; y++) {
         for (int x = -size; x < size; x++) {
@@ -588,18 +587,18 @@ void TERRAIN::FOLIAGE::STONE::drawTiles(
             if (sqrt > size) continue;
 
             // cords + loop for perlin
-            glm::vec2 noiseCords = {
+            glm::vec2 noiseCords {
                 pos.x + x,
                 pos.y + y
             };
 
             // aplay perlin to radius
-            float noise = glm::perlin(noiseCords * 0.06f);
-            float radius = size + noise * 8.0f;
+            float noise {glm::perlin(noiseCords * 0.06f)};
+            float radius {size + noise * 8.0f};
 
             if (sqrt <= radius) {
 
-                glm::ivec2 kniga = noiseCords;
+                glm::ivec2 kniga {noiseCords};
 
                 // safety check
                 if (kniga.x < 0 || kniga.x >= SURFACE::mapSize.x ||
@@ -607,10 +606,10 @@ void TERRAIN::FOLIAGE::STONE::drawTiles(
                     continue;
 
                 // check terrain type underneath
-                int index = kniga.x + kniga.y * SURFACE::mapSize.x;
+                int index {kniga.x + kniga.y * SURFACE::mapSize.x};
                 if (SURFACE::map.at(index).type <= 2 || SURFACE::map.at(index).type >= 5) continue;
 
-                SDL_Rect drect = {
+                SDL_Rect drect {
                     kniga.x * SURFACE::tileSize,
                     kniga.y * SURFACE::tileSize,
                     SURFACE::tileSize,
@@ -643,7 +642,7 @@ void TERRAIN::FOLIAGE::STONE::drawTiles(
 void TERRAIN::FOLIAGE::STONE::spawnStone(int stoneAmount) {
 
     // init vector for hitboxes
-    static std::vector<SDL_Rect> stoneHitbox;
+    static std::vector<SDL_Rect> stoneHitbox {};
     stoneHitbox.clear();
 
     for (int i = 0; i < stoneAmount; i++) {
@@ -652,22 +651,25 @@ void TERRAIN::FOLIAGE::STONE::spawnStone(int stoneAmount) {
         int randomIndex = TOOLBOX::randomInt(0, stoneTiles.size() - 1);
 
         // get width, height
-        int width, height;
+        int width {}, height {};
         SDL_QueryTexture(GENERAL::textures.stone, nullptr, nullptr, &width, &height);
 
         // size, hitbox and collision detection
-        SDL_Rect temp = {
+        SDL_Rect temp {
             stoneTiles.at(randomIndex).x + TOOLBOX::randomInt(-1, 1),
             stoneTiles.at(randomIndex).y + TOOLBOX::randomInt(-1, 1),
             width / 6,
             height / 6
         };
 
-        SDL_Rect tempHitbox = {
-            temp.x - 5, temp.y - 5, temp.w + 10, temp.h + 10
+        SDL_Rect tempHitbox {
+            temp.x - 5,
+            temp.y - 5,
+            temp.w + 10,
+            temp.h + 10
         };
 
-        bool skip = false;
+        bool skip {};
         for (auto& kk : stoneHitbox) {
             if (TOOLBOX::checkHitboxCollision(tempHitbox, kk)) {
                 skip = true;
@@ -676,7 +678,7 @@ void TERRAIN::FOLIAGE::STONE::spawnStone(int stoneAmount) {
         if (skip) continue;
 
         // set renderer
-        SDL_Renderer* rend = window.rend;
+        SDL_Renderer* rend {window.rend};
         SDL_SetRenderTarget(rend, GENERAL::worldTex);
 
         // switch for random tree type
@@ -690,9 +692,9 @@ void TERRAIN::FOLIAGE::STONE::spawnStone(int stoneAmount) {
 }
 
 void TERRAIN::FOLIAGE::STONE::spawnOnMountain() {
-    for (auto& tiles : SURFACE::map) {
+    for (const auto tiles : SURFACE::map) {
         if (tiles.type != 5) continue;
-        SDL_Rect temp = tiles.rect;
+        SDL_Rect temp {tiles.rect};
         stoneTiles.push_back(temp);
     }
 }
@@ -701,7 +703,7 @@ void TERRAIN::FOLIAGE::STONE::generate() {
 
     LOG::INFO("Starting stone generation");
 
-    SDL_Renderer* rend = window.rend;
+    SDL_Renderer* rend {window.rend};
 
     // initializing world tex if not already happen
     if (GENERAL::worldTex == nullptr) {
@@ -737,7 +739,7 @@ void TERRAIN::FOLIAGE::STONE::generate() {
 
     for (int i = 0; i < spawnRate; i++) {
 
-        glm::ivec2 pos = {
+        glm::ivec2 pos {
             TOOLBOX::randomInt(0, SURFACE::mapSize.x - 1),
             TOOLBOX::randomInt(0, SURFACE::mapSize.y - 1),
         };

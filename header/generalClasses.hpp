@@ -22,28 +22,28 @@ namespace ch = std::chrono;
 namespace SDL {
     // if in dev settings is selected a static
     // texture will be loaded
-    inline bool useStaticMaps = false;
+    inline bool useStaticMaps {};
 
     // Window data
     struct Window {
 
-        SDL_Renderer* rend;
+        SDL_Renderer* rend {};
 
-        SDL_Window* win;
-        glm::ivec2 scale = glm::ivec2(1920, 1080);
-        const char* title = "Strategie Game";
+        SDL_Window* win {};
+        const glm::ivec2 scale {1920, 1080};
+        const char* title {"Strategie Game"};
 
         int init();
     };
 
-    struct Gameloop {
-
-        void draw(SDL_Event &e);
-
-        void input(SDL_Event &e);
+    namespace MAIN {
 
         // delta time in seconds
-        float deltaTime;
+        inline float deltaTime {};
+
+        // funcs
+        void draw(SDL_Event &e);
+        void input(SDL_Event &e);
     };
 }
 
@@ -51,68 +51,68 @@ namespace SDL {
 namespace PLAYER {
     // Resources and factorys
     struct Resources_Def {
-        Uint32 wood       = 100; // 100
-        Uint32 stone      = 100; // 100
-        Uint32 clothes    = 0;   // 0
-        Uint32 steel      = 100; // 100
-        Uint32 oil        = 0;   // 0
-        Uint32 weapons    = 50;
+        uint32_t wood       {100}; // 100
+        uint32_t stone      {100}; // 100
+        uint32_t clothes    {};
+        uint32_t steel      {100}; // 100
+        uint32_t oil        {};
+        uint32_t weapons    {50};
     };
     // factorys take 75 citizen
     struct Factory_Def {
-        Uint32 clothesFactorys  = 0;
-        Uint32 steelFactorys    = 0;
-        Uint32 oilFactorys      = 0;
-        Uint32 woodFactorys     = 0;
-        Uint32 stoneFactorys    = 0;
-        Uint32 weaponFactorys   = 0;
+        uint32_t clothesFactorys  {};
+        uint32_t steelFactorys    {};
+        uint32_t oilFactorys      {};
+        uint32_t woodFactorys     {};
+        uint32_t stoneFactorys    {};
+        uint32_t weaponFactorys   {};
     };
     // citys give 400 citizen
     struct Citizen_Def {
-        Uint32 citysTotal   = 0;
-        Uint32 citizen      = 1000;
+        uint32_t citysTotal   {};
+        uint32_t citizen      {1000};
     };
     struct Military_Def {
-        int troops              = 5000;
-        Uint32 militaryCamps    = 0;
+        int troops              {5000};
+        uint32_t militaryCamps  {};
     };
     struct OwnedTiles {
 
-        glm::ivec2 pos = {0, 0}; // pos in world cords
+        glm::ivec2 pos {}; // pos in world cords
 
         // very important if a wrong number is passed
         // the whole game might crash
-        int worldIndex = 0; // index of the same tiles (map, layer)
+        int worldIndex {}; // index of the same tiles (map, layer)
 
         // if its either an country tile or
         // an water tile
-        bool topBlocked     = false;
-        bool bottomBlocked  = false;
-        bool leftBlocked    = false;
-        bool rightBlocked   = false;
+        bool topBlocked     {};
+        bool bottomBlocked  {};
+        bool leftBlocked    {};
+        bool rightBlocked   {};
 
-        bool fullBoxed = false;
+        bool fullBoxed {};
     };
 
-    inline Citizen_Def citizen;
-    inline Factory_Def factorys;
-    inline Resources_Def resources;
-    inline Military_Def military;
+    inline Citizen_Def citizen      {};
+    inline Factory_Def factorys     {};
+    inline Resources_Def resources  {};
+    inline Military_Def military    {};
 
-    inline SDL_Rect camOffset;
-    inline float zoom = 1;
-    inline float target = 1;
+    inline SDL_Rect camOffset {};
+    inline float zoom {1};
+    inline float target {1};
 
     // if touches map border and cant move anymore
-    inline bool touchesBorderRight;
-    inline bool touchesBorderLeft;
-    inline bool touchesBorderTop;
-    inline bool touchesBorderBottom;
+    inline bool touchesBorderRight {};
+    inline bool touchesBorderLeft {};
+    inline bool touchesBorderTop {};
+    inline bool touchesBorderBottom {};
 
-    inline bool playerOwnsAKingdom = false;
+    inline bool playerOwnsAKingdom {};
 
     // update player tiles in progress
-    inline std::vector<OwnedTiles> playerTiles;
+    inline std::vector<OwnedTiles> playerTiles {};
     void update(float deltaTime);
 
     namespace MINING {
@@ -127,31 +127,24 @@ namespace PLAYER {
 
 // territory asignment
 namespace TERRITORY {
-
     struct territoryTile {
-
-        SDL_Rect rect = {0,0,0,0};  // size and pos of the tile
+        SDL_Rect rect {};  // size and pos of the tile
         SDL_Color color = Clear;    // color of the field
-        int ownerID = 0;    // the owner of this field
-
+        int ownerID {};    // the owner of this field
     };
 
-    inline std::vector<territoryTile> layer;
-    inline SDL_Texture* layerTexture;
+    inline std::vector<territoryTile> layer {};
+    inline SDL_Texture* layerTexture {};
 
-    inline bool mouseClick = false;
+    inline bool mouseClick {};
 
     void setupLayer();
     void updateLayer();
     void expandTerritory();
-
     void toolTip();
-
     void spawnTerritory(glm::vec2 pos, int size);
-
 }
 
 extern SDL::Window window;
-extern SDL::Gameloop gameloop;
 
 #endif //STRATEGIE_GAME_GENERALCLASSES_HPP

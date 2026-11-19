@@ -7,34 +7,35 @@
 #include "../../header/generalFuncs.hpp"
 #include "glm/glm.hpp"
 
+// top left
 void UI::topUiBar(SDL_Renderer *rend) {
     SDL_SetRenderDrawColor(rend, 25,25,25,200);
 
-    std::string troopOverview = "Troops: " + std::to_string(PLAYER::military.troops);
-    std::string tilesOverview = "Tiles Owned: " + std::to_string(PLAYER::playerTiles.size());
-    std::string citizenOverview = "Citizens: " + std::to_string(PLAYER::citizen.citizen);
+    std::string troopOverview {"Troops: " + std::to_string(PLAYER::military.troops)};
+    std::string tilesOverview {"Tiles Owned: " + std::to_string(PLAYER::playerTiles.size())};
+    std::string citizenOverview {"Citizens: " + std::to_string(PLAYER::citizen.citizen)};
 
-    std::string text = troopOverview + " | " + tilesOverview + " | " + citizenOverview;
+    std::string text {troopOverview + " | " + tilesOverview + " | " + citizenOverview};
 
-    int wrapLength = 0;
+    int wrapLength {};
     SDL_Surface* textSurface = TTF_RenderUTF8_Blended_Wrapped(
-    fonts.terminessNormal,
-    text.c_str(),
-    {255,255,255,255},
-    wrapLength
+        fonts.terminessNormal,
+        text.c_str(),
+        {255,255,255,255},
+        wrapLength
     );
 
     SDL_Texture* textTexture =  SDL_CreateTextureFromSurface(rend, textSurface);
 
-    int textWidth   = textSurface->w;
-    int textHeight  = textSurface->h;
+    int textWidth   {textSurface->w};
+    int textHeight  {textSurface->h};
 
     SDL_FreeSurface(textSurface);
 
-    glm::ivec2 padding = {5, 4};
+    glm::ivec2 padding {5, 4};
 
     // background drect
-    SDL_Rect bgRect = {
+    SDL_Rect bgRect {
         topUIBar.pos.x,
         topUIBar.pos.y,
         textWidth + padding.x,
@@ -51,55 +52,56 @@ void UI::topUiBar(SDL_Renderer *rend) {
     SDL_SetRenderDrawColor(rend, 100, 100, 100, 255);
     SDL_RenderDrawRect(rend, &bgRect);
 
-    SDL_Rect textDrect = {
+    SDL_Rect textDrect {
         topUIBar.pos.x + padding.x / 2,
         topUIBar.pos.y + padding.y / 2,
         textWidth,
         textHeight
     };
 
-    SDL_RenderCopy(rend, textTexture, NULL, &textDrect);
+    SDL_RenderCopy(rend, textTexture, nullptr, &textDrect);
     SDL_DestroyTexture(textTexture);
 }
 
+// top right
 void UI::rightUiBar(SDL_Renderer *rend) {
     SDL_SetRenderDrawColor(rend, 25,25,25,200);
 
     auto& playerRes = PLAYER::resources;
 
-    std::string wood        = "Wood: "      + std::to_string(playerRes.wood);
-    std::string stone       = "Stone: "     + std::to_string(playerRes.stone);
-    std::string steel       = "Steel: "     + std::to_string(playerRes.steel);
-    std::string oil         = "Oil: "       + std::to_string(playerRes.oil);
-    std::string clothing    = "Clothing: "  + std::to_string(playerRes.clothes);
-    std::string weapons     = "Weapons: "   + std::to_string(playerRes.weapons);
+    std::string wood         {"Wood: "      + std::to_string(playerRes.wood)};
+    std::string stone        {"Stone: "     + std::to_string(playerRes.stone)};
+    std::string steel        {"Steel: "     + std::to_string(playerRes.steel)};
+    std::string oil          {"Oil: "       + std::to_string(playerRes.oil)};
+    std::string clothing     {"Clothing: "  + std::to_string(playerRes.clothes)};
+    std::string weapons      {"Weapons: "   + std::to_string(playerRes.weapons)};
 
-    std::string text = wood + " " + stone + " " + clothing + " " + steel + " " + weapons + " " + oil;
+    std::string text {wood + " " + stone + " " + clothing + " " + steel + " " + weapons + " " + oil};
 
-    int wrapLength = 0;
+    int wrapLength {};
     SDL_Surface* textSurface = TTF_RenderUTF8_Blended_Wrapped(
-    fonts.terminessNormal,
-    text.c_str(),
-    {255,255,255,255},
-    wrapLength
+        fonts.terminessNormal,
+        text.c_str(),
+        {255,255,255,255},
+        wrapLength
     );
 
-    SDL_Texture* textTexture =  SDL_CreateTextureFromSurface(rend, textSurface);
+    SDL_Texture* textTexture = SDL_CreateTextureFromSurface(rend, textSurface);
 
-    int textWidth   = textSurface->w;
-    int textHeight  = textSurface->h;
+    int textWidth   {textSurface->w};
+    int textHeight  {textSurface->h};
 
     SDL_FreeSurface(textSurface);
 
-    glm::ivec2 padding = {5, 4};
+    glm::ivec2 padding {5, 4};
 
-    glm::ivec2 barPos = {
+    glm::ivec2 barPos {
         window.scale.x - textWidth - 10,
         textHeight - 20
     };
 
     // background drect
-    SDL_Rect bgRect = {
+    SDL_Rect bgRect {
         barPos.x,
         barPos.y,
         textWidth + padding.x,
@@ -116,18 +118,19 @@ void UI::rightUiBar(SDL_Renderer *rend) {
     SDL_SetRenderDrawColor(rend, 100, 100, 100, 255);
     SDL_RenderDrawRect(rend, &bgRect);
 
-    SDL_Rect textDrect = {
+    SDL_Rect textDrect {
         barPos.x + padding.x / 2,
         barPos.y + padding.y / 2,
         textWidth,
         textHeight
     };
 
-    SDL_RenderCopy(rend, textTexture, NULL, &textDrect);
+    SDL_RenderCopy(rend, textTexture, nullptr, &textDrect);
     SDL_DestroyTexture(textTexture);
 }
 
-void UI::bottomLeftUI(SDL_Renderer *rend) {
+// unused
+/* void UI::bottomLeftUI(SDL_Renderer *rend) {
     SDL_SetRenderDrawColor(rend, 25,25,25,200);
 
     std::string text =  "|–––––––––––––––––––––FACTORY–––––––––––––––––––––––––|\n"
@@ -206,7 +209,7 @@ void UI::bottomLeftUI(SDL_Renderer *rend) {
 
     SDL_SetRenderDrawColor(rend, 255,255,255,100);
     SDL_RenderFillRect(rend, &pickyDrect);
-}
+} */
 
 // part of the game loop (child of main/draw)
 void UI::UIManager(SDL_Renderer* rend, SDL_Event &e) {

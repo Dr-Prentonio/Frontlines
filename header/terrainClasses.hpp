@@ -17,9 +17,9 @@ namespace TERRAIN {
 
     // LoDs
     namespace LOD {
-        inline SDL_Texture* LoD1; // smoothest
-        inline SDL_Texture* LoD2;
-        inline SDL_Texture* LoD3; // Crapiest
+        inline SDL_Texture* LoD1 {}; // smoothest
+        inline SDL_Texture* LoD2 {};
+        inline SDL_Texture* LoD3 {}; // Crapiest
 
         void generateLoDs();
     }
@@ -37,27 +37,26 @@ namespace TERRAIN {
         };
 
         struct TerrainTile {
-            SDL_Rect rect;
-            TerrainType type;
+            SDL_Rect rect       {};
+            TerrainType type    {};
         };
 
         // corrosion simulation
         struct Droplet {
-
-            glm::vec2 pos;
-            glm::vec2 speed = {0,0};
-            float amount = 1.0f;
-            float sediment = 0.0f;
+            glm::vec2 pos   {};
+            glm::vec2 speed {};
+            float amount    {1.0f};
+            float sediment  {};
         };
 
-        const int tileSize = 32; // size of tiles in full res
-        const int scale = 14; // scaling of the map
+        constexpr int tileSize  {32}; // size of tiles in full res
+        constexpr int scale     {14}; // scaling of the map
 
-        inline std::vector<TerrainTile> map; // map vector
+        inline std::vector<TerrainTile> map {}; // map vector
 
-        inline SDL_Texture* mapTexture;
+        inline SDL_Texture* mapTexture {};
 
-        inline glm::ivec2 mapSize; // size of the map
+        inline glm::ivec2 mapSize {}; // size of the map
 
         void generateTerrain();
         void generateTile(SDL_Renderer* rend);
@@ -71,22 +70,22 @@ namespace TERRAIN {
             // textures
             struct Textures {
                 // trees
-                SDL_Texture* oak;
-                SDL_Texture* spruce;
+                SDL_Texture* oak    {};
+                SDL_Texture* spruce {};
                 // cotton fields
-                SDL_Texture* cotton;
+                SDL_Texture* cotton {};
                 // oil fields
-                SDL_Texture* oil;
+                SDL_Texture* oil    {};
                 // stone fields texture
-                SDL_Texture* stone;
+                SDL_Texture* stone  {};
             };
 
-            inline Textures textures;
+            inline Textures textures {};
 
-            inline SDL_Texture* worldTex;
+            inline SDL_Texture* worldTex {};
 
-            inline std::vector<bool> isUsed;
-            inline std::vector<bool> worldTileUsage; // uses world index
+            inline std::vector<bool> isUsed {};
+            inline std::vector<bool> worldTileUsage {}; // uses world index
 
             void init();
             void drawIcons();
@@ -94,10 +93,10 @@ namespace TERRAIN {
 
         namespace FOREST {
 
-            const int spawnRate = 25;
+            constexpr int spawnRate {25};
 
             // longterm save for pos of tiles
-            inline std::vector<SDL_Rect> forestTiles;
+            inline std::vector<SDL_Rect> forestTiles {};
 
             // funcs
 
@@ -107,16 +106,15 @@ namespace TERRAIN {
                 SDL_Color normalColor,          // color of the tiles
                 std::vector<SDL_Rect>& tiles    // vector to safe tiles to
             );
-
             void spawnTrees(int treesAmount);
             void generate();
         }
 
         namespace COTTON {
 
-            const int spawnRate = 25;
+            constexpr int spawnRate {25};
 
-            inline std::vector<SDL_Rect> cottonTiles;
+            inline std::vector<SDL_Rect> cottonTiles {};
 
             void drawTiles (
                 int size,                       // size of the base
@@ -124,16 +122,15 @@ namespace TERRAIN {
                 SDL_Color normalColor,          // color of the tiles
                 std::vector<SDL_Rect>& tiles    // vector to safe tiles to
             );
-
             void spawnCotton(int cottonAmount);
             void generate();
         }
 
         namespace OIL {
 
-            const int spawnRate = 10;
+            constexpr int spawnRate {10};
 
-            inline std::vector<SDL_Rect> oilTiles;
+            inline std::vector<SDL_Rect> oilTiles {};
 
             void drawTiles (
                 int size,                       // size of the base
@@ -147,9 +144,9 @@ namespace TERRAIN {
 
         namespace STONE {
 
-            const int spawnRate = 15;
+            constexpr int spawnRate {15};
 
-            inline std::vector<SDL_Rect> stoneTiles;
+            inline std::vector<SDL_Rect> stoneTiles {};
 
             void spawnStone(int stoneAmount);
             void drawTiles (

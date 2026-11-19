@@ -29,15 +29,11 @@
 // Funcs used all over the game
 namespace TOOLBOX {
 
-
-
     //
     //
     //      This namespace is for funcs that are used all across the game
     //
     //
-
-
 
     // |============================================|
     // |    Find Mouse Position Relativ to Tiles    |
@@ -45,41 +41,45 @@ namespace TOOLBOX {
 
     inline glm::ivec2 findMousePos() {
         // default size of the tiles
-        glm::vec2 defaultSize = {
+        glm::vec2 defaultSize {
             (static_cast<float>(window.scale.x) / TERRAIN::SURFACE::mapSize.x),
             (static_cast<float>(window.scale.y) / TERRAIN::SURFACE::mapSize.y)
         };
         //        glm::vec2 currentSize = defaultSize * player.zoom;
 
-        glm::ivec2 mousePos;
+        glm::ivec2 mousePos {};
         SDL_GetMouseState(&mousePos.x, &mousePos.y);
 
         float zoom = PLAYER::zoom;
 
         // mouse pos in world cords
-        glm::vec2 mouseWorldPos = {
+        glm::vec2 mouseWorldPos {
             mousePos.x - (PLAYER::camOffset.x * zoom),
             mousePos.y - (PLAYER::camOffset.y * zoom)
         };
 
         // tile size with the zoom
-        glm::vec2 tileSize = {
+        glm::vec2 tileSize {
             defaultSize.x * zoom,
             defaultSize.y * zoom
         };
 
         // tile pos
-        glm::ivec2 tilePos = {
+        glm::ivec2 tilePos {
             static_cast<int>(mouseWorldPos.x / tileSize.x),
             static_cast<int>(mouseWorldPos.y / tileSize.y)
         };
 
         // check if tile is inside the world
-        if (tilePos.x >= 0 && tilePos.x < TERRAIN::SURFACE::mapSize.x && tilePos.y >= 0 && tilePos.y < TERRAIN::SURFACE::mapSize.y) {
+        if (tilePos.x >= 0 &&
+            tilePos.x < TERRAIN::SURFACE::mapSize.x &&
+            tilePos.y >= 0 &&
+            tilePos.y < TERRAIN::SURFACE::mapSize.y) {
+
             return tilePos;
         }
 
-        return {0, 0};
+        return {};
     }
 
     // |==================================================|
@@ -88,7 +88,7 @@ namespace TOOLBOX {
 
     inline int findMouseIndex() {
         // default size of the tiles
-        glm::vec2 defaultSize = {
+        glm::vec2 defaultSize {
             (static_cast<float>(window.scale.x) / TERRAIN::SURFACE::mapSize.x),
             (static_cast<float>(window.scale.y) / TERRAIN::SURFACE::mapSize.y)
         };
@@ -97,35 +97,39 @@ namespace TOOLBOX {
         glm::ivec2 mousePos;
         SDL_GetMouseState(&mousePos.x, &mousePos.y);
 
-        int tileIndex;
+        int tileIndex {};
         float zoom = PLAYER::zoom;
 
         // mouse pos in world cords
-        glm::vec2 mouseWorldPos = {
+        glm::vec2 mouseWorldPos {
             mousePos.x - (PLAYER::camOffset.x * zoom),
             mousePos.y - (PLAYER::camOffset.y * zoom)
         };
 
         // tile size with the zoom
-        glm::vec2 tileSize = {
+        glm::vec2 tileSize {
             defaultSize.x * zoom,
             defaultSize.y * zoom
         };
 
         // tile pos
-        glm::ivec2 tilePos = {
+        glm::ivec2 tilePos {
             static_cast<int>(mouseWorldPos.x / tileSize.x),
             static_cast<int>(mouseWorldPos.y / tileSize.y)
         };
 
         // check if tile is inside the world
-        if (tilePos.x >= 0 && tilePos.x < TERRAIN::SURFACE::mapSize.x && tilePos.y >= 0 && tilePos.y < TERRAIN::SURFACE::mapSize.y) {
+        if (tilePos.x >= 0 &&
+            tilePos.x < TERRAIN::SURFACE::mapSize.x &&
+            tilePos.y >= 0 &&
+            tilePos.y < TERRAIN::SURFACE::mapSize.y) {
+
             tileIndex = tilePos.x + tilePos.y * TERRAIN::SURFACE::mapSize.x; // find out tile index (unused currently)
 
             return tileIndex;
-        } else {
-            return -1;
         }
+
+        return -1;
     }
 
     // |===================================|
@@ -133,15 +137,15 @@ namespace TOOLBOX {
     // |===================================|
 
     // +/- player resources (outdated)
-    inline void updatePlayerRes(int wood, int stone, int steel, int clothes, int oil, int weapons) {
-        auto& playerRes = PLAYER::resources;
+    inline void updatePlayerRes(int wood = 0, int stone = 0, int steel = 0, int clothes = 0, int oil = 0, int weapons = 0) {
+        auto& playerRes   {PLAYER::resources};
 
-        playerRes.wood += wood;
-        playerRes.stone += stone;
-        playerRes.steel += steel;
-        playerRes.clothes += clothes;
-        playerRes.oil += oil;
-        playerRes.weapons += weapons;
+        playerRes.wood      += wood;
+        playerRes.stone     += stone;
+        playerRes.steel     += steel;
+        playerRes.clothes   += clothes;
+        playerRes.oil       += oil;
+        playerRes.weapons   += weapons;
     }
 
     // |============================================|
@@ -149,8 +153,8 @@ namespace TOOLBOX {
     // |============================================|
 
     inline bool checkMouseCollision(
-        glm::ivec2 mouse,   // mouse position
-        SDL_Rect hitbox     // hitbox of a object
+        glm::ivec2  mouse,   // mouse position
+        SDL_Rect    hitbox   // hitbox of a object
         ) {
         if (mouse.x >= hitbox.x &&
             mouse.x < hitbox.x + hitbox.w &&
@@ -190,18 +194,20 @@ namespace TOOLBOX {
         SDL_Rect    &levelCounterRect,      // drect of the level textbox
         SDL_Texture *&levelCounterTexture   // tex of the level text
         ) {
-        SDL_Renderer *rend = window.rend;
+
+        SDL_Renderer *rend {window.rend};
 
         // transform int level -> sdl Texture
-        std::string text = std::to_string(level);
+        std::string text {std::to_string(level)};
 
-        SDL_Surface *textSurface = TTF_RenderUTF8_Solid(
-            UI::fonts.RobotoMonoBold,
-            text.c_str(),
+        SDL_Surface *textSurface {
+            TTF_RenderUTF8_Solid(
+                UI::fonts.RobotoMonoBold,
+                text.c_str(),
             {30, 30, 30, 255}
-        );
+            )};
 
-        SDL_Texture *numberTex = SDL_CreateTextureFromSurface(rend, textSurface);
+        SDL_Texture *numberTex {SDL_CreateTextureFromSurface(rend, textSurface)};
 
         // check if everything went right
         if (textSurface == nullptr or numberTex == nullptr) {
@@ -214,10 +220,10 @@ namespace TOOLBOX {
         }
 
         // get double of the width and height of the text
-        int textWidth = textSurface->w * 2;
-        int textHeight = textSurface->h * 2;
+        int textWidth   {textSurface->w * 2};
+        int textHeight  {textSurface->h * 2};
 
-        SDL_Rect drect = {
+        SDL_Rect drect {
             hitbox.x + 10,
             hitbox.y + hitbox.h - textHeight,
             textWidth,
@@ -243,16 +249,17 @@ namespace TOOLBOX {
         SDL_Texture     *&levelCounterTexture   // tex of the level text
         ) {
 
-        SDL_Renderer* rend = window.rend;
-        SDL_Texture *temp = nullptr;
+        SDL_Renderer *rend  {window.rend};
+        SDL_Texture *temp   {};
 
         // make new tex
-        std::string text = std::to_string(level);
-        SDL_Surface *textSurface = TTF_RenderUTF8_Solid(
-            UI::fonts.RobotoMonoBold,
+        std::string text {std::to_string(level)};
+        SDL_Surface *textSurface {
+            TTF_RenderUTF8_Solid(
+                UI::fonts.RobotoMonoBold,
             text.c_str(),
             {30, 30, 30, 255}
-        );
+            )};
 
         temp = SDL_CreateTextureFromSurface(rend, textSurface);
 
@@ -265,10 +272,10 @@ namespace TOOLBOX {
             return;
         }
 
-        int textWidth = textSurface->w * 2;
-        int textHeight = textSurface->h * 2;
+        int textWidth  {textSurface->w * 2};
+        int textHeight {textSurface->h * 2};
 
-        SDL_Rect drect = {
+        SDL_Rect drect {
             hitbox.x + 10,
             hitbox.y + hitbox.h - textHeight,
             textWidth,
@@ -293,7 +300,7 @@ namespace TOOLBOX {
         ) {
 
         // normalize cords of building (0.0f - 1.0f)
-        glm::vec4 normalized = {
+        glm::vec4 normalized {
             (float)old.x    / (TERRAIN::SURFACE::mapSize.x * TERRAIN::SURFACE::tileSize),
             (float)old.y    / (TERRAIN::SURFACE::mapSize.y * TERRAIN::SURFACE::tileSize),
             (float)old.w    / (TERRAIN::SURFACE::mapSize.x * TERRAIN::SURFACE::tileSize),
@@ -301,7 +308,7 @@ namespace TOOLBOX {
         };
 
         // screen position
-        SDL_Rect temp = {
+        SDL_Rect temp {
             static_cast<int>(currentOffset.x + (normalized.x * currentOffset.w)),
             static_cast<int>(currentOffset.y + (normalized.y * currentOffset.h)),
             static_cast<int>(normalized.z * currentOffset.w),
@@ -316,7 +323,7 @@ namespace TOOLBOX {
     // |==============================|
 
     inline float randomFloat(float min, float max) {
-        static std::random_device dev;
+        static std::random_device dev {};
         static std::mt19937 gen(dev());
         std::uniform_real_distribution<float> dis(min, max);
         return dis(gen);
@@ -327,7 +334,7 @@ namespace TOOLBOX {
     // |============================|
 
     inline int randomInt(int min, int max) {
-        static std::random_device dev;
+        static std::random_device dev {};
         static std::mt19937 gen(dev());
         std::uniform_real_distribution<float> dis(static_cast<float>(min), static_cast<float>(max));
 
@@ -340,7 +347,7 @@ namespace TOOLBOX {
     // |================================|
 
     inline bool randomBool(float normalizedProbability) {
-        static std::random_device dev;
+        static std::random_device dev {};
         static std::mt19937 gen(dev());
         std::uniform_real_distribution<float> dis(0.0f, 1.0f);
 
@@ -357,12 +364,12 @@ namespace TOOLBOX {
         SDL_Texture*& goalTex   // the lod texture
         ) {
 
-        SDL_Renderer* rend = window.rend;
+        SDL_Renderer* rend {window.rend};
 
-        int originalWidth, originalHeight;
+        int originalWidth {}, originalHeight {};
         SDL_QueryTexture(refTex, nullptr, nullptr, &originalWidth, &originalHeight);
 
-        glm::ivec2 lodSize = {
+        glm::ivec2 lodSize {
             originalWidth / downScaling,
             originalHeight / downScaling
         };
@@ -398,7 +405,7 @@ namespace TOOLBOX {
 
         SDL_SetRenderTarget(rend, nullptr);
 
-        int width, height;
+        int width {}, height {};
         SDL_QueryTexture(goalTex, nullptr, nullptr, &width, &height);
 
         LOG::INIT_SUCCESS("LoD: w " + std::to_string(width) + " h " + std::to_string(height));
@@ -413,15 +420,16 @@ namespace TOOLBOX {
         float noiseScale                // scale of the noise scale (0.02 - 0.06 recomended)
         ) {
 
-        float seed = randomFloat(-1, 1);
-        std::vector<float> heightMap;
+        float seed = {randomFloat(-1, 1)};
+        std::vector<float> heightMap {};
+
         heightMap.clear();
         heightMap.resize(size.x * size.y);
 
-        for (int y = 0; y < size.y; y++) {
-            for (int x = 0; x < size.x; x++) {
+        for (int y {}; y < size.y; y++) {
+            for (int x {}; x < size.x; x++) {
 
-                float noiseValue;
+                float noiseValue {};
                 noiseValue = glm::perlin(
                     glm::vec2(
                         x * noiseScale * seed,
@@ -434,14 +442,40 @@ namespace TOOLBOX {
         return heightMap;
     }
 
-    // hitboxes of all ui elements
-    inline std::vector<SDL_Rect> UIHitbox;
+    // |===========================================|
+    // |    Checks for collision for mouse X UI    |
+    // |===========================================|
 
+    // hitboxes of all ui elements
+    inline std::vector<SDL_Rect> UIHitbox {};
     inline bool checkMouseUICollision(glm::ivec2 mousePos) {
-        for (auto& hitbox : UIHitbox) {
+        for (const auto hitbox : UIHitbox) {
             if (checkMouseCollision(mousePos, hitbox)) return true;
         }
-        return false;
+        return {};
+    }
+
+    // |=================================================|
+    // |    Loades Texture from file into SDL_Texture    |
+    // |=================================================|
+
+    inline int loadTexture(SDL_Texture*& tex, const std::string& path) {
+        SDL_Renderer* rend {window.rend};
+
+        SDL_Surface* tempSurf = IMG_Load(path.c_str());
+        tex = SDL_CreateTextureFromSurface(rend, tempSurf);
+
+        if (tex == nullptr) {
+            std::string err = SDL_GetError();
+            if (err.empty()) err = "couldnt get sdl error";
+            LOG::INIT_ERR("Couldnt load " + path + " " + err);
+            SDL_FreeSurface(tempSurf);
+            return -1;
+        }
+
+        SDL_FreeSurface(tempSurf);
+        LOG::INIT_SUCCESS("Loaded " + path);
+        return 0;
     }
 }
 

@@ -21,33 +21,33 @@ namespace FACTORY {
         weapon
     };
     struct Building {
-        factoryType facType = clothing; // Type of factory
+        factoryType facType {clothing}; // Type of factory
 
-        SDL_Texture* facTex = nullptr; // fac tex
-        SDL_Rect facRect = {0,0,0,0}; // pos and width of fac tex
+        SDL_Texture* facTex {}; // fac tex
+        SDL_Rect facRect {}; // pos and width of fac tex
 
         // only stores the facs hitbox
-        SDL_Rect hitbox = {0,0,0,0};
+        SDL_Rect hitbox {};
 
-        int level = 1; // how many are stacked
+        int level {1}; // how many are stacked
 
-        SDL_Texture* levelTex = nullptr;
-        SDL_Rect levelRect = {0,0,0,0};
+        SDL_Texture* levelTex {};
+        SDL_Rect levelRect {};
 
         // if the factory is on for example a forest
-        bool onSpecField = false;
+        bool onSpecField {};
     };
     struct Icons {
-        SDL_Texture* clothingTex;
-        SDL_Texture* woodTex;
-        SDL_Texture* stoneTex;
-        SDL_Texture* steelTex;
-        SDL_Texture* oilTex;
-        SDL_Texture* weaponTex;
+        SDL_Texture* clothingTex    {};
+        SDL_Texture* woodTex        {};
+        SDL_Texture* stoneTex       {};
+        SDL_Texture* steelTex       {};
+        SDL_Texture* oilTex         {};
+        SDL_Texture* weaponTex      {};
     };
 
-    inline Icons icons;
-    inline std::vector<Building> factorys;
+    inline Icons icons {};
+    inline std::vector<Building> factorys {};
 
     int init();
     void mouseClick();
@@ -58,20 +58,20 @@ namespace FACTORY {
 namespace CITY {
     struct Building {
 
-        SDL_Rect cityRect = {0,0,0,0};
-        SDL_Rect hitbox = {0,0,0,0};
+        SDL_Rect cityRect   {};
+        SDL_Rect hitbox     {};
 
-        int level = 1;
+        int level {1};
 
-        SDL_Texture* levelTex = nullptr;
-        SDL_Rect levelRect = {0,0,0,0};
+        SDL_Texture* levelTex {};
+        SDL_Rect levelRect    {};
     };
 
     // texture of the icon
-    inline SDL_Texture* cityTex;
+    inline SDL_Texture* cityTex {};
 
     // vector
-    inline std::vector<Building> citys;
+    inline std::vector<Building> citys {};
 
     // funcs
     int init();
@@ -83,20 +83,20 @@ namespace CITY {
 namespace MILITARYCAMP {
     struct Building {
         // icon and hitbox rect of building
-        SDL_Rect iconRect       = {0,0,0,0};
-        SDL_Rect hitbox         = {0,0,0,0};
+        SDL_Rect iconRect       {};
+        SDL_Rect hitbox         {};
 
         // level
-        int level               = 1;
+        int level               {1};
 
         // level number
-        SDL_Texture* levelTex   = nullptr;
-        SDL_Rect levelRect      = {0,0,0,0};
+        SDL_Texture* levelTex   {};
+        SDL_Rect levelRect      {};
     };
 
     // texture of the icon
-    inline SDL_Texture* campTex = nullptr;
-    inline std::vector<Building> camps;
+    inline SDL_Texture* campTex {};
+    inline std::vector<Building> camps {};
 
     // funcs
     int init();

@@ -7,31 +7,36 @@
 #include "../header/generalFuncs.hpp"
 #include "../header/terrainClasses.hpp"
 
-float interpolatedHeight(glm::vec2 pos, glm::ivec2 size, const std::vector<float>& heightMap) {
+// i just followed a random ass tutorial
+
+float interpolatedHeight(const glm::vec2 pos, const glm::ivec2 size, const std::vector<float>& heightMap) {
     // pos is pos
     // size.x = width; size.y = height
 
     // idfk
-    glm::ivec2 ploh1 = {
+    glm::ivec2 ploh1 {
         static_cast<int>(pos.x),
         static_cast<int>(pos.y)
     };
 
-    glm::ivec2 ploh2 = {
-        ploh1.x + 1,
-        ploh1.y + 1
+    glm::ivec2 ploh2 {
+        static_cast<int>(pos.x) + 1,
+        static_cast<int>(pos.y) + 1
     };
 
     // if droplet is at edge of map
-    if (ploh1.x < 0 || ploh2.x >= size.x || ploh1.y < 0 || ploh2.y >= size.y) return 0.0f;
+    if (ploh1.x < 0 ||
+        ploh2.x >= size.x ||
+        ploh1.y < 0 ||
+        ploh2.y >= size.y) return 0.0f;
 
-    glm::vec2 prz = {
+    glm::vec2 prz {
         pos.x - ploh1.x,    // prz from +x to -x tile
         pos.y - ploh1.y     // prz from +y to -y tile
     };
 
     // top left and right + bottom left and right tiles
-    glm::vec4 tiles = {
+    glm::vec4 tiles {
         heightMap[ploh1.x + ploh1.y * size.x],
         heightMap[ploh2.x + ploh1.y * size.x],
         heightMap[ploh1.x + ploh2.y * size.x],
@@ -45,22 +50,22 @@ float interpolatedHeight(glm::vec2 pos, glm::ivec2 size, const std::vector<float
     return glm::mix(top, bottom, prz.y);
 }
 
-void interpolatedSediment(glm::vec2 pos, glm::ivec2 mapSize, std::vector<float>& heightMap, float amount) {
+void interpolatedSediment(const glm::vec2 pos, const glm::ivec2 mapSize, std::vector<float>& heightMap, float amount) {
     // pos is pos
     // size.x = width; size.y = height
 
     // idfk
-    glm::ivec2 ploh1 = {
+    glm::ivec2 ploh1 {
         static_cast<int>(pos.x),
         static_cast<int>(pos.y)
     };
 
-    glm::ivec2 ploh2 = {
+    glm::ivec2 ploh2 {
         ploh1.x + 1,
         ploh1.y + 1
     };
 
-    glm::vec2 prz = {
+    glm::vec2 prz {
         pos.x - ploh1.x,    // prz from +x to -x tile
         pos.y - ploh1.y     // prz from +y to -y tile
     };
@@ -71,54 +76,59 @@ void interpolatedSediment(glm::vec2 pos, glm::ivec2 mapSize, std::vector<float>&
     heightMap[ploh2.y * mapSize.x + ploh2.x] += amount * prz.x * prz.y;
 }
 
-void erosion(glm::ivec2 mapSize, std::vector<float>& heightMap, int amount = 30000) {
-    std::vector<TERRAIN::SURFACE::TerrainTile> map = TERRAIN::SURFACE::map;
+void erosion(const glm::ivec2 mapSize, std::vector<float>& heightMap, const int amount = 30000) {
+    std::vector map {TERRAIN::SURFACE::map};
 
-    for (int i = 0; i < amount; i++) {
+    for (int i = {}; i < amount; i++) {
 
-        TERRAIN::SURFACE::Droplet drop;
+        TERRAIN::SURFACE::Droplet drop {};
         drop.pos.x = rand() % mapSize.x;
         drop.pos.y = rand() % mapSize.y;
 
         drop.amount = 1.0f;
-        glm::vec2 dropSpeed = {0,0};
+        glm::vec2 dropSpeed {};
 
         while (drop.amount > 0.01f) {
             float height = interpolatedHeight(drop.pos, mapSize, heightMap);
 
             // reset var
-            const float inertia = 0.2f;
-            const float gravity = 4.0f;
+            constexpr float inertia {0.2f};
+            constexpr float offset {0.5f};
 
-            float offset = 0.5f;
             float heightLeft   = interpolatedHeight(glm::vec2(drop.pos.x - offset, drop.pos.y), mapSize, heightMap);
             float heightRight  = interpolatedHeight(glm::vec2(drop.pos.x + offset, drop.pos.y), mapSize, heightMap);
             float heightTop    = interpolatedHeight(glm::vec2(drop.pos.x, drop.pos.y - offset), mapSize, heightMap);
             float heightBottom = interpolatedHeight(glm::vec2(drop.pos.x, drop.pos.y + offset), mapSize, heightMap);
 
-            glm::vec2 gradient = { heightRight - heightLeft, heightBottom - heightTop };
+            glm::vec2 gradient { heightRight - heightLeft, heightBottom - heightTop };
 
             dropSpeed = dropSpeed * inertia - gradient * (1.0f - inertia);
             drop.pos += dropSpeed;
 
-            // safety checks
-            if (drop.pos.x < 0 || drop.pos.x >= mapSize.x - 1 || drop.pos.y < 0 || drop.pos.y >= mapSize.y - 1) break;
+            // safety checks (if drop leaves map)
+            if (drop.pos.x < 0 ||
+                drop.pos.x >= mapSize.x - 1 ||
+                drop.pos.y < 0 ||
+                drop.pos.y >= mapSize.y - 1) break;
 
             float newHeight = interpolatedHeight(drop.pos, mapSize, heightMap);
-            float deltaHeight = newHeight - height;
+            float deltaHeight {newHeight - height};
+            float sedimentDelta {deltaHeight * 0.5f};
 
-            float sedimentDelta = deltaHeight * 0.5f;
             drop.sediment += sedimentDelta;
-
             interpolatedSediment(drop.pos, mapSize, heightMap, sedimentDelta);
             drop.amount -= 0.01f;
         }
     }
 }
 
+// from this point on not tutorial
+
 void TERRAIN::SURFACE::generateTile(SDL_Renderer* rend) {
 
-    for (int i = 0; i < map.size(); i++) {
+    constexpr int border {3};
+
+    for (int i = {}; i < map.size(); i++) {
 
         if (map[i].type == SEA) {
 
@@ -127,7 +137,6 @@ void TERRAIN::SURFACE::generateTile(SDL_Renderer* rend) {
 
             SDL_SetRenderDrawColor(rend, 0, 0, 185, 255);
 
-            int border = 3;
             for (int a = 0; a < border; a++) {
                 SDL_Rect drect = {
                     map[i].rect.x + a,
@@ -146,7 +155,6 @@ void TERRAIN::SURFACE::generateTile(SDL_Renderer* rend) {
 
             SDL_SetRenderDrawColor(rend, 0, 0, 135, 255);
 
-            int border = 3;
             for (int a = 0; a < border; a++) {
                 SDL_Rect drect = {
                     map[i].rect.x + a,
@@ -166,7 +174,6 @@ void TERRAIN::SURFACE::generateTile(SDL_Renderer* rend) {
 
             SDL_SetRenderDrawColor(rend, 235, 210, 85, 255);
 
-            int border = 3;
             for (int a = 0; a < border; a++) {
                 SDL_Rect drect = {
                     map[i].rect.x + a,
@@ -185,7 +192,6 @@ void TERRAIN::SURFACE::generateTile(SDL_Renderer* rend) {
 
             SDL_SetRenderDrawColor(rend, 0, 185, 0, 255);
 
-            int border = 3;
             for (int a = 0; a < border; a++) {
                 SDL_Rect drect = {
                     map[i].rect.x + a,
@@ -204,7 +210,6 @@ void TERRAIN::SURFACE::generateTile(SDL_Renderer* rend) {
 
             SDL_SetRenderDrawColor(rend, 0, 135, 0, 255);
 
-            int border = 3;
             for (int a = 0; a < border; a++) {
                 SDL_Rect drect = {
                     map[i].rect.x + a,
@@ -224,7 +229,6 @@ void TERRAIN::SURFACE::generateTile(SDL_Renderer* rend) {
 
             SDL_SetRenderDrawColor(rend, 135, 135, 135, 255);
 
-            int border = 3;
             for (int a = 0; a < border; a++) {
                 SDL_Rect drect = {
                     map[i].rect.x + a,
@@ -243,7 +247,6 @@ void TERRAIN::SURFACE::generateTile(SDL_Renderer* rend) {
 
             SDL_SetRenderDrawColor(rend, 215, 215, 215, 255);
 
-            int border = 3;
             for (int a = 0; a < border; a++) {
                 SDL_Rect drect = {
                     map[i].rect.x + a,
@@ -255,14 +258,12 @@ void TERRAIN::SURFACE::generateTile(SDL_Renderer* rend) {
                 SDL_RenderDrawRect(rend, &drect);
             }
         }
-
     }
-
 }
 
 void TERRAIN::LOD::generateLoDs() {
-    SDL_Texture* staticTex;
-    SDL_Renderer* rend = window.rend;
+    SDL_Texture* staticTex {};
+    SDL_Renderer* rend {window.rend};
 
     staticTex = SDL_CreateTexture(
         rend,
@@ -278,13 +279,13 @@ void TERRAIN::LOD::generateLoDs() {
     }
 
     // get texture size
-    int width, height;
+    int width {}, height {};
 
     SDL_QueryTexture(SURFACE::mapTexture, nullptr, nullptr, &width, &height);
-    SDL_Rect temp = {0,0,width, height};
+    SDL_Rect temp {0,0,width, height};
 
     SDL_QueryTexture(FOLIAGE::GENERAL::worldTex, nullptr, nullptr, &width, &height);
-    SDL_Rect temp2 = {0,0,width,height};
+    SDL_Rect temp2 {0,0,width,height};
 
     // draw into one texture
     SDL_SetTextureBlendMode(staticTex, SDL_BLENDMODE_BLEND);
@@ -318,7 +319,7 @@ void writeToFile() {
     }
 
     for (int i = 0; i < TERRAIN::SURFACE::map.size(); i++) {
-        auto& kniga = TERRAIN::SURFACE::map.at(i);
+        const auto kniga = TERRAIN::SURFACE::map.at(i);
 
         outFile
         << kniga.rect.x     << " "          // position x
@@ -335,25 +336,23 @@ void writeToFile() {
 void TERRAIN::SURFACE::generateTerrain() {
     LOG::INFO("Generating terrain < STARTED >");
 
-    const float perlinNoiseScale = 0.02f;
+    constexpr float perlinNoiseScale {0.02f};
     mapSize = glm::ivec2(window.scale.x / tileSize * scale, window.scale.y / tileSize * scale);
     mapSize = glm::roundPowerOfTwo(mapSize);
 
     LOG::DEBUG("Map size: " + std::to_string(mapSize.x) + " x " + std::to_string(mapSize.y));
 
-
     static const int seed = TOOLBOX::randomInt(-999999, 999999);
-    glm::ivec2 axisSeed = {seed, seed * 1.5f};
+    glm::ivec2 axisSeed {seed, seed * 1.5f};
 
     LOG::INFO("Seed: " + std::to_string(seed));
 
     std::vector<float> heightMap(mapSize.x * mapSize.y);
 
-    for (int y = 0; y < mapSize.y; y++) {
-        for (int x = 0; x < mapSize.x; x++) {
+    for (int y = {}; y < mapSize.y; y++) {
+        for (int x = {}; x < mapSize.x; x++) {
 
-            float noiseValue;
-            noiseValue = glm::perlin(
+            float noiseValue = glm::perlin(
                 glm::vec2(
                     static_cast<float>(x + axisSeed.x) * perlinNoiseScale,
                     static_cast<float>(y + axisSeed.y) * perlinNoiseScale));
@@ -366,10 +365,10 @@ void TERRAIN::SURFACE::generateTerrain() {
     erosion(mapSize, heightMap, 70000);
     LOG::INFO("Running hydraulic erosion < DONE >");
 
-    for (int y = 0; y < mapSize.y; y++) {
-        for (int x = 0; x < mapSize.x; x++) {
+    for (int y = {}; y < mapSize.y; y++) {
+        for (int x = {}; x < mapSize.x; x++) {
 
-            TerrainTile terrainTile;
+            TerrainTile terrainTile {};
             terrainTile.rect = {x * tileSize, y * tileSize, tileSize, tileSize};
 
              float terrainNoise = heightMap[x + y * mapSize.x];
@@ -389,7 +388,7 @@ void TERRAIN::SURFACE::generateTerrain() {
     LOG::INFO("Generating terrain < DONE >");
     LOG::INFO("Optimizing terrain < STARTED >");
 
-    SDL_Renderer* rend = window.rend;
+    SDL_Renderer* rend {window.rend};
 
     mapTexture = SDL_CreateTexture(
         rend,
@@ -406,7 +405,7 @@ void TERRAIN::SURFACE::generateTerrain() {
     // generate the tiles color and border
     generateTile(rend);
 
-    int width = 0, height = 0;
+    int width {}, height {};
 
     SDL_QueryTexture(mapTexture, nullptr, nullptr, &width, &height);
 

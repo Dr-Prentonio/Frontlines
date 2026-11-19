@@ -10,7 +10,6 @@
 #include "../header/debugLogging.hpp"
 #include "../header/terrainClasses.hpp"
 
-SDL::Gameloop gameloop;
 SDL::Window window;
 
 //
@@ -79,9 +78,9 @@ int devmodeManager() {
 
 int main() {
 
-    bool run = true;    // main game loop
-    bool devMode = true; // enable / disable the developer Mode
-    SDL_Event event;
+    bool run {true};    // main game loop
+    bool devMode {true}; // enable / disable the developer Mode
+    SDL_Event event {};
 
     // |=============================|
     // |    Window Initialization    |
@@ -163,14 +162,14 @@ int main() {
     // |    Game Loop    |
     // |=================|
 
-    Uint64 lastFrame = SDL_GetPerformanceCounter();
-    Uint64 newFrame = 0;
+    uint64_t lastFrame = SDL_GetPerformanceCounter();
+    uint64_t newFrame = {};
 
     while (run) {
 
         // delta frame
         newFrame = SDL_GetPerformanceCounter();
-        gameloop.deltaTime = (float)(newFrame - lastFrame) / (float) SDL_GetPerformanceFrequency();
+        SDL::MAIN::deltaTime = (float)(newFrame - lastFrame) / (float) SDL_GetPerformanceFrequency();
         lastFrame = newFrame;
 
         while (SDL_PollEvent(&event)) {
@@ -180,13 +179,13 @@ int main() {
             }
         }
 
-        gameloop.input(event);
+        SDL::MAIN::input(event);
 
         TERRITORY::updateLayer();
 
-        gameloop.draw(event);
+        SDL::MAIN::draw(event);
 
-        PLAYER::update(gameloop.deltaTime);
+        PLAYER::update(SDL::MAIN::deltaTime);
 
         FACTORY::update();
         MILITARYCAMP::update();

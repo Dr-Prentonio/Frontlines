@@ -4,15 +4,15 @@
 #include "../header/generalFuncs.hpp"
 #include "../header/terrainClasses.hpp"
 
-void SDL::Gameloop::draw(SDL_Event &e) {
-    static SDL_Renderer* rend;
-    float playerZoom = PLAYER::zoom;
+void SDL::MAIN::draw(SDL_Event &e) {
+    static SDL_Renderer* rend {};
+    float playerZoom {PLAYER::zoom};
 
     rend = window.rend;
 
     SDL_RenderClear(rend);
 
-    SDL_Rect drect = {
+    SDL_Rect drect {
         static_cast<int>(PLAYER::camOffset.x * playerZoom),
         static_cast<int>(PLAYER::camOffset.y * playerZoom),
         static_cast<int>(window.scale.x * playerZoom),
@@ -65,44 +65,44 @@ void SDL::Gameloop::draw(SDL_Event &e) {
     SDL_RenderCopy(rend, TERRITORY::layerTexture,   nullptr, &drect);
 
     // Player Factory Texture
-    for (auto& factory : FACTORY::factorys) {
+    for (const auto factory : FACTORY::factorys) {
 
         // calc screen space mapping
-        SDL_Rect buildingCords = {0,0,0,0};
+        SDL_Rect buildingCords {};
         TOOLBOX::screenSpaceMapping(factory.facRect, drect, buildingCords);
 
         SDL_RenderCopy(rend, factory.facTex, nullptr, &buildingCords);
 
         // Calc the screen space mapping
-        SDL_Rect textCords = {0,0,0,0};
+        SDL_Rect textCords {};
         TOOLBOX::screenSpaceMapping(factory.levelRect, drect, textCords);
 
         SDL_RenderCopy(rend, factory.levelTex, nullptr, &textCords);
     }
 
     // Player City Texture
-    for (auto& city : CITY::citys) {
+    for (const auto city : CITY::citys) {
 
-        SDL_Rect buildingCords = {0,0,0,0};
+        SDL_Rect buildingCords {};
         TOOLBOX::screenSpaceMapping(city.cityRect, drect, buildingCords);
 
         SDL_RenderCopy(rend, CITY::cityTex, nullptr, &buildingCords);
 
-        SDL_Rect textCords = {0,0,0,0};
+        SDL_Rect textCords {};
         TOOLBOX::screenSpaceMapping(city.levelRect, drect, textCords);
 
         SDL_RenderCopy(rend, city.levelTex, nullptr, &textCords);
     }
 
     // Player Military camp Texture
-    for (auto& camp : MILITARYCAMP::camps) {
+    for (const auto camp : MILITARYCAMP::camps) {
 
-        SDL_Rect buildingCords = {0,0,0,0};
+        SDL_Rect buildingCords {};
         TOOLBOX::screenSpaceMapping(camp.iconRect, drect, buildingCords);
 
         SDL_RenderCopy(rend, MILITARYCAMP::campTex, nullptr, &buildingCords);
 
-        SDL_Rect textCords = {0,0,0,0};
+        SDL_Rect textCords {};
         TOOLBOX::screenSpaceMapping(camp.levelRect, drect, textCords);
 
         SDL_RenderCopy(rend, camp.levelTex, nullptr, &textCords);

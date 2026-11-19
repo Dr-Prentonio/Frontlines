@@ -8,11 +8,11 @@
 
 void PLAYER::MINING::mouseClick() {
     glm::ivec2 mousePos     = TOOLBOX::findMousePos();
-    glm::ivec2 mouseGridPos = mousePos * TERRAIN::SURFACE::tileSize;
+    glm::ivec2 mouseGridPos {mousePos * TERRAIN::SURFACE::tileSize};
 
-    bool finalBreak = false;
+    bool finalBreak {};
 
-    for (auto& forest : TERRAIN::FOLIAGE::FOREST::forestTiles) {
+    for (const auto forest : TERRAIN::FOLIAGE::FOREST::forestTiles) {
         if (TOOLBOX::checkMouseCollision(mouseGridPos, forest)) {
             TOOLBOX::updatePlayerRes(1, 0, 0, 0, 0, 0);
             finalBreak = true;
@@ -22,7 +22,7 @@ void PLAYER::MINING::mouseClick() {
 
     if (finalBreak) return;
 
-    for (auto& stone : TERRAIN::FOLIAGE::STONE::stoneTiles) {
+    for (const auto stone : TERRAIN::FOLIAGE::STONE::stoneTiles) {
         if (TOOLBOX::checkMouseCollision(mouseGridPos, stone)) {
 
             int chance = TOOLBOX::randomInt(0, 5);

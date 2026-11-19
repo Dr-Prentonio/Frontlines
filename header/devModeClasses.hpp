@@ -26,13 +26,13 @@ namespace DEVMODE {
     // window
     struct Window {
 
-        glm::ivec2 size = {400,200};
+        glm::ivec2 size {400,200};
 
-        SDL_Window* win = nullptr;
-        SDL_Renderer* rend = nullptr;
+        SDL_Window* win     {};
+        SDL_Renderer* rend  {};
     };
 
-    inline Window window;
+    inline Window window {};
 
 }
 
@@ -41,17 +41,16 @@ namespace UI {
     struct CheckBoxClass {
 
         // if checkBox is being checked
-        SDL_Rect drect;
-        bool checked = false;
+        SDL_Rect drect {};
+        bool checked {};
 
     };
 
     // checkBox 0 = god mode
     // checkBox 1 = static map
-    inline std::vector<CheckBoxClass> checkBoxes;
+    inline std::vector<CheckBoxClass> checkBoxes {};
 
     void initCheckBox(SDL_Rect drect, bool checked);
-
     void drawCheckBox(
         SDL_Renderer* rend,
         SDL_Rect drect,
@@ -59,14 +58,14 @@ namespace UI {
 
     namespace TEXT {
 
-        inline TTF_Font* labelFont;
+        inline TTF_Font* labelFont {};
 
         struct LabelClass {
-            SDL_Rect drect = {0,0,0,0};
-            SDL_Texture* texture = nullptr;
+            SDL_Rect drect {};
+            SDL_Texture* texture {};
         };
 
-        inline std::vector<LabelClass> labels;
+        inline std::vector<LabelClass> labels {};
 
         void initLabel(SDL_Rect drect, std::string text);
     }

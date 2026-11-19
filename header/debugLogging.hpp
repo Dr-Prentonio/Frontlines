@@ -22,7 +22,6 @@ namespace ch = std::chrono;
 
 #include "glm/glm.hpp"
 
-
 // Loging & Debugging
 namespace LOG {
 

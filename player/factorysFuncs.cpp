@@ -5,76 +5,23 @@
 #include "../header/UIClasses.hpp"
 
 int FACTORY::init() {
+    // Fabric Init
+    TOOLBOX::loadTexture(icons.clothingTex, "assets/Icon/Fabric.png");
 
-    SDL_Renderer* rend = window.rend;
+    // Metal Init
+    TOOLBOX::loadTexture(icons.steelTex, "assets/Icon/Metal.png");
 
-    // |===================|
-    // |    Fabric Init    |
-    // |===================|
+    // Oil Init
+    TOOLBOX::loadTexture(icons.oilTex, "assets/Icon/Oil.png");
 
-    SDL_Surface* temp = IMG_Load("assets/Icon/Fabric.png");
-    if (temp == nullptr) {
-        LOG::INIT_ERR("Couldnt load clothing factory icon");
-        return -1;
-    }
-    icons.clothingTex = SDL_CreateTextureFromSurface(rend, temp);
+    // Stone Init
+    TOOLBOX::loadTexture(icons.stoneTex, "assets/Icon/Stone.png");
 
-    // |==================|
-    // |    Metal Init    |
-    // |==================|
+    // Wood Init
+    TOOLBOX::loadTexture(icons.woodTex, "assets/Icon/Wood.png");
 
-    temp = IMG_Load("assets/Icon/Metal.png");
-    if (temp == nullptr) {
-        LOG::INIT_ERR("Couldnt load metal factory icon");
-        return -1;
-    }
-    icons.steelTex = SDL_CreateTextureFromSurface(rend, temp);
-
-    // |================|
-    // |    Oil Init    |
-    // |================|
-
-    temp = IMG_Load("assets/Icon/Oil.png");
-    if (temp == nullptr) {
-        LOG::INIT_ERR("Couldnt load oil factory icon");
-        return -1;
-    }
-    icons.oilTex = SDL_CreateTextureFromSurface(rend, temp);
-
-    // |==================|
-    // |    Stone Init    |
-    // |==================|
-
-    temp = IMG_Load("assets/Icon/Stone.png");
-    if (temp == nullptr) {
-        LOG::INIT_ERR("Couldnt load stone factory icon");
-        return -1;
-    }
-    icons.stoneTex = SDL_CreateTextureFromSurface(rend, temp);
-
-    // |=================|
-    // |    Wood Init    |
-    // |=================|
-
-    temp = IMG_Load("assets/Icon/Wood.png");
-    if (temp == nullptr) {
-        LOG::INIT_ERR("Couldnt load wood factory icon");
-        return -1;
-    }
-    icons.woodTex = SDL_CreateTextureFromSurface(rend, temp);
-
-    // |===================|
-    // |    Weapon Init    |
-    // |===================|
-
-    temp = IMG_Load("assets/Icon/Weapon.png");
-    if (temp == nullptr) {
-        LOG::INIT_ERR("Couldnt load weapon factory icon");
-        return -1;
-    }
-    icons.weaponTex = SDL_CreateTextureFromSurface(rend, temp);
-
-    SDL_FreeSurface(temp);
+    // Weapon Init
+    TOOLBOX::loadTexture(icons.weaponTex, "assets/Icon/Weapon.png");
 
     LOG::INIT_SUCCESS("Loaded factory icons successfully");
     return 0;
@@ -82,13 +29,13 @@ int FACTORY::init() {
 
 void FACTORY::update() {
     // every sec update
-    static float timer = 0;
-    timer += gameloop.deltaTime;
+    static float timer {};
+    timer += SDL::MAIN::deltaTime;
 
     if (timer >= 1) {
 
         for (auto& factory : factorys) {
-            int multiplier = 1;
+            int multiplier {1};
 
             if (factory.onSpecField) multiplier = 2;
 
@@ -125,27 +72,27 @@ void FACTORY::update() {
 void removeResources(int type) {
     switch (type) {
         case 1: {
-            TOOLBOX::updatePlayerRes(-20, -20, -50, 0, 0, 0);
+            TOOLBOX::updatePlayerRes(-20, -20, -50);
             break;
         }
         case 2: {
-            TOOLBOX::updatePlayerRes(-20, -50, -25, 0, 0, 0);
+            TOOLBOX::updatePlayerRes(-20, -50, -25);
             break;
         }
         case 3: {
-            TOOLBOX::updatePlayerRes(-30, -20, -50, 0, 0, 0);
+            TOOLBOX::updatePlayerRes(-30, -20, -50);
             break;
         }
         case 4: {
-            TOOLBOX::updatePlayerRes(-30, -50, -50,0,0, 0);
+            TOOLBOX::updatePlayerRes(-30, -50, -50);
             break;
         }
         case 5: {
-            TOOLBOX::updatePlayerRes(-30, -200, -100, 0,0, 0);
+            TOOLBOX::updatePlayerRes(-30, -200, -100);
             break;
         }
         case 6: {
-            TOOLBOX::updatePlayerRes(-75, -125, -125, 0, 0, 0);
+            TOOLBOX::updatePlayerRes(-75, -125, -125);
             break;
         }
         default: break;
@@ -154,32 +101,43 @@ void removeResources(int type) {
 
 // returns true if not enough resources
 bool checkForResources(int type) {
-
     auto& playerRes = PLAYER::resources;
 
     switch (type) {
         case 1: {
-            if (playerRes.wood < 20 || playerRes.stone < 20 || playerRes.steel < 50) return false;
+            if (playerRes.wood < 20 ||
+                playerRes.stone < 20 ||
+                playerRes.steel < 50) return false;
             break;
         }
         case 2: {
-            if (playerRes.wood < 20 || playerRes.steel < 25 || playerRes.stone < 50) return false;
+            if (playerRes.wood < 20 ||
+                playerRes.steel < 25 ||
+                playerRes.stone < 50) return false;
             break;
         }
         case 3: {
-            if (playerRes.wood < 30 || playerRes.steel < 50 || playerRes.stone < 20) return false;
+            if (playerRes.wood < 30 ||
+                playerRes.steel < 50 ||
+                playerRes.stone < 20) return false;
             break;
         }
         case 4: {
-            if (playerRes.wood < 30 || playerRes.steel < 50 || playerRes.stone < 50) return false;
+            if (playerRes.wood < 30 ||
+                playerRes.steel < 50 ||
+                playerRes.stone < 50) return false;
             break;
         }
         case 5: {
-            if (playerRes.wood < 30 || playerRes.steel < 100 || playerRes.stone < 200) return false;
+            if (playerRes.wood < 30 ||
+                playerRes.steel < 100 ||
+                playerRes.stone < 200) return false;
             break;
         }
         case 6: {
-            if (playerRes.wood < 75 || playerRes.steel < 125 || playerRes.stone < 125) return false;
+            if (playerRes.wood < 75 ||
+                playerRes.steel < 125 ||
+                playerRes.stone < 125) return false;
             break;
         }
         default: break;
@@ -189,12 +147,11 @@ bool checkForResources(int type) {
 }
 
 void FACTORY::spawnNewFac(glm::ivec2 mousePos, factoryType type, bool debug) {
-
     // make new building
-    Building building;
+    Building building {};
 
     building.facType = type;
-    SDL_Texture* temp;          // temp storage for tex
+    SDL_Texture* temp {};          // temp storage for tex
 
     // select the correct tex type
     switch (type) {
@@ -204,20 +161,20 @@ void FACTORY::spawnNewFac(glm::ivec2 mousePos, factoryType type, bool debug) {
         case steel:     temp = icons.steelTex;      break;
         case oil:       temp = icons.oilTex;        break;
         case weapon:    temp = icons.weaponTex;     break;
-        default: temp = nullptr;
+        default: break;
     }
 
     if (temp != nullptr) building.facTex = temp;
     else return;
 
     // get tex size and resize it
-    int width, height;
+    int width {}, height {};
     SDL_QueryTexture(temp, nullptr, nullptr, &width, &height);
     width /= 4;
     height /= 4;
 
     // find where to place the building
-    glm::ivec2 tempPos = {
+    glm::ivec2 tempPos {
         (mousePos.x * TERRAIN::SURFACE::tileSize) - width / 2,
         (mousePos.y * TERRAIN::SURFACE::tileSize) - height / 2,
     };
@@ -231,10 +188,10 @@ void FACTORY::spawnNewFac(glm::ivec2 mousePos, factoryType type, bool debug) {
     };
 
     // check for colliding hitboxes
-    for (auto& boo : factorys) {
+    for (const auto boo : factorys) {
         if (TOOLBOX::checkHitboxCollision(building.hitbox, boo.hitbox)) return;
     }
-    for (auto& foo : CITY::citys) {
+    for (const auto foo : CITY::citys) {
         if (TOOLBOX::checkHitboxCollision(building.hitbox, foo.hitbox)) return;
     }
 
@@ -248,7 +205,7 @@ void FACTORY::spawnNewFac(glm::ivec2 mousePos, factoryType type, bool debug) {
     switch (type) {
         case 1: {
             PLAYER::factorys.clothesFactorys++;
-            for (auto& cotton : TERRAIN::FOLIAGE::COTTON::cottonTiles) {
+            for (const auto cotton : TERRAIN::FOLIAGE::COTTON::cottonTiles) {
                 if (TOOLBOX::checkHitboxCollision(building.hitbox, cotton)) {
                     building.onSpecField = true;
                     break;
@@ -259,7 +216,7 @@ void FACTORY::spawnNewFac(glm::ivec2 mousePos, factoryType type, bool debug) {
         }
         case 2: {
             PLAYER::factorys.woodFactorys++;
-            for (auto& forest : TERRAIN::FOLIAGE::FOREST::forestTiles) {
+            for (const auto forest : TERRAIN::FOLIAGE::FOREST::forestTiles) {
                 if (TOOLBOX::checkHitboxCollision(building.hitbox, forest)) {
                     building.onSpecField = true;
                     break;
@@ -269,7 +226,7 @@ void FACTORY::spawnNewFac(glm::ivec2 mousePos, factoryType type, bool debug) {
         }
         case 3: {
             PLAYER::factorys.stoneFactorys++;
-            for (auto& stone : TERRAIN::FOLIAGE::STONE::stoneTiles) {
+            for (const auto stone : TERRAIN::FOLIAGE::STONE::stoneTiles) {
                 if (TOOLBOX::checkHitboxCollision(building.hitbox, stone)) {
                     building.onSpecField = true;
                     break;
@@ -279,7 +236,7 @@ void FACTORY::spawnNewFac(glm::ivec2 mousePos, factoryType type, bool debug) {
         }
         case 4: {
             PLAYER::factorys.steelFactorys++;
-            for (auto& stone : TERRAIN::FOLIAGE::STONE::stoneTiles) {
+            for (const auto stone : TERRAIN::FOLIAGE::STONE::stoneTiles) {
                 if (TOOLBOX::checkHitboxCollision(building.hitbox, stone)) {
                     building.onSpecField = true;
                     break;
@@ -289,7 +246,7 @@ void FACTORY::spawnNewFac(glm::ivec2 mousePos, factoryType type, bool debug) {
         }
         case 5: {
             PLAYER::factorys.oilFactorys++;
-            for (auto& oil : TERRAIN::FOLIAGE::OIL::oilTiles) {
+            for (const auto oil : TERRAIN::FOLIAGE::OIL::oilTiles) {
                 if (TOOLBOX::checkHitboxCollision(building.hitbox, oil)) {
                     building.onSpecField = true;
                     break;
@@ -331,14 +288,14 @@ void FACTORY::spawnNewFac(glm::ivec2 mousePos, factoryType type, bool debug) {
 
 void FACTORY::mouseClick() {
     glm::ivec2 mousePos     = TOOLBOX::findMousePos();
-    glm::ivec2 mouseGridPos = mousePos * TERRAIN::SURFACE::tileSize;
+    glm::ivec2 mouseGridPos {mousePos * TERRAIN::SURFACE::tileSize};
 
-    for (auto& city : CITY::citys) {
+    for (const auto city : CITY::citys) {
         if (TOOLBOX::checkMouseCollision(mouseGridPos, city.hitbox)) {
             return;
         }
     }
-    for (auto& camp : MILITARYCAMP::camps) {
+    for (const auto camp : MILITARYCAMP::camps) {
         if (TOOLBOX::checkMouseCollision(mouseGridPos, camp.hitbox)) {
             return;
         }

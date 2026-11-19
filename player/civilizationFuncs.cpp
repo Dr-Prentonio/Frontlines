@@ -9,36 +9,23 @@
 #include "../header/UIClasses.hpp"
 
 int CITY::init() {
-    SDL_Renderer* rend = window.rend;
-
-    SDL_Surface* temp = IMG_Load("assets/Icon/city.png");
-    if (temp == nullptr) {
-        LOG::INIT_ERR("Couldnt load city.png");
-        return -1;
-    }
-
-    cityTex = SDL_CreateTextureFromSurface(rend, temp);
-
-    if (cityTex == nullptr) {
-        LOG::INIT_ERR("Couldnt create city texture");
-        return -1;
-    }
+    if (TOOLBOX::loadTexture(cityTex, "assets/Icon/city.png") != 0) return -1;
 
     LOG::INIT_SUCCESS("Loaded city icon");
     return 0;
 }
 
 void CITY::spawnNew(glm::ivec2 mousePos, bool debug) {
-    Building building;
+    Building building {};
 
     // texture size
-    int width, height;
+    int width {}, height {};
     SDL_QueryTexture(cityTex, nullptr, nullptr, &width, &height);
     width /= 4;
     height /= 4;
 
     // find where to place the building
-    glm::ivec2 tempPos = {
+    glm::ivec2 tempPos {
         (mousePos.x * TERRAIN::SURFACE::tileSize) - width / 2,
         (mousePos.y * TERRAIN::SURFACE::tileSize) - height / 2,
     };
@@ -53,13 +40,15 @@ void CITY::spawnNew(glm::ivec2 mousePos, bool debug) {
 
     // check player rec
     auto& playerRes = PLAYER::resources;
-    if ( 75 > playerRes.steel or 75 > playerRes.stone or 50 > playerRes.wood) return;
+    if (75 > playerRes.steel or
+        75 > playerRes.stone or
+        50 > playerRes.wood) return;
 
     // check for collisions
-    for (auto& boo : FACTORY::factorys) {
+    for (const auto boo : FACTORY::factorys) {
         if (TOOLBOX::checkHitboxCollision(building.hitbox, boo.hitbox)) return;
     }
-    for (auto& foo : MILITARYCAMP::camps) {
+    for (const auto foo : MILITARYCAMP::camps) {
         if (TOOLBOX::checkHitboxCollision(building.hitbox, foo.hitbox)) return;
     }
 
@@ -67,9 +56,7 @@ void CITY::spawnNew(glm::ivec2 mousePos, bool debug) {
     PLAYER::citizen.citysTotal++;
     PLAYER::citizen.citizen += 400;
 
-    playerRes.stone -= 75;
-    playerRes.steel -= 75;
-    playerRes.wood  -= 50;
+    TOOLBOX::updatePlayerRes(-50, -75, -75);
 
     // |============|
     // |    Draw    |
@@ -97,15 +84,15 @@ void CITY::spawnNew(glm::ivec2 mousePos, bool debug) {
 
 void CITY::mouseClick() {
     glm::ivec2 mousePos = TOOLBOX::findMousePos();
-    glm::ivec2 mouseGridPos = mousePos * TERRAIN::SURFACE::tileSize;
+    glm::ivec2 mouseGridPos {mousePos * TERRAIN::SURFACE::tileSize};
 
     // if click is an buildings hitbox
-    for (auto& factory : FACTORY::factorys) {
+    for (const auto factory : FACTORY::factorys) {
         if (TOOLBOX::checkMouseCollision(mouseGridPos, factory.hitbox)) {
             return;
         }
     }
-    for (auto& camp : MILITARYCAMP::camps) {
+    for (const auto camp : MILITARYCAMP::camps) {
         if (TOOLBOX::checkMouseCollision(mousePos, camp.hitbox)) {
             return;
         }
@@ -117,10 +104,12 @@ void CITY::mouseClick() {
             auto& playerRes = PLAYER::resources;
 
             // checks if player has enough resources
-            if (75 > playerRes.steel or 75 > playerRes.stone or 50 > playerRes.wood) return;
+            if (75 > playerRes.steel or
+                75 > playerRes.stone or
+                50 > playerRes.wood) return;
 
             // update player
-            TOOLBOX::updatePlayerRes(-50, -75, -75, 0, 0, 0);
+            TOOLBOX::updatePlayerRes(-50, -75, -75);
 
             city.level++;
 
@@ -150,37 +139,21 @@ void CITY::mouseClick() {
 // |=====================|
 
 int MILITARYCAMP::init() {
+    if (TOOLBOX::loadTexture(campTex, "assets/Icon/Military.png") != 0) return -1;
 
-    // create surface
-    SDL_Surface* surf = IMG_Load("assets/Icon/Military.png");
-    if (surf == nullptr) {
-        std::string err = SDL_GetError();
-        if (err.empty()) err = "couldnt get error msg";
-        LOG::INIT_ERR("Couldnt create surface: " + err);
-        return -1;
-    }
-
-    // create texture from surface
-    campTex = SDL_CreateTextureFromSurface(window.rend, surf);
-    if (campTex == nullptr) {
-        std::string err = SDL_GetError();
-        if (err.empty()) err = "couldnt get error msg";
-        LOG::INIT_ERR("Couldnt create texture: " + err);
-        return -1;
-    }
-
-    SDL_FreeSurface(surf);
     LOG::INIT_SUCCESS("Loaded military camp icon");
     return 0;
 }
 
 void MILITARYCAMP::levelUp(auto& curCamp) {
     // get the resources the player cur has
-    auto& playerRes = PLAYER::resources;
-    if (playerRes.stone < 100 or playerRes.steel < 150 or playerRes.wood < 125) return;
+    auto& playerRes {PLAYER::resources};
+    if (playerRes.stone < 100 or
+        playerRes.steel < 150 or
+        playerRes.wood < 125) return;
 
     // remove resources from player
-    TOOLBOX::updatePlayerRes(-125, -100, -100, 0, 0, 0);
+    TOOLBOX::updatePlayerRes(-125, -100, -100);
 
     // upgrade level
     curCamp.level++;
@@ -196,13 +169,13 @@ void MILITARYCAMP::levelUp(auto& curCamp) {
 
 // called 60 times a second
 void MILITARYCAMP::update() {
-    static float timer = 0;
-    timer += gameloop.deltaTime;
+    static float timer {0};
+    timer += SDL::MAIN::deltaTime;
 
     // every second
     if (timer >= 1) {
 
-        for (auto& camp : camps) {
+        for (const auto camp : camps) {
             int offset = TOOLBOX::randomInt(-5, 5);
 
             // update player
@@ -217,16 +190,16 @@ void MILITARYCAMP::update() {
 
 void MILITARYCAMP::spawnNew() {
     glm::ivec2 mousePos = TOOLBOX::findMousePos();
-    Building building;
+    Building building {};
 
     // texture size
-    int width, height;
+    int width {}, height {};
     SDL_QueryTexture(campTex, nullptr, nullptr, &width, &height);
     width /= 4;
     height /= 4;
 
     // find where to place the building
-    glm::ivec2 tempPos = {
+    glm::ivec2 tempPos {
         (mousePos.x * TERRAIN::SURFACE::tileSize) - width / 2,
         (mousePos.y * TERRAIN::SURFACE::tileSize) - height / 2,
     };
@@ -241,13 +214,15 @@ void MILITARYCAMP::spawnNew() {
 
     // check player rec
     auto& playerRes = PLAYER::resources;
-    if ( 150 > playerRes.steel or 100 > playerRes.stone or 125 > playerRes.wood) return;
+    if (150 > playerRes.steel or
+        100 > playerRes.stone or
+        125 > playerRes.wood) return;
 
     // check for collisions
-    for (auto& boo : FACTORY::factorys) {
+    for (const auto boo : FACTORY::factorys) {
         if (TOOLBOX::checkHitboxCollision(building.hitbox, boo.hitbox)) return;
     }
-    for (auto& foo : CITY::citys) {
+    for (const auto foo : CITY::citys) {
         if (TOOLBOX::checkHitboxCollision(building.hitbox, foo.hitbox)) return;
     }
 
@@ -285,13 +260,13 @@ void MILITARYCAMP::spawnNew() {
 void MILITARYCAMP::mouseClick() {
     // mouse pos and mouse pos based on grid size
     glm::ivec2 mousePos = TOOLBOX::findMousePos();
-    glm::ivec2 mouseGridPos = mousePos * TERRAIN::SURFACE::tileSize;
+    glm::ivec2 mouseGridPos {mousePos * TERRAIN::SURFACE::tileSize};
 
     // check for building collision
-    for (auto& factory : FACTORY::factorys) {
+    for (const auto factory : FACTORY::factorys) {
         if (TOOLBOX::checkMouseCollision(mouseGridPos, factory.hitbox)) return;
     }
-    for (auto& cities : CITY::citys) {
+    for (const auto cities : CITY::citys) {
         if (TOOLBOX::checkMouseCollision(mousePos, cities.hitbox)) return;
     }
 
