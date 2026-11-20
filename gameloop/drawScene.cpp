@@ -5,18 +5,19 @@
 #include "../header/terrainClasses.hpp"
 
 void SDL::MAIN::draw(SDL_Event &e) {
-    static SDL_Renderer* rend {};
     float playerZoom {PLAYER::zoom};
 
-    rend = window.rend;
+    // window size and renderer
+    const glm::ivec2& windowScale {WINDOW::scale};
+    SDL_Renderer* rend {WINDOW::rend};
 
     SDL_RenderClear(rend);
 
     SDL_Rect drect {
         static_cast<int>(PLAYER::camOffset.x * playerZoom),
         static_cast<int>(PLAYER::camOffset.y * playerZoom),
-        static_cast<int>(window.scale.x * playerZoom),
-        static_cast<int>(window.scale.y * playerZoom)
+        static_cast<int>(windowScale.x * playerZoom),
+        static_cast<int>(windowScale.y * playerZoom)
     };
 
     // player cant escape the map
@@ -30,14 +31,14 @@ void SDL::MAIN::draw(SDL_Event &e) {
     }
     else PLAYER::touchesBorderTop = false;
 
-    if (drect.x < window.scale.x - drect.w) {
-        drect.x = window.scale.x - drect.w;
+    if (drect.x < windowScale.x - drect.w) {
+        drect.x = windowScale.x - drect.w;
         PLAYER::touchesBorderRight = true;
     }
     else PLAYER::touchesBorderRight = false;
 
-    if (drect.y < window.scale.y - drect.h) {
-        drect.y = window.scale.y - drect.h;
+    if (drect.y < windowScale.y - drect.h) {
+        drect.y = windowScale.y - drect.h;
         PLAYER::touchesBorderBottom = true;
     }
     else PLAYER::touchesBorderBottom = false;

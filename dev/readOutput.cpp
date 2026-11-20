@@ -46,12 +46,11 @@ int DEVMODE::useStaticMaps() {
         return -1;
     }
 
-    SDL::Window win;
     TERRAIN::SURFACE::TerrainTile tile;
 
-    LOG::INFO("Window size: " + std::to_string(win.scale.x) + " " + std::to_string(win.scale.y));
+    LOG::INFO("Window size: " + std::to_string(SDL::WINDOW::scale.x) + " " + std::to_string(SDL::WINDOW::scale.y));
 
-    int totalTiles = win.scale.x / TERRAIN::SURFACE::tileSize * TERRAIN::SURFACE::scale * win.scale.y / TERRAIN::SURFACE::tileSize * TERRAIN::SURFACE::scale;
+    int totalTiles = SDL::WINDOW::scale.x / TERRAIN::SURFACE::tileSize * TERRAIN::SURFACE::scale * SDL::WINDOW::scale.y / TERRAIN::SURFACE::tileSize * TERRAIN::SURFACE::scale;
 
     std::vector<TERRAIN::SURFACE::TerrainTile> map;
     map.reserve(totalTiles);
@@ -94,8 +93,8 @@ int DEVMODE::useStaticMaps() {
     }
 
     glm::ivec2 mapSize = glm::ivec2(
-        win.scale.x / TERRAIN::SURFACE::tileSize * TERRAIN::SURFACE::scale,
-        win.scale.y / TERRAIN::SURFACE::tileSize * TERRAIN::SURFACE::scale
+        SDL::WINDOW::scale.x / TERRAIN::SURFACE::tileSize * TERRAIN::SURFACE::scale,
+        SDL::WINDOW::scale.y / TERRAIN::SURFACE::tileSize * TERRAIN::SURFACE::scale
         );
 
     TERRAIN::SURFACE::mapSize = mapSize;

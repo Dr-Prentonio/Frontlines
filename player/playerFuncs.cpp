@@ -105,7 +105,7 @@ void checkTile(auto& tile) {
         int index {tile.worldIndex};
         TERRITORY::layer[index].color = Red;
 
-        SDL_Renderer* rend {window.rend};
+        SDL_Renderer* rend {SDL::WINDOW::rend};
         SDL_SetRenderDrawBlendMode(rend, SDL_BLENDMODE_BLEND);
         SDL_SetRenderTarget(rend, TERRITORY::layerTexture);
         SDL_SetRenderDrawColor(rend,
@@ -123,7 +123,7 @@ void checkTile(auto& tile) {
 void PLAYER::update(float deltaTime) {
     if (pendingTiles.empty()) return;
 
-    SDL_Renderer* rend {window.rend};
+    SDL_Renderer* rend {SDL::WINDOW::rend};
 
     for (int i = {}; i < pendingTiles.size(); i++) {
 
@@ -314,7 +314,7 @@ void TERRITORY::expandTerritory() {
             tile.fullBoxed = true;
             int index {tile.worldIndex};
 
-            SDL_Renderer* rend = window.rend;
+            SDL_Renderer* rend {SDL::WINDOW::rend};
 
             layer[index].color = Red;
 

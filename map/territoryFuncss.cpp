@@ -24,7 +24,7 @@ void TERRITORY::setupLayer() {
         }
     }
 
-    SDL_Renderer* rend {window.rend};
+    SDL_Renderer* rend {SDL::WINDOW::rend};
 
     layerTexture = SDL_CreateTexture(
         rend,
@@ -180,7 +180,7 @@ void TERRITORY::spawnTerritory(const glm::vec2 pos, const int size) {
                     //
                     //
 
-                    SDL_Renderer* rend {window.rend};
+                    SDL_Renderer* rend {SDL::WINDOW::rend};
 
                     SDL_SetRenderDrawBlendMode(rend, SDL_BLENDMODE_BLEND);
 
@@ -208,8 +208,8 @@ void TERRITORY::updateLayer() {
 
         // default size of the tiles
         glm::vec2 defaultSize {
-            (static_cast<float>(window.scale.x) / TERRAIN::SURFACE::mapSize.x),
-            (static_cast<float>(window.scale.y) / TERRAIN::SURFACE::mapSize.y)
+            (static_cast<float>(SDL::WINDOW::scale.x) / TERRAIN::SURFACE::mapSize.x),
+            (static_cast<float>(SDL::WINDOW::scale.y) / TERRAIN::SURFACE::mapSize.y)
         };
 //        glm::vec2 currentSize = defaultSize * player.zoom;
 

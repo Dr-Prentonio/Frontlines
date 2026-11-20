@@ -263,7 +263,7 @@ void TERRAIN::SURFACE::generateTile(SDL_Renderer* rend) {
 
 void TERRAIN::LOD::generateLoDs() {
     SDL_Texture* staticTex {};
-    SDL_Renderer* rend {window.rend};
+    SDL_Renderer* rend {SDL::WINDOW::rend};
 
     staticTex = SDL_CreateTexture(
         rend,
@@ -337,7 +337,7 @@ void TERRAIN::SURFACE::generateTerrain() {
     LOG::INFO("Generating terrain < STARTED >");
 
     constexpr float perlinNoiseScale {0.02f};
-    mapSize = glm::ivec2(window.scale.x / tileSize * scale, window.scale.y / tileSize * scale);
+    mapSize = glm::ivec2(SDL::WINDOW::scale.x / tileSize * scale, SDL::WINDOW::scale.y / tileSize * scale);
     mapSize = glm::roundPowerOfTwo(mapSize);
 
     LOG::DEBUG("Map size: " + std::to_string(mapSize.x) + " x " + std::to_string(mapSize.y));
@@ -388,7 +388,7 @@ void TERRAIN::SURFACE::generateTerrain() {
     LOG::INFO("Generating terrain < DONE >");
     LOG::INFO("Optimizing terrain < STARTED >");
 
-    SDL_Renderer* rend {window.rend};
+    SDL_Renderer* rend {SDL::WINDOW::rend};
 
     mapTexture = SDL_CreateTexture(
         rend,

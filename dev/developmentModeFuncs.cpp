@@ -10,7 +10,7 @@
 
 int DEVMODE::init() {
 
-    window.win = ::window.win;
+    window.win = SDL::WINDOW::win;
     if (window.win == nullptr) {
         std::string err = SDL_GetError();
         LOG::INIT_ERR("Couldnt create dev window: " + err);
@@ -20,7 +20,7 @@ int DEVMODE::init() {
     SDL_SetWindowTitle(window.win, "Devmode - Settings");
     LOG::INIT_SUCCESS("Created window");
 
-    window.rend = ::window.rend;
+    window.rend = SDL::WINDOW::rend;
     if (window.rend == nullptr) {
         std::string err = SDL_GetError();
         LOG::INIT_ERR("Couldnt create renderer: " + err);

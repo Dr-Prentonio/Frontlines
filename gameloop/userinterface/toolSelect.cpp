@@ -8,7 +8,7 @@
 #include "../../header/generalFuncs.hpp"
 
 void UI::TOOL::mouseAction(SDL_Rect& collisionRect, bool& clickState, Uint32& timer, SDL_Event& e) {
-    SDL_Renderer *rend {window.rend};
+    SDL_Renderer *rend {SDL::WINDOW::rend};
 
     // get colors
     static const SDL_Color hover     {BUILDTOOL::hover};
@@ -60,7 +60,7 @@ int UI::TOOL::SELECT::init() {
 
 // func for rendering the entire menu bar
 void UI::TOOL::SELECT::drawBar(SDL_Event &e) {
-    SDL_Renderer* rend {window.rend};
+    SDL_Renderer* rend {SDL::WINDOW::rend};
 
     // colors are here defined
     constexpr SDL_Color bgColor  = {55, 55, 55, 220};
@@ -71,7 +71,7 @@ void UI::TOOL::SELECT::drawBar(SDL_Event &e) {
     // background rect
     bgRect = {
         10,
-        window.scale.y / 2 - 125,
+        SDL::WINDOW::scale.y / 2 - 125,
         75,
         250
     };
@@ -195,11 +195,11 @@ int UI::TOOL::BUILDTOOL::init() {
 }
 
 void UI::TOOL::BUILDTOOL::draw(SDL_Event &e) {
-    SDL_Renderer* rend {window.rend};
+    SDL_Renderer* rend {SDL::WINDOW::rend};
 
     baseRect = {
         10,
-        window.scale.y - 10 - 80,
+        SDL::WINDOW::scale.y - 10 - 80,
         400,
         80
     };
@@ -291,7 +291,7 @@ void UI::TOOL::BUILDTOOL::draw(SDL_Event &e) {
 
 // factory build tool selection menu
 void UI::TOOL::BUILDTOOL::SUBPANEL::drawFactorySub(SDL_Event &e) {
-    SDL_Renderer* rend {window.rend};
+    SDL_Renderer* rend {SDL::WINDOW::rend};
 
     static const SDL_Rect baseRect {
         BUILDTOOL::baseRect.x + BUILDTOOL::baseRect.w + 50,
@@ -384,7 +384,7 @@ void UI::TOOL::BUILDTOOL::SUBPANEL::drawFactorySub(SDL_Event &e) {
 
 // city build tool selection menu
 void UI::TOOL::BUILDTOOL::SUBPANEL::drawCitySub(SDL_Event &e) {
-    SDL_Renderer* rend = window.rend;
+    SDL_Renderer* rend = SDL::WINDOW::rend;
 
     static const SDL_Rect baseRect {
         BUILDTOOL::baseRect.x + BUILDTOOL::baseRect.w + 50,

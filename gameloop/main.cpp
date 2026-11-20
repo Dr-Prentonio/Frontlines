@@ -10,8 +10,6 @@
 #include "../header/debugLogging.hpp"
 #include "../header/terrainClasses.hpp"
 
-SDL::Window window;
-
 //
 // GRR FOR loops Very VERRY bad grr
 //
@@ -47,14 +45,13 @@ void cleanup() {
     SDL_DestroyTexture(UI::TOOL::BUILDTOOL::textures.city);
     SDL_DestroyTexture(UI::TOOL::BUILDTOOL::textures.factory);
 
-    SDL_DestroyRenderer(window.rend);
-    SDL_DestroyWindow(window.win);
+    SDL_DestroyRenderer(SDL::WINDOW::rend);
+    SDL_DestroyWindow(SDL::WINDOW::win);
 
     LOG::INFO("Cleaning up done");
 }
 
 int devmodeManager() {
-
     // init
     if (DEVMODE::init() != 0) {
         LOG::INIT_ERR("Devmode couldnt be initialized");
@@ -69,9 +66,9 @@ int devmodeManager() {
     DEVMODE::readOutput();
 
     // set the window back to its original size
-    SDL_SetWindowSize(window.win, window.scale.x, window.scale.y);
-    SDL_SetWindowPosition(window.win, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-    SDL_SetWindowTitle(window.win, window.title);
+    SDL_SetWindowSize(SDL::WINDOW::win, SDL::WINDOW::scale.x, SDL::WINDOW::scale.y);
+    SDL_SetWindowPosition(SDL::WINDOW::win, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+    SDL_SetWindowTitle(SDL::WINDOW::win, SDL::WINDOW::title);
 
     return 0;
 }
@@ -87,7 +84,7 @@ int main() {
     // |=============================|
 
     // init the window
-    if (window.init() != 0) {
+    if (SDL::WINDOW::init() != 0) {
         LOG::INIT_ERR("Failed to initialize SDL, aborting");
         return -1;
     }

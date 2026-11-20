@@ -52,73 +52,80 @@ glm::ivec4 checkNeighbour(int index) {
 // |    Forests    |
 // |===============|
 
-void TERRAIN::FOLIAGE::FOREST::drawTiles(
-    const int size,                     // size of the base
-    const glm::ivec2 pos,               // pos of the center of the base
-    const SDL_Color normalColor,        // color of the tiles
-    std::vector<SDL_Rect>& tiles        // vector to safe tiles to
-    ) {
+namespace LOCAL {
 
-    SDL_Renderer* rend {window.rend};
+    // func to draw Tiles ngl
+    inline void drawTiles(
+        const int size,                     // size of the base
+        const glm::ivec2 pos,               // pos of the center of the base
+        const SDL_Color normalColor,        // color of the tiles
+        std::vector<SDL_Rect>& tiles        // vector to safe tiles to
+        ) {
+        SDL_Renderer* rend {SDL::WINDOW::rend};
 
-    for (int y = -size; y < size; y++) {
-        for (int x = -size; x < size; x++) {
+        for (int y = -size; y < size; y++) {
+            for (int x = -size; x < size; x++) {
 
-            float sqrt = std::sqrt(x * x + y * y);
-            if (sqrt > size) continue;
+                float sqrt = std::sqrt(x * x + y * y);
+                if (sqrt > size) continue;
 
-            // cords + loop for perlin
-            glm::vec2 noiseCords {
-                pos.x + x,
-                pos.y + y
-            };
-
-            // aplay perlin to radius
-            float noise {glm::perlin(noiseCords * 0.06f)};
-            float radius {size + noise * 8.0f};
-
-            if (sqrt <= radius) {
-
-                glm::ivec2 kniga {noiseCords};
-
-                // safety check
-                if (kniga.x < 0 || kniga.x >= SURFACE::mapSize.x ||
-                    kniga.y < 0 || kniga.y >= SURFACE::mapSize.y)
-                    continue;
-
-                // check terrain type underneath
-                int index = kniga.x + kniga.y * SURFACE::mapSize.x;
-                if (SURFACE::map.at(index).type <= 2 || SURFACE::map.at(index).type >= 5) continue;
-
-                SDL_Rect drect {
-                    kniga.x * SURFACE::tileSize,
-                    kniga.y * SURFACE::tileSize,
-                    SURFACE::tileSize,
-                    SURFACE::tileSize
+                // cords + loop for perlin
+                glm::vec2 noiseCords {
+                    pos.x + x,
+                    pos.y + y
                 };
 
-                // check if theres already an forest tile
-                if (GENERAL::isUsed.at(index)) continue;
+                // aplay perlin to radius
+                float noise {glm::perlin(noiseCords * 0.06f)};
+                float radius {size + noise * 8.0f};
 
-                // push back vectors
-                GENERAL::isUsed.at(index) = true;
-                GENERAL::worldTileUsage.at(index) = true;
-                tiles.push_back(drect);
+                if (sqrt <= radius) {
 
-                //
-                //  Draw
-                //
+                    glm::ivec2 kniga {noiseCords};
 
-                SDL_SetRenderDrawBlendMode(rend, SDL_BLENDMODE_BLEND);
-                SDL_SetRenderTarget(rend, GENERAL::worldTex);
+                    constexpr glm::ivec2& mapSize {TERRAIN::SURFACE::mapSize};
+                    static const int& tileSize {TERRAIN::SURFACE::tileSize};
 
-                SDL_SetRenderDrawColor(rend, normalColor.r, normalColor.g, normalColor.b, normalColor.a);
-                SDL_RenderFillRect(rend, &drect);
+                    // safety check
+                    if (kniga.x < 0 || kniga.x >= mapSize.x ||
+                        kniga.y < 0 || kniga.y >= mapSize.y)
+                        continue;
 
-                SDL_SetRenderTarget(rend, nullptr);
+                    // check terrain type underneath
+                    int index = kniga.x + kniga.y * mapSize.x;
+                    if (TERRAIN::SURFACE::map.at(index).type <= 2 || TERRAIN::SURFACE::map.at(index).type >= 5) continue;
+
+                    SDL_Rect drect {
+                        kniga.x * tileSize,
+                        kniga.y * tileSize,
+                        tileSize,
+                        tileSize
+                    };
+
+                    // check if theres already an forest tile
+                    if (TERRAIN::FOLIAGE::GENERAL::isUsed.at(index)) continue;
+
+                    // push back vectors
+                    TERRAIN::FOLIAGE::GENERAL::isUsed.at(index) = true;
+                    TERRAIN::FOLIAGE::GENERAL::worldTileUsage.at(index) = true;
+                    tiles.push_back(drect);
+
+                    //
+                    //  Draw
+                    //
+
+                    SDL_SetRenderDrawBlendMode(rend, SDL_BLENDMODE_BLEND);
+                    SDL_SetRenderTarget(rend, TERRAIN::FOLIAGE::GENERAL::worldTex);
+
+                    SDL_SetRenderDrawColor(rend, normalColor.r, normalColor.g, normalColor.b, normalColor.a);
+                    SDL_RenderFillRect(rend, &drect);
+
+                    SDL_SetRenderTarget(rend, nullptr);
+                }
             }
         }
     }
+
 }
 
 // spawns the trees
@@ -158,7 +165,7 @@ void TERRAIN::FOLIAGE::FOREST::spawnTrees(int treesAmount) {
         if (skip) continue;
 
         // set renderer
-        SDL_Renderer* rend {window.rend};
+        SDL_Renderer* rend {SDL::WINDOW::rend};
         SDL_SetRenderTarget(rend, GENERAL::worldTex);
 
         // switch for random tree type
@@ -173,37 +180,37 @@ void TERRAIN::FOLIAGE::FOREST::spawnTrees(int treesAmount) {
 }
 
 void TERRAIN::FOLIAGE::FOREST::generate() {
-
     LOG::INFO("Starting Forest Generation");
 
+    SDL_Renderer* rend {SDL::WINDOW::rend};
+
     // initializing world tex if not already happen
+    LOG::INFO("Initialising World Tex");
+
+    GENERAL::worldTex = SDL_CreateTexture(
+        rend,
+        SDL_PIXELFORMAT_RGBA8888,
+        SDL_TEXTUREACCESS_TARGET,
+        SURFACE::mapSize.x * SURFACE::tileSize,
+        SURFACE::mapSize.y * SURFACE::tileSize);
+
     if (GENERAL::worldTex == nullptr) {
-        LOG::INFO("Initialising World Tex");
+        std::string err = SDL_GetError();
+        if (err.empty()) err = "Couldnt get error";
 
-        GENERAL::worldTex = SDL_CreateTexture(
-            window.rend,
-            SDL_PIXELFORMAT_RGBA8888,
-            SDL_TEXTUREACCESS_TARGET,
-            SURFACE::mapSize.x * SURFACE::tileSize,
-            SURFACE::mapSize.y * SURFACE::tileSize);
-
-        if (GENERAL::worldTex == nullptr) {
-            std::string err = SDL_GetError();
-            if (err.empty()) err = "Couldnt get error";
-
-            LOG::INIT_ERR("Couldnt init world Tex: " + err);
-            return;
-        }
-
-        // clear tex
-        SDL_SetTextureBlendMode(GENERAL::worldTex, SDL_BLENDMODE_BLEND);
-
-        SDL_SetRenderTarget(window.rend, GENERAL::worldTex);
-        SDL_SetRenderDrawColor(window.rend, 0, 0, 0, 0);
-        SDL_RenderClear(window.rend);
-
-        SDL_SetRenderTarget(window.rend, nullptr);
+        LOG::INIT_ERR("Couldnt init world Tex: " + err);
+        return;
     }
+
+    // clear tex
+    SDL_SetTextureBlendMode(GENERAL::worldTex, SDL_BLENDMODE_BLEND);
+
+    SDL_SetRenderTarget(rend, GENERAL::worldTex);
+    SDL_SetRenderDrawColor(rend, 0, 0, 0, 0);
+    SDL_RenderClear(rend);
+
+    SDL_SetRenderTarget(rend, nullptr);
+
 
     // clear all vectors
     forestTiles.clear();
@@ -218,7 +225,7 @@ void TERRAIN::FOLIAGE::FOREST::generate() {
         int y = static_cast<int>(TOOLBOX::randomFloat(0.0f, static_cast<float>(SURFACE::mapSize.y)));
 
         // draws floor
-        drawTiles(20, glm::ivec2(x, y), (SDL_Color){ 0, 125, 0, 155 }, forestTiles);
+        LOCAL::drawTiles(20, glm::ivec2(x, y), (SDL_Color){ 0, 125, 0, 155 }, forestTiles);
     }
 
     LOG::INFO("Spawned Forests");
@@ -227,74 +234,6 @@ void TERRAIN::FOLIAGE::FOREST::generate() {
 // |=====================|
 // |    Cotton Fields    |
 // |=====================|
-
-void TERRAIN::FOLIAGE::COTTON::drawTiles(
-    const int size,                     // size of the base
-    const glm::ivec2 pos,               // pos of the center of the base
-    const SDL_Color normalColor,        // color of the tiles
-    std::vector<SDL_Rect>& tiles        // vector to safe tiles to
-    ) {
-
-    SDL_Renderer* rend {window.rend};
-
-    for (int y = -size; y < size; y++) {
-        for (int x = -size; x < size; x++) {
-
-            float sqrt = std::sqrt(x * x + y * y);
-            if (sqrt > size) continue;
-
-            // cords + loop for perlin
-            glm::vec2 noiseCords {
-                pos.x + x,
-                pos.y + y
-            };
-
-            // aplay perlin to radius
-            float noise {glm::perlin(noiseCords * 0.06f)};
-            float radius {size + noise * 8.0f};
-
-            if (sqrt <= radius) {
-
-                glm::ivec2 kniga {noiseCords};
-
-                // safety check
-                if (kniga.x < 0 || kniga.x >= SURFACE::mapSize.x ||
-                    kniga.y < 0 || kniga.y >= SURFACE::mapSize.y)
-                    continue;
-
-                // check terrain type underneath
-                int index {kniga.x + kniga.y * SURFACE::mapSize.x};
-                if (SURFACE::map.at(index).type <= 2 || SURFACE::map.at(index).type >= 5) continue;
-
-                SDL_Rect drect {
-                    kniga.x * SURFACE::tileSize,
-                    kniga.y * SURFACE::tileSize,
-                    SURFACE::tileSize,
-                    SURFACE::tileSize
-                };
-
-                // check if theres already an forest tile
-                if (GENERAL::isUsed.at(index)) continue;
-
-                // push back vectors
-                GENERAL::isUsed.at(index) = true;
-                GENERAL::worldTileUsage.at(index) = true;
-                tiles.push_back(drect);
-
-                //
-                //  Draw
-                //
-
-                SDL_SetRenderTarget(rend, GENERAL::worldTex);
-
-                SDL_SetRenderDrawColor(rend, normalColor.r, normalColor.g, normalColor.b, normalColor.a);
-                SDL_RenderFillRect(rend, &drect);
-
-                SDL_SetRenderTarget(rend, nullptr);
-            }
-        }
-    }
-}
 
 void TERRAIN::FOLIAGE::COTTON::spawnCotton(int treesAmount) {
 
@@ -335,7 +274,7 @@ void TERRAIN::FOLIAGE::COTTON::spawnCotton(int treesAmount) {
         if (skip) continue;
 
         // set renderer
-        SDL_Renderer* rend {window.rend};
+        SDL_Renderer* rend {SDL::WINDOW::rend};
         SDL_SetRenderTarget(rend, GENERAL::worldTex);
 
         // switch for random tree type
@@ -352,7 +291,7 @@ void TERRAIN::FOLIAGE::COTTON::generate() {
 
     LOG::INFO("Starting cotton Generation");
 
-    SDL_Renderer* rend {window.rend};
+    SDL_Renderer* rend {SDL::WINDOW::rend};
 
     // initializing world tex if not already happen
     if (GENERAL::worldTex == nullptr) {
@@ -376,12 +315,12 @@ void TERRAIN::FOLIAGE::COTTON::generate() {
         // clear tex
         SDL_SetTextureBlendMode(GENERAL::worldTex, SDL_BLENDMODE_BLEND);
 
-        SDL_SetRenderTarget(window.rend, GENERAL::worldTex);
+        SDL_SetRenderTarget(rend, GENERAL::worldTex);
 
-        SDL_SetRenderDrawColor(window.rend, 0, 0, 0, 0);
-        SDL_RenderClear(window.rend);
+        SDL_SetRenderDrawColor(rend, 0, 0, 0, 0);
+        SDL_RenderClear(rend);
 
-        SDL_SetRenderTarget(window.rend, nullptr);
+        SDL_SetRenderTarget(rend, nullptr);
     }
 
     for (int i = 0; i < spawnRate; i++) {
@@ -391,7 +330,7 @@ void TERRAIN::FOLIAGE::COTTON::generate() {
         int y = static_cast<int>(TOOLBOX::randomFloat(0.0f, static_cast<float>(SURFACE::mapSize.y)));
 
         // draws floor
-        drawTiles(14, glm::ivec2(x, y), (SDL_Color){ 220, 220, 220, 155 }, cottonTiles);
+        LOCAL::drawTiles(14, glm::ivec2(x, y), (SDL_Color){ 220, 220, 220, 155 }, cottonTiles);
     }
 
     LOG::INFO("Done");
@@ -400,74 +339,6 @@ void TERRAIN::FOLIAGE::COTTON::generate() {
 // |==================|
 // |    Oil Fields    |
 // |==================|
-
-void TERRAIN::FOLIAGE::OIL::drawTiles(
-    const int size,                     // size of the base
-    const glm::ivec2 pos,               // pos of the center of the base
-    const SDL_Color normalColor,        // color of the tiles
-    std::vector<SDL_Rect>& tiles        // vector to safe tiles to
-    ) {
-
-    SDL_Renderer* rend {window.rend};
-
-    for (int y = -size; y < size; y++) {
-        for (int x = -size; x < size; x++) {
-
-            float sqrt = std::sqrt(x * x + y * y);
-            if (sqrt > size) continue;
-
-            // cords + loop for perlin
-            glm::vec2 noiseCords {
-                pos.x + x,
-                pos.y + y
-            };
-
-            // aplay perlin to radius
-            float noise {glm::perlin(noiseCords * 0.06f)};
-            float radius {size + noise * 8.0f};
-
-            if (sqrt <= radius) {
-
-                glm::ivec2 kniga {noiseCords};
-
-                // safety check
-                if (kniga.x < 0 || kniga.x >= SURFACE::mapSize.x ||
-                    kniga.y < 0 || kniga.y >= SURFACE::mapSize.y)
-                    continue;
-
-                // check terrain type underneath
-                int index {kniga.x + kniga.y * SURFACE::mapSize.x};
-                if (SURFACE::map.at(index).type <= 2 || SURFACE::map.at(index).type >= 5) continue;
-
-                SDL_Rect drect {
-                    kniga.x * SURFACE::tileSize,
-                    kniga.y * SURFACE::tileSize,
-                    SURFACE::tileSize,
-                    SURFACE::tileSize
-                };
-
-                // check if theres already an forest tile
-                if (GENERAL::isUsed.at(index)) continue;
-
-                // push back vectors
-                GENERAL::isUsed.at(index) = true;
-                GENERAL::worldTileUsage.at(index) = true;
-                tiles.push_back(drect);
-
-                //
-                //  Draw
-                //
-
-                SDL_SetRenderTarget(rend, GENERAL::worldTex);
-
-                SDL_SetRenderDrawColor(rend, normalColor.r, normalColor.g, normalColor.b, normalColor.a);
-                SDL_RenderFillRect(rend, &drect);
-
-                SDL_SetRenderTarget(rend, nullptr);
-            }
-        }
-    }
-}
 
 void TERRAIN::FOLIAGE::OIL::spawnOil(int treesAmount) {
 
@@ -505,7 +376,7 @@ void TERRAIN::FOLIAGE::OIL::spawnOil(int treesAmount) {
         if (skip) continue;
 
         // set renderer
-        SDL_Renderer* rend {window.rend};
+        SDL_Renderer* rend {SDL::WINDOW::rend};
         SDL_SetRenderTarget(rend, GENERAL::worldTex);
 
         // switch for random tree type
@@ -522,7 +393,7 @@ void TERRAIN::FOLIAGE::OIL::generate() {
 
     LOG::INFO("Starting oil Generation");
 
-    SDL_Renderer* rend {window.rend};
+    SDL_Renderer* rend {SDL::WINDOW::rend};
 
     // initializing world tex if not already happen
     if (GENERAL::worldTex == nullptr) {
@@ -546,12 +417,12 @@ void TERRAIN::FOLIAGE::OIL::generate() {
         // clear tex
         SDL_SetTextureBlendMode(GENERAL::worldTex, SDL_BLENDMODE_BLEND);
 
-        SDL_SetRenderTarget(window.rend, GENERAL::worldTex);
+        SDL_SetRenderTarget(rend, GENERAL::worldTex);
 
-        SDL_SetRenderDrawColor(window.rend, 0, 0, 0, 0);
-        SDL_RenderClear(window.rend);
+        SDL_SetRenderDrawColor(rend, 0, 0, 0, 0);
+        SDL_RenderClear(rend);
 
-        SDL_SetRenderTarget(window.rend, nullptr);
+        SDL_SetRenderTarget(rend, nullptr);
     }
 
     for (int i = 0; i < spawnRate; i++) {
@@ -561,7 +432,7 @@ void TERRAIN::FOLIAGE::OIL::generate() {
         int y = static_cast<int>(TOOLBOX::randomFloat(0.0f, static_cast<float>(SURFACE::mapSize.y)));
 
         // draws floor
-        drawTiles(8, glm::ivec2(x, y), (SDL_Color){ 40, 40, 40, 155 }, oilTiles);
+        LOCAL::drawTiles(8, glm::ivec2(x, y), (SDL_Color){ 40, 40, 40, 155 }, oilTiles);
     }
 
     LOG::INFO("Done");
@@ -570,74 +441,6 @@ void TERRAIN::FOLIAGE::OIL::generate() {
 // |===================|
 // |    Stony Areas    |
 // |===================|
-
-void TERRAIN::FOLIAGE::STONE::drawTiles(
-    const int size,                     // size of the base
-    const glm::ivec2 pos,               // pos of the center of the base
-    const SDL_Color normalColor,        // color of the tiles
-    std::vector<SDL_Rect>& tiles        // vector to safe tiles to
-    ) {
-
-    SDL_Renderer* rend {window.rend};
-
-    for (int y = -size; y < size; y++) {
-        for (int x = -size; x < size; x++) {
-
-            float sqrt = std::sqrt(x * x + y * y);
-            if (sqrt > size) continue;
-
-            // cords + loop for perlin
-            glm::vec2 noiseCords {
-                pos.x + x,
-                pos.y + y
-            };
-
-            // aplay perlin to radius
-            float noise {glm::perlin(noiseCords * 0.06f)};
-            float radius {size + noise * 8.0f};
-
-            if (sqrt <= radius) {
-
-                glm::ivec2 kniga {noiseCords};
-
-                // safety check
-                if (kniga.x < 0 || kniga.x >= SURFACE::mapSize.x ||
-                    kniga.y < 0 || kniga.y >= SURFACE::mapSize.y)
-                    continue;
-
-                // check terrain type underneath
-                int index {kniga.x + kniga.y * SURFACE::mapSize.x};
-                if (SURFACE::map.at(index).type <= 2 || SURFACE::map.at(index).type >= 5) continue;
-
-                SDL_Rect drect {
-                    kniga.x * SURFACE::tileSize,
-                    kniga.y * SURFACE::tileSize,
-                    SURFACE::tileSize,
-                    SURFACE::tileSize
-                };
-
-                // check if theres already an forest tile
-                if (GENERAL::isUsed.at(index)) continue;
-
-                // push back vectors
-                GENERAL::isUsed.at(index) = true;
-                GENERAL::worldTileUsage.at(index) = true;
-                tiles.push_back(drect);
-
-                //
-                //  Draw
-                //
-
-                SDL_SetRenderTarget(rend, GENERAL::worldTex);
-
-                SDL_SetRenderDrawColor(rend, normalColor.r, normalColor.g, normalColor.b, normalColor.a);
-                SDL_RenderFillRect(rend, &drect);
-
-                SDL_SetRenderTarget(rend, nullptr);
-            }
-        }
-    }
-}
 
 void TERRAIN::FOLIAGE::STONE::spawnStone(int stoneAmount) {
 
@@ -678,7 +481,7 @@ void TERRAIN::FOLIAGE::STONE::spawnStone(int stoneAmount) {
         if (skip) continue;
 
         // set renderer
-        SDL_Renderer* rend {window.rend};
+        SDL_Renderer* rend {SDL::WINDOW::rend};
         SDL_SetRenderTarget(rend, GENERAL::worldTex);
 
         // switch for random tree type
@@ -703,7 +506,7 @@ void TERRAIN::FOLIAGE::STONE::generate() {
 
     LOG::INFO("Starting stone generation");
 
-    SDL_Renderer* rend {window.rend};
+    SDL_Renderer* rend {SDL::WINDOW::rend};
 
     // initializing world tex if not already happen
     if (GENERAL::worldTex == nullptr) {
@@ -727,12 +530,12 @@ void TERRAIN::FOLIAGE::STONE::generate() {
         // clear tex
         SDL_SetTextureBlendMode(GENERAL::worldTex, SDL_BLENDMODE_BLEND);
 
-        SDL_SetRenderTarget(window.rend, GENERAL::worldTex);
+        SDL_SetRenderTarget(rend, GENERAL::worldTex);
 
-        SDL_SetRenderDrawColor(window.rend, 0, 0, 0, 0);
-        SDL_RenderClear(window.rend);
+        SDL_SetRenderDrawColor(rend, 0, 0, 0, 0);
+        SDL_RenderClear(rend);
 
-        SDL_SetRenderTarget(window.rend, nullptr);
+        SDL_SetRenderTarget(rend, nullptr);
     }
 
     spawnOnMountain();
@@ -744,7 +547,7 @@ void TERRAIN::FOLIAGE::STONE::generate() {
             TOOLBOX::randomInt(0, SURFACE::mapSize.y - 1),
         };
 
-        drawTiles(14, pos, (SDL_Color){255,125,125,125}, stoneTiles);
+        LOCAL::drawTiles(14, pos, (SDL_Color){255,125,125,125}, stoneTiles);
     }
 
     LOG::INFO("Done");

@@ -96,7 +96,7 @@ void UI::rightUiBar(SDL_Renderer *rend) {
     glm::ivec2 padding {5, 4};
 
     glm::ivec2 barPos {
-        window.scale.x - textWidth - 10,
+        SDL::WINDOW::scale.x - textWidth - 10,
         textHeight - 20
     };
 

@@ -24,17 +24,18 @@ namespace SDL {
     // texture will be loaded
     inline bool useStaticMaps {};
 
-    // Window data
-    struct Window {
+    namespace WINDOW {
 
-        SDL_Renderer* rend {};
+        inline SDL_Renderer* rend {};
+        inline SDL_Window* win {};
 
-        SDL_Window* win {};
-        const glm::ivec2 scale {1920, 1080};
-        const char* title {"Strategie Game"};
+        inline const glm::ivec2 scale {1920, 1080};
+        inline const char* title {"Strategie Game"};
+
+        inline SDL_Surface* icon {};
 
         int init();
-    };
+    }
 
     namespace MAIN {
 
@@ -144,7 +145,5 @@ namespace TERRITORY {
     void toolTip();
     void spawnTerritory(glm::vec2 pos, int size);
 }
-
-extern SDL::Window window;
 
 #endif //STRATEGIE_GAME_GENERALCLASSES_HPP

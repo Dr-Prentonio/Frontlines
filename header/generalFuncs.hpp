@@ -42,8 +42,8 @@ namespace TOOLBOX {
     inline glm::ivec2 findMousePos() {
         // default size of the tiles
         glm::vec2 defaultSize {
-            (static_cast<float>(window.scale.x) / TERRAIN::SURFACE::mapSize.x),
-            (static_cast<float>(window.scale.y) / TERRAIN::SURFACE::mapSize.y)
+            (static_cast<float>(SDL::WINDOW::scale.x) / TERRAIN::SURFACE::mapSize.x),
+            (static_cast<float>(SDL::WINDOW::scale.y) / TERRAIN::SURFACE::mapSize.y)
         };
         //        glm::vec2 currentSize = defaultSize * player.zoom;
 
@@ -89,8 +89,8 @@ namespace TOOLBOX {
     inline int findMouseIndex() {
         // default size of the tiles
         glm::vec2 defaultSize {
-            (static_cast<float>(window.scale.x) / TERRAIN::SURFACE::mapSize.x),
-            (static_cast<float>(window.scale.y) / TERRAIN::SURFACE::mapSize.y)
+            (static_cast<float>(SDL::WINDOW::scale.x) / TERRAIN::SURFACE::mapSize.x),
+            (static_cast<float>(SDL::WINDOW::scale.y) / TERRAIN::SURFACE::mapSize.y)
         };
         //        glm::vec2 currentSize = defaultSize * player.zoom;
 
@@ -195,8 +195,6 @@ namespace TOOLBOX {
         SDL_Texture *&levelCounterTexture   // tex of the level text
         ) {
 
-        SDL_Renderer *rend {window.rend};
-
         // transform int level -> sdl Texture
         std::string text {std::to_string(level)};
 
@@ -207,7 +205,7 @@ namespace TOOLBOX {
             {30, 30, 30, 255}
             )};
 
-        SDL_Texture *numberTex {SDL_CreateTextureFromSurface(rend, textSurface)};
+        SDL_Texture *numberTex {SDL_CreateTextureFromSurface(SDL::WINDOW::rend, textSurface)};
 
         // check if everything went right
         if (textSurface == nullptr or numberTex == nullptr) {
@@ -248,8 +246,6 @@ namespace TOOLBOX {
         SDL_Rect        &levelCounterRect,      // drect of the level textbox
         SDL_Texture     *&levelCounterTexture   // tex of the level text
         ) {
-
-        SDL_Renderer *rend  {window.rend};
         SDL_Texture *temp   {};
 
         // make new tex
@@ -261,7 +257,7 @@ namespace TOOLBOX {
             {30, 30, 30, 255}
             )};
 
-        temp = SDL_CreateTextureFromSurface(rend, textSurface);
+        temp = SDL_CreateTextureFromSurface(SDL::WINDOW::rend, textSurface);
 
         if (temp == nullptr or textSurface == nullptr) {
             LOG::ERR("Couldnt create level Texture");
@@ -364,7 +360,7 @@ namespace TOOLBOX {
         SDL_Texture*& goalTex   // the lod texture
         ) {
 
-        SDL_Renderer* rend {window.rend};
+        SDL_Renderer* rend {SDL::WINDOW::rend};
 
         int originalWidth {}, originalHeight {};
         SDL_QueryTexture(refTex, nullptr, nullptr, &originalWidth, &originalHeight);
@@ -460,10 +456,8 @@ namespace TOOLBOX {
     // |=================================================|
 
     inline int loadTexture(SDL_Texture*& tex, const std::string& path) {
-        SDL_Renderer* rend {window.rend};
-
         SDL_Surface* tempSurf = IMG_Load(path.c_str());
-        tex = SDL_CreateTextureFromSurface(rend, tempSurf);
+        tex = SDL_CreateTextureFromSurface(SDL::WINDOW::rend, tempSurf);
 
         if (tex == nullptr) {
             std::string err = SDL_GetError();

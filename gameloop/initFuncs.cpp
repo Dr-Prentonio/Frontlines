@@ -5,7 +5,7 @@
 #include "../header/UIClasses.hpp"
 #include "../header/debugLogging.hpp"
 
-int SDL::Window::init() {
+int SDL::WINDOW::init() {
 
     // SDL INIT
     LOG::INIT_SUCCESS("Begin SDL init");
@@ -29,7 +29,7 @@ int SDL::Window::init() {
         return -1;
     }
 
-    SDL_Surface* icon = IMG_Load("knigaCar.jpg");
+    icon = IMG_Load("knigaCar.jpg");
 
     if (icon == nullptr) {
         std::string err = SDL_GetError();
